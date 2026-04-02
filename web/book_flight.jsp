@@ -11,7 +11,7 @@
     int flightId = Integer.parseInt(flightIdStr);
     int numSeats = (numSeatsStr != null) ? Integer.parseInt(numSeatsStr) : 1;
 
-    String flightNo = "", source = "", destination = "", departDate = "", departTime = "", arrivalTime = "";
+    String flightNo="", source="", destination="", departDate="", departTime="", arrivalTime="";
     double price = 0;
     int seatsAvailable = 0;
 
@@ -20,220 +20,84 @@
         ps.setInt(1, flightId);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            flightNo      = rs.getString("flight_no");
-            source        = rs.getString("source");
-            destination   = rs.getString("destination");
-            departDate    = rs.getString("depart_date");
-            departTime    = rs.getString("depart_time");
-            arrivalTime   = rs.getString("arrival_time");
-            price         = rs.getDouble("price");
+            flightNo       = rs.getString("flight_no");
+            source         = rs.getString("source");
+            destination    = rs.getString("destination");
+            departDate     = rs.getString("depart_date");
+            departTime     = rs.getString("depart_time");
+            arrivalTime    = rs.getString("arrival_time");
+            price          = rs.getDouble("price");
             seatsAvailable = rs.getInt("seats_available");
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+    } catch (Exception e) { e.printStackTrace(); }
 
     double totalAmount = price * numSeats;
 %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Book Flight - SkyConnect</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; color: #222; }
-
-        /* NAVBAR */
-        .navbar {
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            padding: 14px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-        }
-        .navbar .brand { color: #fff; font-size: 22px; font-weight: 700; text-decoration: none; }
-        .nav-links a {
-            color: #fff; text-decoration: none; margin-left: 22px;
-            font-size: 14px; font-weight: 500; opacity: 0.9;
-        }
-        .nav-links a:hover { opacity: 1; text-decoration: underline; }
-
-        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
-
-        /* CARD */
-        .card {
-            background: #fff;
-            border-radius: 18px;
-            padding: 36px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
-        }
-        .card h2 {
-            font-size: 22px;
-            color: #1a56db;
-            font-weight: 700;
-            margin-bottom: 24px;
-        }
-
-        /* FLIGHT SUMMARY BOX */
-        .flight-summary {
-            background: linear-gradient(120deg, #eef4ff, #f0faff);
-            border: 1.5px solid #c7d9ff;
-            border-radius: 14px;
-            padding: 22px 26px;
-            margin-bottom: 28px;
-        }
-        .flight-summary .route {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a56db;
-            margin-bottom: 14px;
-        }
-        .flight-summary .route span { color: #0ea5e9; margin: 0 10px; }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .info-item label {
-            display: block;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #888;
-            margin-bottom: 3px;
-        }
-        .info-item span {
-            font-size: 15px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        /* DIVIDER */
-        .divider {
-            border: none;
-            border-top: 1.5px solid #eef0f8;
-            margin: 24px 0;
-        }
-
-        /* FARE SUMMARY */
-        .fare-box {
-            background: #f8faff;
-            border-radius: 12px;
-            padding: 18px 22px;
-            margin-bottom: 28px;
-        }
-        .fare-box h4 {
-            font-size: 15px;
-            font-weight: 700;
-            color: #444;
-            margin-bottom: 12px;
-        }
-        .fare-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 8px;
-        }
-        .fare-row.total {
-            font-size: 18px;
-            font-weight: 700;
-            color: #059669;
-            border-top: 1.5px dashed #d1d9f0;
-            padding-top: 10px;
-            margin-top: 6px;
-        }
-
-        /* FORM */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 18px;
-        }
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 6px;
-        }
-        .form-group input, .form-group select {
-            padding: 11px 14px;
-            border: 1.5px solid #d1d9f0;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-            background: #fafbff;
-        }
-        .form-group input:focus, .form-group select:focus {
-            border-color: #1a56db;
-            background: #fff;
-        }
-
-        /* SEATS WARNING */
-        .seats-info {
-            font-size: 13px;
-            color: #d97706;
-            background: #fffbeb;
-            border: 1px solid #fcd34d;
-            border-radius: 8px;
-            padding: 8px 14px;
-            margin-bottom: 18px;
-        }
-
-        /* BUTTON */
-        .btn-confirm {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-        .btn-confirm:hover { opacity: 0.92; transform: translateY(-1px); }
-
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 16px;
-            font-size: 13px;
-            color: #1a56db;
-            text-decoration: none;
-        }
-        .back-link:hover { text-decoration: underline; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Booking – SkyConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
 
-<!-- NAVBAR -->
+<div class="page-bg"></div>
+<div class="stars-layer" id="stars"></div>
+
 <nav class="navbar">
-    <a href="userDashboard" class="brand">✈ SkyConnect</a>
+    <a href="userDashboard" class="nav-brand">
+        <div class="brand-icon">✈</div>
+        <span class="brand-name">Sky<span>Connect</span></span>
+    </a>
     <div class="nav-links">
-        <a href="userDashboard">Dashboard</a>
-        <a href="search_flights.jsp">Search</a>
-        <a href="userBookings">My Bookings</a>
-        <a href="logout">Logout</a>
+        <a href="userDashboard" class="nav-link">Dashboard</a>
+        <a href="search_flights.jsp" class="nav-link">Search</a>
+        <a href="userBookings" class="nav-link">My Bookings</a>
+        <a href="logout" class="nav-link btn-danger">Logout</a>
     </div>
 </nav>
 
-<div class="container">
-    <div class="card">
-        <h2>✈ Confirm Your Booking</h2>
+<div class="page-wrapper narrow">
 
-        <!-- FLIGHT SUMMARY -->
-        <div class="flight-summary">
-            <div class="route">
-                <%= source %> <span>→</span> <%= destination %>
+    <!-- STEPS -->
+    <div class="steps">
+        <div class="step done"><div class="step-circle">✓</div><div class="step-label">Search</div></div>
+        <div class="step-line done"></div>
+        <div class="step active"><div class="step-circle">2</div><div class="step-label">Confirm</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-circle">3</div><div class="step-label">Passengers</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-circle">4</div><div class="step-label">Payment</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-circle">5</div><div class="step-label">Ticket</div></div>
+    </div>
+
+    <div class="card card-top-line">
+        <div class="card-pad">
+            <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:22px;">✈ Confirm Your Booking</h2>
+
+            <!-- ROUTE STRIP -->
+            <div class="route-strip" style="border-radius:12px;margin-bottom:20px;">
+                <div class="route-city">
+                    <div class="city"><%= source %></div>
+                    <div class="label">Origin</div>
+                </div>
+                <div class="route-arrow">✈</div>
+                <div class="route-city">
+                    <div class="city"><%= destination %></div>
+                    <div class="label">Destination</div>
+                </div>
             </div>
-            <div class="info-grid">
+
+            <!-- INFO GRID -->
+            <div class="info-grid" style="margin-bottom:20px;">
                 <div class="info-item">
-                    <label>Flight No</label>
-                    <span><%= flightNo %></span>
+                    <label>Flight No.</label>
+                    <span style="color:var(--sky-glow)"><%= flightNo %></span>
                 </div>
                 <div class="info-item">
                     <label>Date</label>
@@ -245,7 +109,7 @@
                 </div>
                 <div class="info-item">
                     <label>Arrival</label>
-                    <span><%= arrivalTime != null && !arrivalTime.isEmpty() ? arrivalTime : "-" %></span>
+                    <span><%= (arrivalTime != null && !arrivalTime.isEmpty()) ? arrivalTime : "—" %></span>
                 </div>
                 <div class="info-item">
                     <label>Seats Available</label>
@@ -256,62 +120,67 @@
                     <span>₹ <%= String.format("%.2f", price) %></span>
                 </div>
             </div>
+
+            <% if (seatsAvailable < numSeats) { %>
+            <div class="alert alert-warning">⚠ Only <%= seatsAvailable %> seat(s) available. Please reduce seat count.</div>
+            <% } %>
+
+            <!-- FARE SUMMARY -->
+            <div class="fare-box">
+                <div class="section-label" style="margin-bottom:12px;">💰 Fare Summary</div>
+                <div class="fare-row">
+                    <span>Price per Seat</span>
+                    <span>₹ <%= String.format("%.2f", price) %></span>
+                </div>
+                <div class="fare-row">
+                    <span>Number of Seats</span>
+                    <span id="seatsDisplay"><%= numSeats %></span>
+                </div>
+                <div class="fare-row total">
+                    <span>Total Amount</span>
+                    <span id="totalDisplay">₹ <%= String.format("%.2f", totalAmount) %></span>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <form action="bookFlight" method="post">
+                <input type="hidden" name="flightId" value="<%= flightId %>">
+                <div class="field" style="margin-bottom:18px;">
+                    <label>Number of Seats</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">💺</span>
+                        <input type="number" name="numSeats"
+                               min="1" max="<%= seatsAvailable %>"
+                               value="<%= numSeats %>" required
+                               oninput="updateTotal(this.value)">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-blue btn-lg" <%= seatsAvailable == 0 ? "disabled style='opacity:.5;cursor:not-allowed'" : "" %>>
+                    ✅ Confirm Booking →
+                </button>
+            </form>
+
+            <a href="javascript:history.back()" style="display:block;text-align:center;margin-top:14px;font-size:.85rem;color:var(--muted);text-decoration:none;">← Back to Results</a>
         </div>
-
-        <% if (seatsAvailable < numSeats) { %>
-        <div class="seats-info">
-            ⚠️ Only <%= seatsAvailable %> seat(s) available. Please reduce your seat count.
-        </div>
-        <% } %>
-
-        <!-- FARE SUMMARY -->
-        <div class="fare-box">
-            <h4>💰 Fare Summary</h4>
-            <div class="fare-row">
-                <span>Price per Seat</span>
-                <span>₹ <%= String.format("%.2f", price) %></span>
-            </div>
-            <div class="fare-row">
-                <span>Number of Seats</span>
-                <span><%= numSeats %></span>
-            </div>
-            <div class="fare-row total">
-                <span>Total Amount</span>
-                <span>₹ <%= String.format("%.2f", totalAmount) %></span>
-            </div>
-        </div>
-
-        <hr class="divider">
-
-        <!-- BOOKING FORM -->
-        <form action="bookFlight" method="post">
-            <input type="hidden" name="flightId" value="<%= flightId %>">
-
-            <div class="form-group">
-                <label>Number of Seats</label>
-                <input type="number" name="numSeats"
-                       min="1" max="<%= seatsAvailable %>"
-                       value="<%= numSeats %>" required
-                       oninput="updateTotal(this.value)">
-            </div>
-
-            <button type="submit" class="btn-confirm"
-                    <%= seatsAvailable == 0 ? "disabled" : "" %>>
-                ✅ Confirm Booking
-            </button>
-        </form>
-
-        <a href="search_flights.jsp" class="back-link">← Back to Search</a>
     </div>
+
 </div>
 
 <script>
+const pricePerSeat = <%= price %>;
 function updateTotal(seats) {
-    const price = <%= price %>;
-    const total = (price * seats).toFixed(2);
-    // optionally update a live total display if added
+    const n = Math.max(1, parseInt(seats) || 1);
+    document.getElementById('seatsDisplay').textContent = n;
+    document.getElementById('totalDisplay').textContent = '₹ ' + (pricePerSeat * n).toFixed(2);
+}
+const s = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+    const el = document.createElement('div'); el.className = 'star';
+    const sz = Math.random() * 2 + .5;
+    el.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.3+Math.random()*.5};`;
+    s.appendChild(el);
 }
 </script>
-
 </body>
 </html>
