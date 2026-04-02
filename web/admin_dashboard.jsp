@@ -1,378 +1,257 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.util.List, java.util.Map" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
-    ResultSet refund = (ResultSet) request.getAttribute("refund");
-    String refundId      = "";
-    String bookingId     = "";
-    String flightNo      = "";
-    String source        = "";
-    String destination   = "";
-    String flightDate    = "";
-    String departTime    = "";
-    String refundAmount  = "";
-    String status        = "";
-    String requestedAt   = "";
-    String processedAt   = "";
-    String paymentMethod = "";
-    String passengerCount = "";
-    try {
-        if (refund != null && refund.next()) {
-            refundId       = String.valueOf(refund.getObject("refund_id")     != null ? refund.getObject("refund_id")     : "");
-            bookingId      = String.valueOf(refund.getObject("booking_id")    != null ? refund.getObject("booking_id")    : "");
-            flightNo       = String.valueOf(refund.getObject("flight_no")     != null ? refund.getObject("flight_no")     : "");
-            source         = String.valueOf(refund.getObject("source")        != null ? refund.getObject("source")        : "");
-            destination    = String.valueOf(refund.getObject("destination")   != null ? refund.getObject("destination")   : "");
-            flightDate     = String.valueOf(refund.getObject("flight_date")   != null ? refund.getObject("flight_date")   : "");
-            departTime     = String.valueOf(refund.getObject("depart_time")   != null ? refund.getObject("depart_time")   : "");
-            refundAmount   = String.valueOf(refund.getObject("refund_amount") != null ? refund.getObject("refund_amount") : "0");
-            status         = String.valueOf(refund.getObject("status")        != null ? refund.getObject("status")        : "pending");
-            requestedAt    = String.valueOf(refund.getObject("requested_at")  != null ? refund.getObject("requested_at")  : "");
-            processedAt    = String.valueOf(refund.getObject("processed_at")  != null ? refund.getObject("processed_at")  : "—");
-            paymentMethod  = String.valueOf(refund.getObject("payment_method")!= null ? refund.getObject("payment_method"): "");
-            passengerCount = String.valueOf(refund.getObject("passenger_count")!=null ? refund.getObject("passenger_count"): "");
-        }
-    } catch (Exception e) { e.printStackTrace(); }
+    String userRole = (String) session.getAttribute("userRole");
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect("login.jsp"); return; }
 
-    String badgeClass = "badge-pending";
-    if (status.equalsIgnoreCase("approved"))  badgeClass = "badge-approved";
-    else if (status.equalsIgnoreCase("refunded"))  badgeClass = "badge-refunded";
-    else if (status.equalsIgnoreCase("rejected"))  badgeClass = "badge-rejected";
+    Integer totalFlights  = (Integer) request.getAttribute("totalFlights");
+    Integer totalBookings = (Integer) request.getAttribute("totalBookings");
+    Integer totalUsers    = (Integer) request.getAttribute("totalUsers");
+    Double  totalRevenue  = (Double)  request.getAttribute("totalRevenue");
+    Integer pendingRefunds= (Integer) request.getAttribute("pendingRefunds");
+    List<com.skyconnect.servlet.AdminDashboardServlet.RecentBooking> recentBookings =
+        (List<com.skyconnect.servlet.AdminDashboardServlet.RecentBooking>) request.getAttribute("recentBookings");
 
-    double amount = 0;
-    try { amount = Double.parseDouble(refundAmount); } catch (Exception e) {}
+    if (totalFlights  == null) totalFlights  = 0;
+    if (totalBookings == null) totalBookings = 0;
+    if (totalUsers    == null) totalUsers    = 0;
+    if (totalRevenue  == null) totalRevenue  = 0.0;
+    if (pendingRefunds== null) pendingRefunds= 0;
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Refund Receipt – SkyConnect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – SkyConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; color: #222; }
-
-        .navbar {
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            padding: 14px 32px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .stat-card {
+            background: rgba(13,20,39,.7); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px 20px;
+            animation: fadeUp .5s ease both;
+            transition: border-color .2s, transform .2s;
+            position: relative; overflow: hidden;
         }
-        .navbar .brand { color: #fff; font-size: 22px; font-weight: 700; text-decoration: none; }
-        .nav-links a { color: #fff; text-decoration: none; margin-left: 22px; font-size: 14px; font-weight: 500; opacity: 0.9; }
-        .nav-links a:hover { opacity: 1; text-decoration: underline; }
-
-        .container { max-width: 680px; margin: 40px auto; padding: 0 16px; }
-
-        .page-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 24px;
+        .stat-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(0,87,255,.08) 0%, transparent 70%);
+            pointer-events: none;
         }
-        .page-header h1 { font-size: 22px; font-weight: 700; color: #1a56db; }
-        .page-header p  { font-size: 13px; color: #6b7280; margin-top: 2px; }
+        .stat-card:hover { border-color: var(--border-glow); transform: translateY(-3px); }
+        .stat-icon { font-size: 2rem; margin-bottom: 12px; }
+        .stat-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+        .stat-value { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--white); margin-top: 4px; }
+        .stat-value.gold { color: var(--gold); }
+        .stat-value.danger { color: var(--danger); }
 
-        .btn-back {
-            padding: 9px 20px;
-            background: #e5e7eb; color: #374151;
-            border-radius: 10px; font-weight: 600; font-size: 13px;
-            text-decoration: none; display: inline-block;
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 32px; }
+        .qa-btn {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(13,20,39,.7); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 20px;
+            text-decoration: none; color: var(--white);
+            font-weight: 600; font-size: .9rem;
+            transition: all .2s; animation: fadeUp .5s ease both;
         }
-        .btn-back:hover { background: #d1d5db; }
+        .qa-btn:hover { border-color: var(--sky-glow); background: rgba(0,87,255,.12); transform: translateY(-2px); }
+        .qa-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .qa-icon.blue   { background: rgba(0,87,255,.2); }
+        .qa-icon.gold   { background: rgba(255,184,0,.15); }
+        .qa-icon.green  { background: rgba(16,185,129,.15); }
+        .qa-icon.purple { background: rgba(139,92,246,.15); }
 
-        .receipt-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.08);
-            overflow: hidden;
+        .recent-table { width: 100%; border-collapse: collapse; }
+        .recent-table thead th {
+            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--muted); padding: 10px 16px; border-bottom: 1px solid var(--border);
+            text-align: left;
         }
+        .recent-table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border); font-size: .875rem; }
+        .recent-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+        .recent-table tbody tr:last-child td { border-bottom: none; }
 
-        /* Header strip */
-        .receipt-header {
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            padding: 28px 32px;
-            color: #fff;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .receipt-header .rh-left h2 { font-size: 20px; font-weight: 700; }
-        .receipt-header .rh-left p  { font-size: 13px; opacity: 0.85; margin-top: 4px; }
-        .receipt-header .rh-right { text-align: right; }
-        .receipt-header .rh-right .amount { font-size: 32px; font-weight: 800; }
-        .receipt-header .rh-right .amount-label { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-
-        .badge {
-            display: inline-block; padding: 5px 16px;
-            border-radius: 20px; font-size: 13px; font-weight: 700;
-        }
-        .badge-pending  { background: #fef9c3; color: #854d0e; }
-        .badge-approved { background: #d1fae5; color: #065f46; }
-        .badge-refunded { background: #dbeafe; color: #1e40af; }
-        .badge-rejected { background: #fee2e2; color: #991b1b; }
-
-        /* Route strip */
-        .route-strip {
-            display: flex; align-items: center; justify-content: center;
-            gap: 12px; padding: 22px 32px;
-            background: #f8faff; border-bottom: 1.5px solid #eef4ff;
-        }
-        .route-city { text-align: center; }
-        .route-city .city-code { font-size: 28px; font-weight: 800; color: #1a56db; }
-        .route-city .city-name { font-size: 12px; color: #6b7280; margin-top: 2px; }
-        .route-line {
-            flex: 1; display: flex; align-items: center; gap: 6px;
-            flex-direction: column;
-        }
-        .route-line .plane { font-size: 22px; }
-        .route-line .line {
-            width: 100%; height: 2px;
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            border-radius: 2px;
-        }
-        .route-line .flight-no { font-size: 11px; color: #6b7280; font-weight: 600; }
-
-        /* Info grid */
-        .info-body { padding: 28px 32px; }
-
-        .section-title {
-            font-size: 13px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.7px; color: #1a56db;
-            border-bottom: 2px solid #eef4ff; padding-bottom: 8px;
-            margin-bottom: 18px;
-        }
-
-        .info-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 16px; margin-bottom: 28px;
-        }
-        .info-item .item-label { font-size: 12px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
-        .info-item .item-value { font-size: 15px; font-weight: 600; color: #111; margin-top: 4px; }
-
-        .divider { border: none; border-top: 1.5px solid #eef4ff; margin: 4px 0 24px 0; }
-
-        /* Amount breakdown */
-        .amount-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
-        .amount-table td { padding: 11px 0; border-bottom: 1px solid #f0f4ff; font-size: 14px; }
-        .amount-table td:last-child { text-align: right; font-weight: 600; }
-        .amount-table .total-row td { font-size: 16px; font-weight: 800; color: #1a56db; border-bottom: none; padding-top: 14px; }
-
-        /* Status timeline */
-        .timeline { display: flex; flex-direction: column; gap: 14px; margin-bottom: 8px; }
-        .timeline-item { display: flex; align-items: flex-start; gap: 14px; }
-        .tl-dot {
-            width: 14px; height: 14px; border-radius: 50%; margin-top: 3px; flex-shrink: 0;
-            background: #d1fae5; border: 3px solid #065f46;
-        }
-        .tl-dot.inactive { background: #f3f4f6; border-color: #d1d5db; }
-        .tl-content .tl-title { font-size: 14px; font-weight: 600; color: #111; }
-        .tl-content .tl-time  { font-size: 12px; color: #9ca3af; margin-top: 2px; }
-
-        /* Action buttons */
-        .action-row {
-            display: flex; gap: 12px; padding: 0 32px 28px 32px;
-        }
-        .btn-print {
-            flex: 1; padding: 12px;
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            color: #fff; border: none; border-radius: 10px;
-            font-size: 14px; font-weight: 700; cursor: pointer;
-        }
-        .btn-print:hover { opacity: 0.9; }
-        .btn-bookings {
-            flex: 1; padding: 12px;
-            background: #e5e7eb; color: #374151;
-            border: none; border-radius: 10px;
-            font-size: 14px; font-weight: 600; cursor: pointer;
-            text-decoration: none; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-bookings:hover { background: #d1d5db; }
-
-        .not-found {
-            text-align: center; padding: 64px 24px;
-        }
-        .not-found .icon { font-size: 52px; margin-bottom: 16px; }
-        .not-found h3 { font-size: 18px; font-weight: 700; color: #374151; }
-        .not-found p  { font-size: 14px; color: #9ca3af; margin-top: 8px; }
-
-        @media print {
-            .navbar, .page-header, .action-row { display: none !important; }
-            body { background: #fff; }
-            .container { margin: 0; max-width: 100%; }
-            .receipt-card { box-shadow: none; border: 1px solid #ddd; }
-        }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+        .badge-paid     { background: rgba(16,185,129,.15); color: #10B981; }
+        .badge-pending  { background: rgba(245,158,11,.15); color: #F59E0B; }
+        .badge-cancelled{ background: rgba(239,68,68,.15);  color: #EF4444; }
+        .badge-booked   { background: rgba(139,92,246,.15); color: #8B5CF6; }
+        .badge-refunded { background: rgba(0,87,255,.15);   color: var(--sky-glow); }
     </style>
 </head>
 <body>
+<div class="page-bg"></div>
+<div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a class="brand" href="index.jsp">✈ SkyConnect</a>
+    <a href="adminDashboard" class="nav-brand">
+        <div class="brand-icon">✈</div>
+        <span class="brand-name">Sky<span>Connect</span> <span style="font-size:.7rem;color:var(--gold);font-weight:600;margin-left:6px;vertical-align:middle;">ADMIN</span></span>
+    </a>
     <div class="nav-links">
-        <a href="index.jsp">Home</a>
-        <a href="userDashboard">Dashboard</a>
-        <a href="search_flights.jsp">Search</a>
-        <a href="userBookings">My Bookings</a>
-        <a href="userRefundHistory">My Refunds</a>
-        <a href="profile">Profile</a>
-        <a href="logout">Logout</a>
+        <a href="adminDashboard"   class="nav-link active">Dashboard</a>
+        <a href="adminFlights"     class="nav-link">Flights</a>
+        <a href="adminBookings"    class="nav-link">Bookings</a>
+        <a href="adminRefunds"     class="nav-link">Refunds</a>
+        <a href="reports.jsp"      class="nav-link">Reports</a>
+        <a href="logout"           class="nav-link btn-primary">Logout</a>
     </div>
 </nav>
 
-<div class="container">
-
-    <div class="page-header">
+<div class="page-wrapper">
+    <div class="page-header" style="animation: fadeUp .4s ease both;">
         <div>
-            <h1>🧾 Refund Receipt</h1>
-            <p>Official refund confirmation from SkyConnect</p>
+            <h1 class="page-title">🛠 Admin Dashboard</h1>
+            <p class="page-subtitle">Welcome back, <%= userName %> — here's what's happening today</p>
         </div>
-        <a href="<%= request.getContextPath() %>/userRefundHistory" class="btn-back">← My Refunds</a>
+        <a href="admin_add_flight.jsp" class="btn btn-blue">+ Add New Flight</a>
     </div>
 
-    <% if (refundId.isEmpty()) { %>
-        <div class="receipt-card">
-            <div class="not-found">
-                <div class="icon">❌</div>
-                <h3>Refund Not Found</h3>
-                <p>The requested refund receipt could not be located.</p>
+    <!-- STAT CARDS -->
+    <div class="admin-grid">
+        <div class="stat-card" style="animation-delay:.05s">
+            <div class="stat-icon">✈</div>
+            <div class="stat-label">Total Flights</div>
+            <div class="stat-value"><%= totalFlights %></div>
+        </div>
+        <div class="stat-card" style="animation-delay:.10s">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value"><%= totalBookings %></div>
+        </div>
+        <div class="stat-card" style="animation-delay:.15s">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Registered Users</div>
+            <div class="stat-value"><%= totalUsers %></div>
+        </div>
+        <div class="stat-card" style="animation-delay:.20s">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value gold">₹<%= String.format("%,.0f", totalRevenue) %></div>
+        </div>
+        <div class="stat-card" style="animation-delay:.25s">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-label">Pending Refunds</div>
+            <div class="stat-value <%= pendingRefunds > 0 ? "danger" : "" %>"><%= pendingRefunds %></div>
+        </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card" style="margin-bottom:28px;animation:fadeUp .5s .3s ease both;opacity:0;animation-fill-mode:forwards;">
+        <div class="card-header">
+            <span class="card-title">⚡ Quick Actions</span>
+        </div>
+        <div style="padding: 20px;">
+            <div class="quick-actions">
+                <a href="admin_add_flight.jsp" class="qa-btn" style="animation-delay:.35s">
+                    <div class="qa-icon blue">➕</div>
+                    <div><div style="font-weight:700;">Add Flight</div><div style="font-size:.75rem;color:var(--muted);">Schedule new route</div></div>
+                </a>
+                <a href="adminFlights" class="qa-btn" style="animation-delay:.40s">
+                    <div class="qa-icon gold">✈</div>
+                    <div><div style="font-weight:700;">Manage Flights</div><div style="font-size:.75rem;color:var(--muted);">Edit or remove flights</div></div>
+                </a>
+                <a href="adminBookings" class="qa-btn" style="animation-delay:.45s">
+                    <div class="qa-icon green">📋</div>
+                    <div><div style="font-weight:700;">View Bookings</div><div style="font-size:.75rem;color:var(--muted);">All booking records</div></div>
+                </a>
+                <a href="adminRefunds" class="qa-btn" style="animation-delay:.50s">
+                    <div class="qa-icon purple">💸</div>
+                    <div><div style="font-weight:700;">Refund Requests</div><div style="font-size:.75rem;color:var(--muted);"><%= pendingRefunds %> pending</div></div>
+                </a>
+                <a href="reports.jsp" class="qa-btn" style="animation-delay:.55s">
+                    <div class="qa-icon blue">📊</div>
+                    <div><div style="font-weight:700;">Reports</div><div style="font-size:.75rem;color:var(--muted);">Analytics & exports</div></div>
+                </a>
             </div>
         </div>
-    <% } else { %>
+    </div>
 
-    <div class="receipt-card">
-
-        <!-- Header -->
-        <div class="receipt-header">
-            <div class="rh-left">
-                <h2>Refund Receipt</h2>
-                <p>Refund ID: #<%= refundId %> &nbsp;|&nbsp; Booking ID: #<%= bookingId %></p>
-                <br>
-                <span class="badge <%= badgeClass %>">
-                    <%= status.substring(0,1).toUpperCase() + status.substring(1).toLowerCase() %>
-                </span>
-            </div>
-            <div class="rh-right">
-                <div class="amount">₹<%= String.format("%,.2f", amount) %></div>
-                <div class="amount-label">Refund Amount</div>
-            </div>
+    <!-- RECENT BOOKINGS -->
+    <div class="card" style="animation:fadeUp .5s .4s ease both;opacity:0;animation-fill-mode:forwards;">
+        <div class="card-header">
+            <span class="card-title">🕐 Recent Bookings</span>
+            <a href="adminBookings" class="btn btn-ghost btn-sm">View All →</a>
         </div>
-
-        <!-- Route Strip -->
-        <div class="route-strip">
-            <div class="route-city">
-                <div class="city-code"><%= source.length() >= 3 ? source.substring(0,3).toUpperCase() : source.toUpperCase() %></div>
-                <div class="city-name"><%= source %></div>
-            </div>
-            <div class="route-line">
-                <div class="plane">✈</div>
-                <div class="line"></div>
-                <div class="flight-no"><%= flightNo %></div>
-            </div>
-            <div class="route-city">
-                <div class="city-code"><%= destination.length() >= 3 ? destination.substring(0,3).toUpperCase() : destination.toUpperCase() %></div>
-                <div class="city-name"><%= destination %></div>
-            </div>
-        </div>
-
-        <div class="info-body">
-
-            <!-- Flight Details -->
-            <p class="section-title">Flight Details</p>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="item-label">Flight Number</div>
-                    <div class="item-value"><%= flightNo %></div>
+        <div style="overflow-x:auto;">
+            <% if (recentBookings == null || recentBookings.isEmpty()) { %>
+                <div style="text-align:center;padding:60px 24px;color:var(--muted);">
+                    <div style="font-size:3rem;margin-bottom:12px;">📋</div>
+                    <p>No bookings yet</p>
                 </div>
-                <div class="info-item">
-                    <div class="item-label">Flight Date</div>
-                    <div class="item-value"><%= flightDate %></div>
-                </div>
-                <div class="info-item">
-                    <div class="item-label">Departure Time</div>
-                    <div class="item-value"><%= departTime %></div>
-                </div>
-                <div class="info-item">
-                    <div class="item-label">Passengers</div>
-                    <div class="item-value"><%= passengerCount %> Pax</div>
-                </div>
-            </div>
+            <% } else { %>
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Passenger</th>
+                        <th>Flight</th>
+                        <th>Route</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+<% int ri = 0; for (com.skyconnect.servlet.AdminDashboardServlet.RecentBooking b : recentBookings) { ri++; %>
 
-            <hr class="divider">
+<tr style="animation:fadeUp .4s <%= ri * 0.06 %>s ease both;opacity:0;animation-fill-mode:forwards;">
 
-            <!-- Refund Breakdown -->
-            <p class="section-title">Refund Breakdown</p>
-            <%
-                double gst    = amount - (amount / 1.05);
-                double base   = amount / 1.05;
-            %>
-            <table class="amount-table">
-                <tr>
-                    <td>Base Fare Refund</td>
-                    <td>₹<%= String.format("%,.2f", base) %></td>
-                </tr>
-                <tr>
-                    <td>GST (5%) Refund</td>
-                    <td>₹<%= String.format("%,.2f", gst) %></td>
-                </tr>
-                <tr>
-                    <td style="color:#6b7280; font-size:13px;">Payment Method</td>
-                    <td style="color:#6b7280; font-size:13px;"><%= paymentMethod %></td>
-                </tr>
-                <tr class="total-row">
-                    <td>Total Refund Amount</td>
-                    <td>₹<%= String.format("%,.2f", amount) %></td>
-                </tr>
+    <td>#<%= b.bookingId %></td>
+
+    <td><%= b.userName %></td>
+
+    <td><%= b.flightNo %></td>
+
+    <td>
+        <span style="color:var(--gold)">
+            <%= b.source.length() >= 3 ? b.source.substring(0,3).toUpperCase() : b.source %>
+        </span>
+        →
+        <span style="color:var(--sky-glow)">
+            <%= b.destination.length() >= 3 ? b.destination.substring(0,3).toUpperCase() : b.destination %>
+        </span>
+    </td>
+
+    <td><%= b.bookingDate %></td>
+
+    <td>₹<%= String.format("%,.0f", b.totalAmount) %></td>
+
+    <td>
+        <span class="badge badge-<%= b.paymentStatus.toLowerCase() %>">
+            <%= b.paymentStatus %>
+        </span>
+    </td>
+
+    <td>
+        <a href="viewInvoice?bookingId=<%= b.bookingId %>" class="btn btn-ghost btn-sm">
+            Invoice
+        </a>
+    </td>
+
+</tr>
+
+<% } %>
+</tbody>
             </table>
-
-            <hr class="divider">
-
-            <!-- Refund Timeline -->
-            <p class="section-title">Refund Timeline</p>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="tl-dot"></div>
-                    <div class="tl-content">
-                        <div class="tl-title">Refund Requested</div>
-                        <div class="tl-time"><%= requestedAt %></div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="tl-dot <%= (status.equalsIgnoreCase("approved") || status.equalsIgnoreCase("refunded")) ? "" : "inactive" %>"></div>
-                    <div class="tl-content">
-                        <div class="tl-title">Admin Review & Approval</div>
-                        <div class="tl-time">
-                            <% if (status.equalsIgnoreCase("rejected")) { %>
-                                Rejected – <%= processedAt %>
-                            <% } else if (status.equalsIgnoreCase("approved") || status.equalsIgnoreCase("refunded")) { %>
-                                Approved – <%= processedAt %>
-                            <% } else { %>
-                                Awaiting review
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="tl-dot <%= status.equalsIgnoreCase("refunded") ? "" : "inactive" %>"></div>
-                    <div class="tl-content">
-                        <div class="tl-title">Amount Credited to Original Payment Method</div>
-                        <div class="tl-time">
-                            <% if (status.equalsIgnoreCase("refunded")) { %>
-                                Credited – <%= processedAt %>
-                            <% } else { %>
-                                Pending
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <% } %>
         </div>
-
-        <!-- Action Buttons -->
-        <div class="action-row">
-            <button class="btn-print" onclick="window.print()">🖨 Print Receipt</button>
-            <a href="<%= request.getContextPath() %>/userRefundHistory" class="btn-bookings">← Back to Refunds</a>
-        </div>
-
     </div>
-    <% } %>
-
 </div>
+
+<script>
+const s = document.getElementById('stars');
+for (let i = 0; i < 100; i++) {
+    const el = document.createElement('div'); el.className = 'star';
+    const sz = Math.random() * 2.5 + .5;
+    el.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*6}s;--op:${.2+Math.random()*.5};`;
+    s.appendChild(el);
+}
+</script>
 </body>
 </html>

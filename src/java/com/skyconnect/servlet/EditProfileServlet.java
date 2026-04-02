@@ -12,7 +12,6 @@ public class EditProfileServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // show edit form
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
             resp.sendRedirect("login.jsp");
@@ -21,12 +20,18 @@ public class EditProfileServlet extends HttpServlet {
         int userId = (Integer) session.getAttribute("userId");
 
         try (Connection con = DBConnection.getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT name, email FROM users WHERE id = ?");
+            // FIX: Fetch ALL fields so the edit form is pre-filled
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT name, email, phone, dob, gender, address FROM users WHERE id = ?");
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                req.setAttribute("curName", rs.getString("name"));
-                req.setAttribute("curEmail", rs.getString("email"));
+                req.setAttribute("curName",    rs.getString("name"));
+                req.setAttribute("curEmail",   rs.getString("email"));
+                req.setAttribute("curPhone",   rs.getString("phone")   != null ? rs.getString("phone")   : "");
+                req.setAttribute("curDob",     rs.getDate("dob")       != null ? rs.getDate("dob").toString() : "");
+                req.setAttribute("curGender",  rs.getString("gender")  != null ? rs.getString("gender")  : "");
+                req.setAttribute("curAddress", rs.getString("address") != null ? rs.getString("address") : "");
             } else {
                 req.setAttribute("error", "User not found.");
             }
@@ -40,7 +45,6 @@ public class EditProfileServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // handle update
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
             resp.sendRedirect("login.jsp");
@@ -48,63 +52,81 @@ public class EditProfileServlet extends HttpServlet {
         }
         int userId = (Integer) session.getAttribute("userId");
 
-        String name = req.getParameter("name");
-        String email = req.getParameter("email");
-        String password = req.getParameter("password"); // optional
-
-        String message = null;
+        String name     = req.getParameter("name");
+        String email    = req.getParameter("email");
+        String phone    = req.getParameter("phone");
+        String dobStr   = req.getParameter("dob");
+        String gender   = req.getParameter("gender");
+        String address  = req.getParameter("address");
+        String password = req.getParameter("password");
 
         if (name == null || email == null || name.trim().isEmpty() || email.trim().isEmpty()) {
-            message = "Name and email cannot be empty.";
-            req.setAttribute("error", message);
-            // reload current values below and forward
-        } else {
-            try (Connection con = DBConnection.getConnection()) {
-                if (password != null && password.trim().length() > 0) {
-                    String sql = "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?";
-                    PreparedStatement ps = con.prepareStatement(sql);
-                    ps.setString(1, name.trim());
-                    ps.setString(2, email.trim());
-                    ps.setString(3, password);
-                    ps.setInt(4, userId);
-                    ps.executeUpdate();
-                } else {
-                    String sql = "UPDATE users SET name = ?, email = ? WHERE id = ?";
-                    PreparedStatement ps = con.prepareStatement(sql);
-                    ps.setString(1, name.trim());
-                    ps.setString(2, email.trim());
-                    ps.setInt(3, userId);
-                    ps.executeUpdate();
-                }
-                // update session
-                session.setAttribute("userName", name.trim());
-                req.setAttribute("success", "Profile updated successfully.");
-                // after successful update, forward to profile page
-                resp.sendRedirect("profile"); // will use ProfileServlet to load fresh data
-                return;
-            } catch (SQLIntegrityConstraintViolationException cve) {
-                message = "Email already in use by another account.";
-                req.setAttribute("error", message);
-            } catch (Exception e) {
-                e.printStackTrace();
-                message = "Update error: " + e.getMessage();
-                req.setAttribute("error", message);
-            }
+            req.setAttribute("error", "Name and email cannot be empty.");
+            reloadForm(req, userId);
+            req.getRequestDispatcher("edit_profile.jsp").forward(req, resp);
+            return;
         }
 
-        // if we reach here, show form again with current DB values (so user doesn't lose data)
         try (Connection con = DBConnection.getConnection()) {
-            PreparedStatement ps = con.prepareStatement("SELECT name,email FROM users WHERE id = ?");
+
+            // Build query depending on whether password is being changed
+            String sql;
+            PreparedStatement ps;
+
+            if (password != null && !password.trim().isEmpty()) {
+                sql = "UPDATE users SET name=?, email=?, phone=?, dob=?, gender=?, address=?, password=? WHERE id=?";
+                ps  = con.prepareStatement(sql);
+                ps.setString(1, name.trim());
+                ps.setString(2, email.trim());
+                ps.setString(3, phone   != null ? phone.trim()   : null);
+                if (dobStr != null && !dobStr.isEmpty()) { ps.setDate(4, Date.valueOf(dobStr)); } else { ps.setNull(4, Types.DATE); }
+                ps.setString(5, gender  != null ? gender.trim()  : null);
+                ps.setString(6, address != null ? address.trim() : null);
+                ps.setString(7, password.trim());
+                ps.setInt(8, userId);
+            } else {
+                sql = "UPDATE users SET name=?, email=?, phone=?, dob=?, gender=?, address=? WHERE id=?";
+                ps  = con.prepareStatement(sql);
+                ps.setString(1, name.trim());
+                ps.setString(2, email.trim());
+                ps.setString(3, phone   != null ? phone.trim()   : null);
+                if (dobStr != null && !dobStr.isEmpty()) { ps.setDate(4, Date.valueOf(dobStr)); } else { ps.setNull(4, Types.DATE); }
+                ps.setString(5, gender  != null ? gender.trim()  : null);
+                ps.setString(6, address != null ? address.trim() : null);
+                ps.setInt(7, userId);
+            }
+
+            ps.executeUpdate();
+            session.setAttribute("userName", name.trim());
+            resp.sendRedirect("profile");
+            return;
+
+        } catch (SQLIntegrityConstraintViolationException cve) {
+            req.setAttribute("error", "Email already in use by another account.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Update error: " + e.getMessage());
+        }
+
+        reloadForm(req, userId);
+        req.getRequestDispatcher("edit_profile.jsp").forward(req, resp);
+    }
+
+    /** Reload current DB values into request for re-displaying the form */
+    private void reloadForm(HttpServletRequest req, int userId) {
+        try (Connection con = DBConnection.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT name, email, phone, dob, gender, address FROM users WHERE id = ?");
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                req.setAttribute("curName", rs.getString("name"));
-                req.setAttribute("curEmail", rs.getString("email"));
+                req.setAttribute("curName",    rs.getString("name"));
+                req.setAttribute("curEmail",   rs.getString("email"));
+                req.setAttribute("curPhone",   rs.getString("phone")   != null ? rs.getString("phone")   : "");
+                req.setAttribute("curDob",     rs.getDate("dob")       != null ? rs.getDate("dob").toString() : "");
+                req.setAttribute("curGender",  rs.getString("gender")  != null ? rs.getString("gender")  : "");
+                req.setAttribute("curAddress", rs.getString("address") != null ? rs.getString("address") : "");
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        req.getRequestDispatcher("edit_profile.jsp").forward(req, resp);
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 }

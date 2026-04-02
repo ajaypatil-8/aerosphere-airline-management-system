@@ -10,437 +10,226 @@
     String cancelError   = (String) session.getAttribute("cancelError");
     session.removeAttribute("cancelSuccess");
     session.removeAttribute("cancelError");
+
+    int total = 0, paid = 0, pending = 0, cancelled = 0;
+    double revenue = 0;
+    if (bookings != null) for (var b : bookings) {
+        total++;
+        if ("PAID".equalsIgnoreCase(b.paymentStatus)) { paid++; revenue += b.totalAmount; }
+        else if ("PENDING".equalsIgnoreCase(b.paymentStatus)) pending++;
+        if ("CANCELLED".equalsIgnoreCase(b.status)) cancelled++;
+    }
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Bookings – SkyConnect Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; color: #222; }
+        .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:24px; }
+        .s-chip {
+            background:rgba(13,20,39,.7); border:1px solid var(--border);
+            border-radius:var(--radius); padding:18px 20px;
+            animation:fadeUp .4s ease both; transition:border-color .2s;
+        }
+        .s-chip:hover { border-color:var(--border-glow); }
+        .s-chip-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+        .s-chip-value { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; margin-top:4px; }
 
-        .navbar {
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            padding: 14px 32px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        .filter-row {
+            display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+            margin-bottom:20px; animation:fadeUp .4s .2s ease both; opacity:0; animation-fill-mode:forwards;
         }
-        .navbar .brand { color: #fff; font-size: 22px; font-weight: 700; text-decoration: none; }
-        .nav-links a { color: #fff; text-decoration: none; margin-left: 22px; font-size: 14px; font-weight: 500; opacity: 0.9; }
-        .nav-links a:hover { opacity: 1; text-decoration: underline; }
+        .filter-row input, .filter-row select {
+            background:rgba(13,20,39,.7); border:1px solid var(--border);
+            border-radius:10px; color:var(--white);
+            padding:10px 14px; font-family:'DM Sans',sans-serif;
+            font-size:.875rem; outline:none; transition:border-color .2s;
+        }
+        .filter-row input { flex:1; min-width:220px; }
+        .filter-row input:focus, .filter-row select:focus { border-color:var(--sky-glow); }
+        .filter-row input::placeholder { color:rgba(255,255,255,.25); }
+        .filter-row select option { background:var(--ink-3); }
 
-        .container { max-width: 1300px; margin: 40px auto; padding: 0 20px; }
+        .bookings-table { width:100%; border-collapse:collapse; }
+        .bookings-table thead th {
+            font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+            color:var(--muted); padding:12px 16px;
+            border-bottom:1px solid var(--border); text-align:left;
+        }
+        .bookings-table tbody td { padding:13px 16px; border-bottom:1px solid var(--border); font-size:.875rem; }
+        .bookings-table tbody tr:hover td { background:rgba(255,255,255,.025); }
+        .bookings-table tbody tr:last-child td { border-bottom:none; }
 
-        .page-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 24px;
-        }
-        .page-header h1 { font-size: 22px; font-weight: 700; color: #1a56db; }
-        .page-header p  { font-size: 13px; color: #6b7280; margin-top: 2px; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .badge-paid      { background:rgba(16,185,129,.15); color:#10B981; }
+        .badge-pending   { background:rgba(245,158,11,.15);  color:#F59E0B; }
+        .badge-cancelled { background:rgba(239,68,68,.15);   color:#EF4444; }
+        .badge-booked    { background:rgba(139,92,246,.15);  color:#8B5CF6; }
+        .badge-refunded  { background:rgba(0,87,255,.15);    color:var(--sky-glow); }
 
-        .alert {
-            padding: 12px 16px; border-radius: 10px;
-            font-size: 14px; font-weight: 500; margin-bottom: 20px;
-        }
-        .alert-error   { background: #fee2e2; color: #991b1b; }
-        .alert-success { background: #d1fae5; color: #065f46; }
-
-        /* Stats strip */
-        .stats-strip {
-            display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap;
-        }
-        .stat-chip {
-            background: #fff; border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            padding: 14px 22px; flex: 1; min-width: 130px;
-        }
-        .stat-chip .chip-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
-        .stat-chip .chip-value { font-size: 22px; font-weight: 800; color: #1a56db; margin-top: 3px; }
-
-        /* Filter bar */
-        .filter-bar {
-            display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
-        }
-        .filter-bar input {
-            flex: 2; min-width: 220px; padding: 10px 14px;
-            border: 1.5px solid #d1d9f0; border-radius: 10px;
-            font-size: 14px; background: #fff; outline: none;
-        }
-        .filter-bar input:focus { border-color: #1a56db; }
-        .filter-bar select {
-            flex: 1; min-width: 150px; padding: 10px 14px;
-            border: 1.5px solid #d1d9f0; border-radius: 10px;
-            font-size: 14px; background: #fff; outline: none; cursor: pointer;
-        }
-        .btn-export {
-            padding: 10px 20px;
-            background: #d1fae5; color: #065f46;
-            border: none; border-radius: 10px;
-            font-size: 13px; font-weight: 700; cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-export:hover { background: #a7f3d0; }
-
-        .card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .section-title {
-            font-size: 13px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.7px; color: #1a56db;
-            border-bottom: 2px solid #eef4ff; padding-bottom: 8px;
-            padding: 22px 28px 12px 28px;
-        }
-
-        table { width: 100%; border-collapse: collapse; }
-        thead tr { background: linear-gradient(90deg, #1a56db, #0ea5e9); }
-        thead th {
-            color: #fff; text-align: left;
-            padding: 14px 16px; font-size: 13px; font-weight: 600;
-            letter-spacing: 0.4px; white-space: nowrap;
-        }
-        tbody tr:hover { background: #f8faff; }
-        td { padding: 13px 16px; border-bottom: 1px solid #f0f4ff; font-size: 14px; vertical-align: middle; }
-
-        .badge {
-            display: inline-block; padding: 4px 12px;
-            border-radius: 20px; font-size: 12px; font-weight: 700;
-        }
-        .badge-paid      { background: #d1fae5; color: #065f46; }
-        .badge-pending   { background: #fef9c3; color: #854d0e; }
-        .badge-cancelled { background: #fee2e2; color: #991b1b; }
-        .badge-booked    { background: #ede9fe; color: #5b21b6; }
-        .badge-refunded  { background: #dbeafe; color: #1e40af; }
-
-        .route-arrow { color: #0ea5e9; margin: 0 5px; }
-        .amount-col  { font-weight: 700; color: #1a56db; }
-        .sno-cell    { color: #9ca3af; font-size: 13px; }
-
-        .action-btns { display: flex; gap: 7px; flex-wrap: wrap; }
-
-        .btn-view {
-            padding: 6px 13px; border-radius: 8px; font-size: 12px; font-weight: 700;
-            background: linear-gradient(90deg, #1a56db, #0ea5e9); color: #fff;
-            text-decoration: none; display: inline-block; border: none; cursor: pointer;
-        }
-        .btn-view:hover { opacity: 0.88; }
-
-        .btn-cancel {
-            padding: 6px 13px; border-radius: 8px; font-size: 12px; font-weight: 700;
-            background: #fee2e2; color: #991b1b;
-            border: none; cursor: pointer;
-        }
-        .btn-cancel:hover { background: #fecaca; }
-
-        .btn-invoice {
-            padding: 6px 13px; border-radius: 8px; font-size: 12px; font-weight: 700;
-            background: #ede9fe; color: #5b21b6;
-            text-decoration: none; display: inline-block; border: none; cursor: pointer;
-        }
-        .btn-invoice:hover { background: #ddd6fe; }
-
-        .empty-state { text-align: center; padding: 64px 24px; }
-        .empty-state .icon { font-size: 52px; margin-bottom: 16px; }
-        .empty-state h3 { font-size: 18px; font-weight: 700; color: #374151; }
-        .empty-state p  { font-size: 14px; color: #9ca3af; margin-top: 8px; }
-
-        /* Pagination */
-        .pagination {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 20px; border-top: 1.5px solid #f0f4ff;
-            font-size: 13px; color: #6b7280;
-        }
-        .pagination-btns { display: flex; gap: 6px; }
-        .page-btn {
-            width: 32px; height: 32px; border-radius: 8px;
-            border: 1.5px solid #d1d9f0; background: #fff;
-            font-size: 13px; font-weight: 600; cursor: pointer; color: #374151;
-        }
-        .page-btn.active { background: #1a56db; color: #fff; border-color: #1a56db; }
-        .page-btn:hover:not(.active) { background: #f0f4ff; }
-
-        /* Cancel modal */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45); z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-            padding: 36px 40px; max-width: 420px; width: 90%; text-align: center;
-        }
-        .modal .modal-icon { font-size: 44px; margin-bottom: 12px; }
-        .modal h3 { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 8px; }
-        .modal p  { font-size: 14px; color: #6b7280; margin-bottom: 24px; }
-        .modal-btns { display: flex; gap: 12px; }
-        .btn-cancel-modal {
-            flex: 1; padding: 11px; background: #e5e7eb; color: #374151;
-            border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
-        }
-        .btn-confirm-cancel {
-            flex: 1; padding: 11px; background: #ef4444; color: #fff;
-            border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
-        }
-        .btn-confirm-cancel:hover { background: #dc2626; }
+        .action-group { display:flex; gap:7px; flex-wrap:wrap; }
     </style>
 </head>
 <body>
+<div class="page-bg"></div>
+<div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a class="brand" href="index.jsp">✈ SkyConnect</a>
+    <a href="adminDashboard" class="nav-brand">
+        <div class="brand-icon">✈</div>
+        <span class="brand-name">Sky<span>Connect</span> <span style="font-size:.7rem;color:var(--gold);font-weight:600;margin-left:6px;">ADMIN</span></span>
+    </a>
     <div class="nav-links">
-        <a href="adminDashboard">Dashboard</a>
-        <a href="adminFlights">Flights</a>
-        <a href="adminBookings">Bookings</a>
-        <a href="admin_add_flight.jsp">Add Flight</a>
-        <a href="reports.jsp">Reports</a>
-        <a href="adminRefunds">Refunds</a>
-        <a href="logout">Logout</a>
+        <a href="adminDashboard" class="nav-link">Dashboard</a>
+        <a href="adminFlights"   class="nav-link">Flights</a>
+        <a href="adminBookings"  class="nav-link active">Bookings</a>
+        <a href="adminRefunds"   class="nav-link">Refunds</a>
+        <a href="reports.jsp"    class="nav-link">Reports</a>
+        <a href="logout"         class="nav-link btn-primary">Logout</a>
     </div>
 </nav>
 
-<div class="container">
-
-    <div class="page-header">
+<div class="page-wrapper">
+    <div class="page-header" style="animation:fadeUp .4s ease both;">
         <div>
-            <h1>🎫 Manage Bookings</h1>
-            <p>View and manage all passenger bookings</p>
+            <h1 class="page-title">📋 Manage Bookings</h1>
+            <p class="page-subtitle">All bookings across every flight</p>
         </div>
     </div>
 
-    <% if (cancelError != null) { %>
-        <div class="alert alert-error">⚠ <%= cancelError %></div>
-    <% } %>
-    <% if (cancelSuccess != null) { %>
-        <div class="alert alert-success">✔ <%= cancelSuccess %></div>
-    <% } %>
+    <% if (cancelError   != null) { %><div class="alert alert-error">⚠ <%= cancelError %></div><% } %>
+    <% if (cancelSuccess != null) { %><div class="alert alert-success">✔ <%= cancelSuccess %></div><% } %>
 
-    <%
-        int total = 0, paid = 0, pending = 0, cancelled = 0, refunded = 0;
-        double revenue = 0;
-        if (bookings != null) {
-            total = bookings.size();
-            for (com.skyconnect.servlet.AdminBookingsServlet.BookingRow b : bookings) {
-                String s = b.status != null ? b.status.toLowerCase() : "";
-                if (s.equals("paid"))      { paid++;      revenue += b.totalAmount; }
-                if (s.equals("pending"))   pending++;
-                if (s.equals("cancelled")) cancelled++;
-                if (s.equals("refunded"))  refunded++;
-            }
-        }
-    %>
-
-    <div class="stats-strip">
-        <div class="stat-chip">
-            <div class="chip-label">Total</div>
-            <div class="chip-value"><%= total %></div>
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="s-chip" style="animation-delay:.05s">
+            <div class="s-chip-label">Total Bookings</div>
+            <div class="s-chip-value"><%= total %></div>
         </div>
-        <div class="stat-chip">
-            <div class="chip-label">Paid</div>
-            <div class="chip-value" style="color:#065f46;"><%= paid %></div>
+        <div class="s-chip" style="animation-delay:.10s">
+            <div class="s-chip-label">Paid</div>
+            <div class="s-chip-value" style="color:#10B981;"><%= paid %></div>
         </div>
-        <div class="stat-chip">
-            <div class="chip-label">Pending</div>
-            <div class="chip-value" style="color:#854d0e;"><%= pending %></div>
+        <div class="s-chip" style="animation-delay:.15s">
+            <div class="s-chip-label">Pending</div>
+            <div class="s-chip-value" style="color:#F59E0B;"><%= pending %></div>
         </div>
-        <div class="stat-chip">
-            <div class="chip-label">Cancelled</div>
-            <div class="chip-value" style="color:#991b1b;"><%= cancelled %></div>
+        <div class="s-chip" style="animation-delay:.20s">
+            <div class="s-chip-label">Cancelled</div>
+            <div class="s-chip-value" style="color:#EF4444;"><%= cancelled %></div>
         </div>
-        <div class="stat-chip">
-            <div class="chip-label">Refunded</div>
-            <div class="chip-value" style="color:#1e40af;"><%= refunded %></div>
-        </div>
-        <div class="stat-chip">
-            <div class="chip-label">Revenue</div>
-            <div class="chip-value">₹<%= String.format("%,.0f", revenue) %></div>
+        <div class="s-chip" style="animation-delay:.25s">
+            <div class="s-chip-label">Revenue (Paid)</div>
+            <div class="s-chip-value" style="color:var(--gold);">₹<%= String.format("%,.0f", revenue) %></div>
         </div>
     </div>
 
-    <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="🔍  Search by booking ID, passenger, flight, route..." onkeyup="filterTable()">
-        <select id="statusFilter" onchange="filterTable()">
-            <option value="">All Statuses</option>
+    <!-- FILTER -->
+    <div class="filter-row">
+        <input type="text" id="searchInput" placeholder="🔍  Search by name, flight, route…">
+        <select id="statusFilter">
+            <option value="">All Status</option>
             <option value="paid">Paid</option>
             <option value="pending">Pending</option>
-            <option value="booked">Booked</option>
             <option value="cancelled">Cancelled</option>
-            <option value="refunded">Refunded</option>
         </select>
-        <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
     </div>
 
-    <div class="card">
+    <!-- TABLE -->
+    <div class="card" style="animation:fadeUp .4s .3s ease both;opacity:0;animation-fill-mode:forwards;">
+        <div class="card-header">
+            <span class="card-title">All Bookings</span>
+            <span style="font-size:.8rem;color:var(--muted);"><%= total %> records</span>
+        </div>
+        <div style="overflow-x:auto;">
         <% if (bookings == null || bookings.isEmpty()) { %>
-            <div class="empty-state">
-                <div class="icon">🎫</div>
-                <h3>No Bookings Found</h3>
-                <p>No bookings have been made yet.</p>
+            <div style="text-align:center;padding:80px 24px;color:var(--muted);">
+                <div style="font-size:4rem;margin-bottom:16px;">📋</div>
+                <p style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:rgba(255,255,255,.5);">No bookings yet</p>
             </div>
         <% } else { %>
-        <table id="bookingsTable">
+        <table class="bookings-table" id="bookingsTable">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Booking ID</th>
                     <th>Passenger</th>
-                    <th>Flight No</th>
+                    <th>Flight</th>
                     <th>Route</th>
-                    <th>Date</th>
                     <th>Seats</th>
                     <th>Amount</th>
+                    <th>Date</th>
                     <th>Payment</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="bookingsBody">
-                <% int sno = 1;
-                   for (com.skyconnect.servlet.AdminBookingsServlet.BookingRow b : bookings) {
-                       String st = b.status != null ? b.status : "booked";
-                       String bc = "badge-booked";
-                       if (st.equalsIgnoreCase("paid"))       bc = "badge-paid";
-                       else if (st.equalsIgnoreCase("pending"))   bc = "badge-pending";
-                       else if (st.equalsIgnoreCase("cancelled")) bc = "badge-cancelled";
-                       else if (st.equalsIgnoreCase("refunded"))  bc = "badge-refunded";
-                       boolean canCancel = !st.equalsIgnoreCase("cancelled") && !st.equalsIgnoreCase("refunded");
-                %>
-                <tr>
-                    <td class="sno-cell"><%= sno++ %></td>
-                    <td><strong>#<%= b.bookingId %></strong></td>
-                    <td>
-                        <div style="font-weight:600;"><%= b.userName %></div>
-                        <div style="font-size:12px;color:#9ca3af;"><%= b.userEmail %></div>
-                    </td>
-                    <td><strong><%= b.flightNo %></strong></td>
-                    <td>
-                        <strong><%= b.source %></strong>
-                        <span class="route-arrow">→</span>
-                        <strong><%= b.destination %></strong>
-                    </td>
-                    <td style="color:#6b7280;font-size:13px;"><%= b.flightDate %></td>
-                    <td style="text-align:center;"><%= b.seatCount %></td>
-                    <td class="amount-col">₹<%= String.format("%,.2f", b.totalAmount) %></td>
-                    <td style="font-size:13px;color:#374151;"><%= b.paymentMethod != null ? b.paymentMethod : "—" %></td>
-                    <td><span class="badge <%= bc %>"><%= st.substring(0,1).toUpperCase() + st.substring(1) %></span></td>
-                    <td>
-                        <div class="action-btns">
-                            <a href="<%= request.getContextPath() %>/invoice?bookingId=<%= b.bookingId %>"
-                               class="btn-invoice">🎫 Invoice</a>
-                            <% if (canCancel) { %>
-                            <button class="btn-cancel"
-                                onclick="confirmCancel(<%= b.bookingId %>, '<%= b.userName %>')">
-                                ✖ Cancel
-                            </button>
-                            <% } %>
-                        </div>
-                    </td>
-                </tr>
-                <% } %>
+            <tbody>
+            <% int bi = 0; for (com.skyconnect.servlet.AdminBookingsServlet.BookingRow b : bookings) { bi++; %>
+            <tr data-name="<%= b.userName.toLowerCase() %>" data-flight="<%= b.flightNo.toLowerCase() %>"
+                data-src="<%= b.source.toLowerCase() %>" data-dst="<%= b.destination.toLowerCase() %>"
+                data-status="<%= b.paymentStatus.toLowerCase() %>"
+                style="animation:fadeUp .4s <%= bi * 0.04 %>s ease both;opacity:0;animation-fill-mode:forwards;">
+                <td style="color:var(--muted);font-size:.8rem;"><%= bi %></td>
+                <td style="font-family:'Syne',sans-serif;font-size:.85rem;color:var(--sky-glow);">#<%= b.bookingId %></td>
+                <td style="font-weight:500;"><%= b.userName %></td>
+                <td style="color:var(--sky-glow);font-weight:600;">✈ <%= b.flightNo %></td>
+                <td>
+                    <span style="color:var(--gold);font-weight:700;font-size:.85rem;"><%= b.source.length()>=3?b.source.substring(0,3).toUpperCase():b.source %></span>
+                    <span style="color:var(--muted);margin:0 4px;">→</span>
+                    <span style="color:var(--sky-glow);font-weight:700;font-size:.85rem;"><%= b.destination.length()>=3?b.destination.substring(0,3).toUpperCase():b.destination %></span>
+                </td>
+                <td style="text-align:center;"><%= b.numSeats %></td>
+                <td style="font-weight:700;color:var(--gold);">₹<%= String.format("%,.0f", b.totalAmount) %></td>
+                <td style="color:var(--muted);font-size:.82rem;"><%= b.bookingDate %></td>
+                <td><span class="badge badge-<%= b.paymentStatus.toLowerCase() %>"><%= b.paymentStatus %></span></td>
+                <td><span class="badge badge-<%= b.status.toLowerCase() %>"><%= b.status %></span></td>
+                <td>
+                    <div class="action-group">
+                        <a href="viewInvoice?bookingId=<%= b.bookingId %>" class="btn btn-ghost btn-sm">📄 Invoice</a>
+                        <% if (!"CANCELLED".equalsIgnoreCase(b.status)) { %>
+                        <form action="cancelBooking" method="post" style="margin:0;" onsubmit="return confirm('Cancel booking #<%= b.bookingId %>?')">
+                            <input type="hidden" name="bookingId" value="<%= b.bookingId %>">
+                            <button type="submit" class="btn btn-danger btn-sm">✕ Cancel</button>
+                        </form>
+                        <% } %>
+                    </div>
+                </td>
+            </tr>
+            <% } %>
             </tbody>
         </table>
-
-        <div class="pagination">
-            <span id="paginationInfo">Showing all <%= total %> bookings</span>
-            <div class="pagination-btns" id="paginationBtns"></div>
-        </div>
         <% } %>
-    </div>
-
-</div>
-
-<!-- Cancel Modal -->
-<div class="modal-overlay" id="cancelModal">
-    <div class="modal">
-        <div class="modal-icon">⚠</div>
-        <h3>Cancel Booking?</h3>
-        <p id="cancelModalText">Are you sure you want to cancel this booking?</p>
-        <div class="modal-btns">
-            <button class="btn-cancel-modal" onclick="closeModal()">Keep Booking</button>
-            <form id="cancelForm" method="post" action="<%= request.getContextPath() %>/cancelBooking" style="flex:1;">
-                <input type="hidden" name="bookingId" id="cancelBookingId">
-                <input type="hidden" name="redirect" value="adminBookings">
-                <button type="submit" class="btn-confirm-cancel" style="width:100%;">Yes, Cancel</button>
-            </form>
         </div>
     </div>
 </div>
 
 <script>
-    // --- Modal ---
-    function confirmCancel(id, name) {
-        document.getElementById('cancelBookingId').value = id;
-        document.getElementById('cancelModalText').innerHTML =
-            'Cancel booking <strong>#' + id + '</strong> for <strong>' + name + '</strong>?<br>This cannot be undone.';
-        document.getElementById('cancelModal').classList.add('active');
-    }
-    function closeModal() {
-        document.getElementById('cancelModal').classList.remove('active');
-    }
-    document.getElementById('cancelModal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
+const s = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+    const el = document.createElement('div'); el.className = 'star';
+    const sz = Math.random() * 2 + .5;
+    el.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.2+Math.random()*.45};`;
+    s.appendChild(el);
+}
+const searchInput  = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+function filterTable() {
+    const q  = searchInput.value.toLowerCase().trim();
+    const st = statusFilter.value;
+    document.querySelectorAll('#bookingsTable tbody tr').forEach(row => {
+        const matchQ  = !q  || row.dataset.name.includes(q) || row.dataset.flight.includes(q) || row.dataset.src.includes(q) || row.dataset.dst.includes(q);
+        const matchSt = !st || row.dataset.status === st;
+        row.style.display = matchQ && matchSt ? '' : 'none';
     });
-
-    // --- Filter ---
-    function filterTable() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const status = document.getElementById('statusFilter').value.toLowerCase();
-        const rows   = document.querySelectorAll('#bookingsBody tr');
-        let visible  = 0;
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            const statusCell = row.querySelector('.badge');
-            const rowStatus  = statusCell ? statusCell.textContent.trim().toLowerCase() : '';
-            const matchSearch = text.includes(search);
-            const matchStatus = status === '' || rowStatus === status;
-            if (matchSearch && matchStatus) { row.style.display = ''; visible++; }
-            else row.style.display = 'none';
-        });
-        document.getElementById('paginationInfo').textContent = 'Showing ' + visible + ' booking(s)';
-    }
-
-    // --- CSV Export ---
-    function exportCSV() {
-        const headers = ['#','Booking ID','Passenger','Email','Flight No','Source','Destination',
-                         'Date','Seats','Amount','Payment','Status'];
-        const rows = document.querySelectorAll('#bookingsBody tr');
-        const data = [headers];
-        let sno = 1;
-        rows.forEach(row => {
-            if (row.style.display === 'none') return;
-            const cells = row.querySelectorAll('td');
-            if (cells.length < 10) return;
-            const passenger = cells[2].querySelectorAll('div');
-            const name  = passenger[0] ? passenger[0].textContent.trim() : '';
-            const email = passenger[1] ? passenger[1].textContent.trim() : '';
-            const routeCells = cells[4].textContent.replace('→', '→').split('→');
-            data.push([
-                sno++,
-                cells[1].textContent.trim().replace('#',''),
-                name, email,
-                cells[3].textContent.trim(),
-                routeCells[0] ? routeCells[0].trim() : '',
-                routeCells[1] ? routeCells[1].trim() : '',
-                cells[5].textContent.trim(),
-                cells[6].textContent.trim(),
-                cells[7].textContent.trim().replace('₹','').replace(/,/g,''),
-                cells[8].textContent.trim(),
-                cells[9].textContent.trim()
-            ]);
-        });
-        const csv  = data.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const a    = document.createElement('a');
-        a.href     = URL.createObjectURL(blob);
-        a.download = 'bookings_report.csv';
-        a.click();
-    }
+}
+searchInput.addEventListener('input', filterTable);
+statusFilter.addEventListener('change', filterTable);
 </script>
-
 </body>
 </html>

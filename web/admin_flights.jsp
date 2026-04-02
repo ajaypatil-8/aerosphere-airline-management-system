@@ -10,353 +10,269 @@
     String deleteSuccess = (String) session.getAttribute("deleteSuccess");
     session.removeAttribute("deleteError");
     session.removeAttribute("deleteSuccess");
+    int totalFlights   = flights != null ? flights.size() : 0;
+    int activeFlights  = 0;
+    double totalSeats  = 0;
+    if (flights != null) for (var f : flights) { if (f.seatsAvailable > 0) activeFlights++; totalSeats += f.seatsAvailable; }
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Flights – SkyConnect Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; color: #222; }
-
-        .navbar {
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            padding: 14px 32px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+        .s-chip {
+            background: rgba(13,20,39,.7); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 20px;
+            animation: fadeUp .4s ease both;
+            transition: border-color .2s;
         }
-        .navbar .brand { color: #fff; font-size: 22px; font-weight: 700; text-decoration: none; }
-        .nav-links a { color: #fff; text-decoration: none; margin-left: 22px; font-size: 14px; font-weight: 500; opacity: 0.9; }
-        .nav-links a:hover { opacity: 1; text-decoration: underline; }
+        .s-chip:hover { border-color: var(--border-glow); }
+        .s-chip-label { font-size: .72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+        .s-chip-value { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; margin-top:4px; }
 
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-
-        .page-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 24px;
+        .filter-row {
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+            margin-bottom: 20px;
         }
-        .page-header h1 { font-size: 22px; font-weight: 700; color: #1a56db; }
-        .page-header p  { font-size: 13px; color: #6b7280; margin-top: 2px; }
-
-        .btn-primary {
-            display: inline-block; padding: 11px 24px;
-            background: linear-gradient(90deg, #1a56db, #0ea5e9);
-            color: #fff; border-radius: 10px; font-weight: 700;
-            font-size: 14px; text-decoration: none; border: none; cursor: pointer;
+        .filter-row input, .filter-row select {
+            background: rgba(13,20,39,.7); border: 1px solid var(--border);
+            border-radius: 10px; color: var(--white);
+            padding: 10px 14px; font-family: 'DM Sans',sans-serif;
+            font-size: .875rem; outline: none; transition: border-color .2s;
         }
-        .btn-primary:hover { opacity: 0.9; }
+        .filter-row input { flex: 1; min-width: 200px; }
+        .filter-row input:focus, .filter-row select:focus { border-color: var(--sky-glow); }
+        .filter-row input::placeholder { color: rgba(255,255,255,.25); }
+        .filter-row select option { background: var(--ink-3); }
 
-        .alert {
-            padding: 12px 16px; border-radius: 10px;
-            font-size: 14px; font-weight: 500; margin-bottom: 20px;
+        .flights-table { width: 100%; border-collapse: collapse; }
+        .flights-table thead th {
+            font-size: .72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+            color: var(--muted); padding: 12px 16px;
+            border-bottom: 1px solid var(--border); text-align:left;
         }
-        .alert-error   { background: #fee2e2; color: #991b1b; }
-        .alert-success { background: #d1fae5; color: #065f46; }
+        .flights-table tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: .875rem; }
+        .flights-table tbody tr:hover td { background: rgba(255,255,255,.025); }
+        .flights-table tbody tr:last-child td { border-bottom: none; }
 
-        /* Search / filter bar */
-        .filter-bar {
-            display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
-        }
-        .filter-bar input {
-            flex: 1; min-width: 200px;
-            padding: 10px 14px; border: 1.5px solid #d1d9f0;
-            border-radius: 10px; font-size: 14px; background: #fff;
-            outline: none;
-        }
-        .filter-bar input:focus { border-color: #1a56db; }
-        .filter-bar select {
-            padding: 10px 14px; border: 1.5px solid #d1d9f0;
-            border-radius: 10px; font-size: 14px; background: #fff;
-            outline: none; cursor: pointer;
-        }
+        .route-cell { display:flex; align-items:center; gap:8px; font-weight:600; }
+        .city-code-sm { font-family:'Syne',sans-serif; font-size:.95rem; font-weight:800; }
+        .route-arrow { color: var(--sky-glow); font-size:.85rem; }
 
-        /* Stats strip */
-        .stats-strip {
-            display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap;
-        }
-        .stat-chip {
-            background: #fff; border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            padding: 14px 22px; flex: 1; min-width: 140px;
-        }
-        .stat-chip .chip-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
-        .stat-chip .chip-value { font-size: 22px; font-weight: 800; color: #1a56db; margin-top: 3px; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .badge-active   { background:rgba(16,185,129,.15); color:#10B981; }
+        .badge-soldout  { background:rgba(239,68,68,.15);  color:#EF4444; }
 
-        .card {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
+        .seats-bar { width:80px; height:6px; background:rgba(255,255,255,.1); border-radius:3px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; }
+        .seats-fill { height:100%; border-radius:3px; background: linear-gradient(90deg,var(--sky),var(--sky-glow)); }
 
-        .section-title {
-            font-size: 13px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.7px; color: #1a56db;
-            border-bottom: 2px solid #eef4ff; padding-bottom: 8px;
-            padding: 22px 28px 12px 28px;
-        }
+        .action-group { display:flex; gap:8px; }
 
-        table { width: 100%; border-collapse: collapse; }
-        thead tr { background: linear-gradient(90deg, #1a56db, #0ea5e9); }
-        thead th {
-            color: #fff; text-align: left;
-            padding: 14px 16px; font-size: 13px; font-weight: 600; letter-spacing: 0.4px;
-            white-space: nowrap;
-        }
-        tbody tr:hover { background: #f8faff; }
-        td { padding: 13px 16px; border-bottom: 1px solid #f0f4ff; font-size: 14px; vertical-align: middle; }
-
-        .route-cell { font-weight: 600; }
-        .route-arrow { color: #0ea5e9; margin: 0 5px; }
-
-        .price-cell { font-weight: 700; color: #1a56db; }
-
-        .time-cell { font-size: 13px; color: #374151; }
-
-        .badge {
-            display: inline-block; padding: 4px 12px;
-            border-radius: 20px; font-size: 12px; font-weight: 700;
-        }
-        .badge-active   { background: #d1fae5; color: #065f46; }
-        .badge-inactive { background: #fee2e2; color: #991b1b; }
-
-        .action-btns { display: flex; gap: 8px; }
-
-        .btn-edit {
-            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
-            background: #ede9fe; color: #5b21b6;
-            text-decoration: none; display: inline-block; border: none; cursor: pointer;
-        }
-        .btn-edit:hover { background: #ddd6fe; }
-
-        .btn-delete {
-            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
-            background: #fee2e2; color: #991b1b;
-            border: none; cursor: pointer;
-        }
-        .btn-delete:hover { background: #fecaca; }
-
-        .empty-state { text-align: center; padding: 64px 24px; }
-        .empty-state .icon { font-size: 52px; margin-bottom: 16px; }
-        .empty-state h3 { font-size: 18px; font-weight: 700; color: #374151; }
-        .empty-state p  { font-size: 14px; color: #9ca3af; margin-top: 8px; margin-bottom: 24px; }
-
-        .sno-cell { color: #9ca3af; font-size: 13px; }
-
-        /* Confirm delete modal */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45); z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: #fff; border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-            padding: 36px 40px; max-width: 420px; width: 90%; text-align: center;
-        }
-        .modal .modal-icon { font-size: 44px; margin-bottom: 12px; }
-        .modal h3 { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 8px; }
-        .modal p  { font-size: 14px; color: #6b7280; margin-bottom: 24px; }
-        .modal-btns { display: flex; gap: 12px; }
-        .modal-btns .btn-cancel-modal {
-            flex: 1; padding: 11px; background: #e5e7eb; color: #374151;
-            border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
-        }
-        .modal-btns .btn-confirm-delete {
-            flex: 1; padding: 11px; background: #ef4444; color: #fff;
-            border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
-        }
-        .modal-btns .btn-confirm-delete:hover { background: #dc2626; }
+        /* Delete Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:var(--ink-2); border:1px solid var(--border); border-radius:20px; padding:40px; max-width:420px; width:90%; text-align:center; animation:fadeUp .3s ease both; }
+        .modal-icon { font-size:3rem; margin-bottom:16px; }
+        .modal-title { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; }
+        .modal-sub { color:var(--muted); font-size:.875rem; margin-bottom:28px; }
+        .modal-btns { display:flex; gap:12px; }
+        .btn-cancel-modal { flex:1; padding:12px; background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:10px; color:var(--white); font-size:.875rem; font-weight:600; cursor:pointer; transition:.2s; }
+        .btn-cancel-modal:hover { background:rgba(255,255,255,.12); }
+        .btn-confirm-delete { flex:1; padding:12px; background:var(--danger); border:none; border-radius:10px; color:#fff; font-size:.875rem; font-weight:700; cursor:pointer; transition:.2s; }
+        .btn-confirm-delete:hover { background:#dc2626; }
     </style>
 </head>
 <body>
+<div class="page-bg"></div>
+<div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a class="brand" href="index.jsp">✈ SkyConnect</a>
+    <a href="adminDashboard" class="nav-brand">
+        <div class="brand-icon">✈</div>
+        <span class="brand-name">Sky<span>Connect</span> <span style="font-size:.7rem;color:var(--gold);font-weight:600;margin-left:6px;">ADMIN</span></span>
+    </a>
     <div class="nav-links">
-        <a href="adminDashboard">Dashboard</a>
-        <a href="adminFlights">Flights</a>
-        <a href="adminBookings">Bookings</a>
-        <a href="admin_add_flight.jsp">Add Flight</a>
-        <a href="reports.jsp">Reports</a>
-        <a href="adminRefunds">Refunds</a>
-        <a href="logout">Logout</a>
+        <a href="adminDashboard" class="nav-link">Dashboard</a>
+        <a href="adminFlights"   class="nav-link active">Flights</a>
+        <a href="adminBookings"  class="nav-link">Bookings</a>
+        <a href="adminRefunds"   class="nav-link">Refunds</a>
+        <a href="reports.jsp"    class="nav-link">Reports</a>
+        <a href="logout"         class="nav-link btn-primary">Logout</a>
     </div>
 </nav>
 
-<div class="container">
-
-    <div class="page-header">
+<div class="page-wrapper">
+    <div class="page-header" style="animation:fadeUp .4s ease both;">
         <div>
-            <h1>✈ Manage Flights</h1>
-            <p>View, edit and remove scheduled flights</p>
+            <h1 class="page-title">✈ Manage Flights</h1>
+            <p class="page-subtitle">Schedule, edit and remove flights</p>
         </div>
-        <a href="admin_add_flight.jsp" class="btn-primary">+ Add New Flight</a>
+        <a href="admin_add_flight.jsp" class="btn btn-blue">+ Add New Flight</a>
     </div>
 
-    <% if (deleteError != null) { %>
-        <div class="alert alert-error">⚠ <%= deleteError %></div>
-    <% } %>
-    <% if (deleteSuccess != null) { %>
-        <div class="alert alert-success">✔ <%= deleteSuccess %></div>
-    <% } %>
+    <% if (deleteError != null) { %><div class="alert alert-error">⚠ <%= deleteError %></div><% } %>
+    <% if (deleteSuccess != null) { %><div class="alert alert-success">✔ <%= deleteSuccess %></div><% } %>
 
-    <%
-        int totalF = flights != null ? flights.size() : 0;
-        double minPrice = Double.MAX_VALUE, maxPrice = 0;
-        if (flights != null) {
-            for (com.skyconnect.servlet.AdminFlightsServlet.Flight f : flights) {
-                if (f.price < minPrice) minPrice = f.price;
-                if (f.price > maxPrice) maxPrice = f.price;
-            }
-        }
-        if (totalF == 0) { minPrice = 0; }
-    %>
-
-    <div class="stats-strip">
-        <div class="stat-chip">
-            <div class="chip-label">Total Flights</div>
-            <div class="chip-value"><%= totalF %></div>
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="s-chip" style="animation-delay:.05s">
+            <div class="s-chip-label">Total Flights</div>
+            <div class="s-chip-value"><%= totalFlights %></div>
         </div>
-        <div class="stat-chip">
-            <div class="chip-label">Lowest Fare</div>
-            <div class="chip-value">₹<%= totalF > 0 ? String.format("%,.0f", minPrice) : "—" %></div>
+        <div class="s-chip" style="animation-delay:.10s">
+            <div class="s-chip-label">With Open Seats</div>
+            <div class="s-chip-value" style="color:var(--success);"><%= activeFlights %></div>
         </div>
-        <div class="stat-chip">
-            <div class="chip-label">Highest Fare</div>
-            <div class="chip-value">₹<%= totalF > 0 ? String.format("%,.0f", maxPrice) : "—" %></div>
+        <div class="s-chip" style="animation-delay:.15s">
+            <div class="s-chip-label">Available Seats</div>
+            <div class="s-chip-value" style="color:var(--sky-glow);"><%= (int)totalSeats %></div>
         </div>
     </div>
 
-    <!-- Filter bar -->
-    <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="🔍  Search by flight no, source or destination..." onkeyup="filterTable()">
-        <select id="sortSelect" onchange="sortTable()">
-            <option value="">Sort by...</option>
-            <option value="price-asc">Price: Low → High</option>
-            <option value="price-desc">Price: High → Low</option>
-            <option value="date-asc">Date: Earliest First</option>
-            <option value="date-desc">Date: Latest First</option>
+    <!-- FILTER -->
+    <div class="filter-row" style="animation:fadeUp .4s .2s ease both;opacity:0;animation-fill-mode:forwards;">
+        <input type="text" id="searchInput" placeholder="🔍  Search by flight no, source or destination…">
+        <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="available">With Seats</option>
+            <option value="soldout">Sold Out</option>
         </select>
     </div>
 
-    <div class="card">
+    <!-- TABLE -->
+    <div class="card" style="animation:fadeUp .4s .3s ease both;opacity:0;animation-fill-mode:forwards;">
+        <div class="card-header">
+            <span class="card-title">Flight Schedule</span>
+            <span style="font-size:.8rem;color:var(--muted);"><%= totalFlights %> flights</span>
+        </div>
+        <div style="overflow-x:auto;">
         <% if (flights == null || flights.isEmpty()) { %>
-            <div class="empty-state">
-                <div class="icon">✈</div>
-                <h3>No Flights Found</h3>
-                <p>Start by adding your first flight route.</p>
-                <a href="admin_add_flight.jsp" class="btn-primary">+ Add Flight</a>
+            <div style="text-align:center;padding:80px 24px;color:var(--muted);">
+                <div style="font-size:4rem;margin-bottom:16px;">✈</div>
+                <p style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:rgba(255,255,255,.5);">No flights scheduled</p>
+                <p style="margin-top:8px;font-size:.875rem;">Add your first flight to get started</p>
+                <a href="admin_add_flight.jsp" class="btn btn-blue" style="margin-top:20px;display:inline-block;">+ Add Flight</a>
             </div>
         <% } else { %>
-        <table id="flightsTable">
+        <table class="flights-table" id="flightsTable">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Flight No</th>
+                    <th>Flight No.</th>
                     <th>Route</th>
                     <th>Date</th>
                     <th>Departure</th>
                     <th>Arrival</th>
-                    <th>Price / Seat</th>
+                    <th>Price</th>
                     <th>Seats</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="flightsBody">
-                <% int sno = 1;
-                   for (com.skyconnect.servlet.AdminFlightsServlet.Flight f : flights) { %>
-                <tr>
-                    <td class="sno-cell"><%= sno++ %></td>
-                    <td><strong><%= f.flightNo %></strong></td>
-                    <td class="route-cell">
-                        <%= f.source %>
+            <tbody>
+            <% int fi = 0; for (com.skyconnect.servlet.AdminFlightsServlet.Flight f : flights) { fi++;
+               String src3  = f.source.length()      >= 3 ? f.source.substring(0,3).toUpperCase()      : f.source.toUpperCase();
+               String dst3  = f.destination.length() >= 3 ? f.destination.substring(0,3).toUpperCase() : f.destination.toUpperCase();
+               int pct = f.seatsTotal > 0 ? (int)(((double)f.seatsAvailable / f.seatsTotal) * 100) : 0;
+            %>
+            <tr data-fn="<%= f.flightNo.toLowerCase() %>" data-src="<%= f.source.toLowerCase() %>" data-dst="<%= f.destination.toLowerCase() %>" data-avail="<%= f.seatsAvailable %>"
+                style="animation:fadeUp .4s <%= fi * 0.05 %>s ease both;opacity:0;animation-fill-mode:forwards;">
+                <td style="color:var(--muted);font-size:.8rem;"><%= fi %></td>
+                <td><span style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--sky-glow);">✈ <%= f.flightNo %></span></td>
+                <td>
+                    <div class="route-cell">
+                        <span class="city-code-sm" style="color:var(--gold);"><%= src3 %></span>
                         <span class="route-arrow">→</span>
-                        <%= f.destination %>
-                    </td>
-                    <td style="color:#6b7280; font-size:13px;"><%= f.date %></td>
-                    <td class="time-cell">🕐 <%= f.departTime %></td>
-                    <td class="time-cell">🕓 <%= f.arrivalTime %></td>
-                    <td class="price-cell">₹<%= String.format("%,.2f", f.price) %></td>
-                    <td><%= f.availableSeats %></td>
-                    <td>
-                        <div class="action-btns">
-                            <a href="admin_edit_flight.jsp?id=<%= f.id %>" class="btn-edit">✏ Edit</a>
-                            <button class="btn-delete"
-                                onclick="confirmDelete(<%= f.id %>, '<%= f.flightNo %>', '<%= f.source %> → <%= f.destination %>')">
-                                🗑 Delete
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <% } %>
+                        <span class="city-code-sm" style="color:var(--sky-glow);"><%= dst3 %></span>
+                    </div>
+                    <div style="font-size:.75rem;color:var(--muted);margin-top:2px;"><%= f.source %> → <%= f.destination %></div>
+                </td>
+                <td style="font-size:.85rem;"><%= f.departDate %></td>
+                <td style="color:var(--sky-glow);font-weight:600;font-size:.875rem;"><%= f.departTime %></td>
+                <td style="color:var(--muted);font-size:.875rem;"><%= f.arrivalTime != null ? f.arrivalTime : "—" %></td>
+                <td style="font-weight:700;color:var(--gold);">₹<%= String.format("%,.0f", f.price) %></td>
+                <td>
+                    <span style="font-size:.85rem;font-weight:600;"><%= f.seatsAvailable %>/<%= f.seatsTotal %></span>
+                    <div class="seats-bar"><div class="seats-fill" style="width:<%= pct %>%"></div></div>
+                </td>
+                <td>
+                    <span class="badge <%= f.seatsAvailable > 0 ? "badge-active" : "badge-soldout" %>">
+                        <%= f.seatsAvailable > 0 ? "OPEN" : "SOLD OUT" %>
+                    </span>
+                </td>
+                <td>
+                    <div class="action-group">
+                        <a href="editFlight?flightId=<%= f.id %>" class="btn btn-ghost btn-sm">✏ Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDelete(<%= f.id %>, '<%= f.flightNo %>', '<%= f.source %>', '<%= f.destination %>')">🗑 Delete</button>
+                    </div>
+                </td>
+            </tr>
+            <% } %>
             </tbody>
         </table>
         <% } %>
+        </div>
     </div>
-
 </div>
 
-<!-- Delete Confirm Modal -->
+<!-- Delete Modal -->
 <div class="modal-overlay" id="deleteModal">
-    <div class="modal">
+    <div class="modal-box">
         <div class="modal-icon">🗑</div>
-        <h3>Delete Flight?</h3>
-        <p id="modalText">Are you sure you want to delete this flight?<br>This action cannot be undone.</p>
+        <div class="modal-title">Delete Flight?</div>
+        <div class="modal-sub" id="deleteModalSub">This will permanently remove this flight and all associated bookings.</div>
         <div class="modal-btns">
             <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
-            <form id="deleteForm" method="post" action="<%= request.getContextPath() %>/deleteFlight" style="flex:1;">
+            <form id="deleteForm" action="deleteFlight" method="post" style="flex:1">
                 <input type="hidden" name="flightId" id="deleteFlightId">
-                <button type="submit" class="btn-confirm-delete" style="width:100%;">Yes, Delete</button>
+                <button type="submit" class="btn-confirm-delete" style="width:100%">Delete Flight</button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-    function confirmDelete(id, flightNo, route) {
-        document.getElementById('deleteFlightId').value = id;
-        document.getElementById('modalText').innerHTML =
-            'Delete flight <strong>' + flightNo + '</strong> (' + route + ')?<br>This action cannot be undone.';
-        document.getElementById('deleteModal').classList.add('active');
-    }
-    function closeModal() {
-        document.getElementById('deleteModal').classList.remove('active');
-    }
-    document.getElementById('deleteModal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
+const s = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+    const el = document.createElement('div'); el.className = 'star';
+    const sz = Math.random() * 2 + .5;
+    el.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.2+Math.random()*.45};`;
+    s.appendChild(el);
+}
+
+function confirmDelete(id, fn, src, dst) {
+    document.getElementById('deleteFlightId').value = id;
+    document.getElementById('deleteModalSub').textContent =
+        `Flight ${fn} (${src} → ${dst}) will be permanently deleted along with all bookings.`;
+    document.getElementById('deleteModal').classList.add('show');
+}
+function closeModal() { document.getElementById('deleteModal').classList.remove('show'); }
+document.getElementById('deleteModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// Filter
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+function filterTable() {
+    const q = searchInput.value.toLowerCase().trim();
+    const st = statusFilter.value;
+    document.querySelectorAll('#flightsTable tbody tr').forEach(row => {
+        const fn  = row.dataset.fn  || '';
+        const src = row.dataset.src || '';
+        const dst = row.dataset.dst || '';
+        const avail = parseInt(row.dataset.avail) || 0;
+        const matchQ  = !q || fn.includes(q) || src.includes(q) || dst.includes(q);
+        const matchSt = !st || (st === 'available' && avail > 0) || (st === 'soldout' && avail === 0);
+        row.style.display = matchQ && matchSt ? '' : 'none';
     });
-
-    function filterTable() {
-        const val = document.getElementById('searchInput').value.toLowerCase();
-        const rows = document.querySelectorAll('#flightsBody tr');
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(val) ? '' : 'none';
-        });
-    }
-
-    function sortTable() {
-        const val = document.getElementById('sortSelect').value;
-        const tbody = document.getElementById('flightsBody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a, b) => {
-            if (val === 'price-asc' || val === 'price-desc') {
-                const pa = parseFloat(a.cells[6].textContent.replace(/[₹,]/g, '')) || 0;
-                const pb = parseFloat(b.cells[6].textContent.replace(/[₹,]/g, '')) || 0;
-                return val === 'price-asc' ? pa - pb : pb - pa;
-            }
-            if (val === 'date-asc' || val === 'date-desc') {
-                const da = new Date(a.cells[3].textContent.trim());
-                const db = new Date(b.cells[3].textContent.trim());
-                return val === 'date-asc' ? da - db : db - da;
-            }
-            return 0;
-        });
-        rows.forEach(r => tbody.appendChild(r));
-    }
+}
+searchInput.addEventListener('input', filterTable);
+statusFilter.addEventListener('change', filterTable);
 </script>
-
 </body>
 </html>

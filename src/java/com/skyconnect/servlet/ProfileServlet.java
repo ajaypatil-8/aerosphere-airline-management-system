@@ -19,15 +19,20 @@ public class ProfileServlet extends HttpServlet {
         int userId = (Integer) session.getAttribute("userId");
 
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT id, name, email, role, created_at FROM users WHERE id = ?";
+            // FIX: Fetch ALL user fields including phone, dob, gender, address
+            String sql = "SELECT id, name, email, phone, dob, gender, address, role, created_at FROM users WHERE id = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                req.setAttribute("id", rs.getInt("id"));
-                req.setAttribute("name", rs.getString("name"));
-                req.setAttribute("email", rs.getString("email"));
-                req.setAttribute("role", rs.getString("role"));
+                req.setAttribute("id",        rs.getInt("id"));
+                req.setAttribute("name",      rs.getString("name"));
+                req.setAttribute("email",     rs.getString("email"));
+                req.setAttribute("phone",     rs.getString("phone")   != null ? rs.getString("phone")   : "");
+                req.setAttribute("dob",       rs.getDate("dob")       != null ? rs.getDate("dob").toString() : "");
+                req.setAttribute("gender",    rs.getString("gender")  != null ? rs.getString("gender")  : "");
+                req.setAttribute("address",   rs.getString("address") != null ? rs.getString("address") : "");
+                req.setAttribute("role",      rs.getString("role"));
                 req.setAttribute("createdAt", rs.getTimestamp("created_at"));
             } else {
                 req.setAttribute("error", "Profile not found.");
@@ -37,7 +42,6 @@ public class ProfileServlet extends HttpServlet {
             req.setAttribute("error", "Error loading profile: " + e.getMessage());
         }
 
-        // forward to JSP
         req.getRequestDispatcher("profile.jsp").forward(req, resp);
     }
 }
