@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/register.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/src/java/com/skyconnect/util/DBConnection.java</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/login.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/admin_login.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/addPassengers.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/src/java/com/skyconnect/servlet/SavePassengersServlet.java</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/admin_add_flight.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/src/java/com/skyconnect/servlet/ReportUsersServlet.java</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/user_dashboard.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/search_flights.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/book_flight.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/payment.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/invoice.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/user_bookings.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/profile.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/edit_profile.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/refund_history.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/refund_receipt.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/admin_dashboard.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/admin_flights.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/admin_edit_flight.jsp</file>
+            <file>file:/C:/vishu_project/SkyConnect%20Airline%20Reservation%20System/web/admin_bookings.jsp</file>
+        </group>
+    </open-files>
+</project-private>
