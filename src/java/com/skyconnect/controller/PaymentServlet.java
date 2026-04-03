@@ -28,7 +28,7 @@ public class PaymentServlet extends HttpServlet {
         String paymentMethod = req.getParameter("paymentMethod");
 
         if (bookingIdStr == null || paymentMethod == null || paymentMethod.isEmpty()) {
-            resp.sendRedirect("userDashboard");
+            resp.sendRedirect(request.getContextPath() + "/userDashboard");
             return;
         }
 
@@ -50,7 +50,7 @@ public class PaymentServlet extends HttpServlet {
 
                 if (!rs.next()) {
                     con.rollback();
-                    resp.sendRedirect("userDashboard");
+                    resp.sendRedirect(request.getContextPath() + "/userDashboard");
                     return;
                 }
 
@@ -87,7 +87,7 @@ public class PaymentServlet extends HttpServlet {
         }
 
         // ✅ Payment done → go to My Bookings
-        resp.sendRedirect("userBookings");
+        resp.sendRedirect(request.getContextPath() + "/userBookings");
     }
 }
 */
@@ -137,7 +137,7 @@ public class PaymentServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                resp.sendRedirect("userBookings");
+                resp.sendRedirect(request.getContextPath() + "/userBookings");
                 return;
             }
 
@@ -147,13 +147,13 @@ public class PaymentServlet extends HttpServlet {
 
             // ❌ Already cancelled
             if ("CANCELLED".equals(bookingStatus)) {
-                resp.sendRedirect("invoice?bookingId=" + bookingId);
+                resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
                 return;
             }
 
             // ✅ Already paid → skip payment
             if ("PAID".equals(paymentStatus)) {
-                resp.sendRedirect("invoice?bookingId=" + bookingId);
+                resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
                 return;
             }
 
@@ -170,7 +170,7 @@ public class PaymentServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("userBookings");
+            resp.sendRedirect(request.getContextPath() + "/userBookings");
         }
     }
 
@@ -193,7 +193,7 @@ public class PaymentServlet extends HttpServlet {
         String method = req.getParameter("paymentMethod");
 
         if (method == null || method.isEmpty()) {
-            resp.sendRedirect("payment?bookingId=" + bookingId);
+            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
             return;
         }
 
@@ -213,7 +213,7 @@ public class PaymentServlet extends HttpServlet {
 
             if (!rs.next()) {
                 con.rollback();
-                resp.sendRedirect("userBookings");
+                resp.sendRedirect(request.getContextPath() + "/userBookings");
                 return;
             }
 
@@ -222,7 +222,7 @@ public class PaymentServlet extends HttpServlet {
             // ❌ Already paid
             if ("PAID".equals(paymentStatus)) {
                 con.rollback();
-                resp.sendRedirect("invoice?bookingId=" + bookingId);
+                resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
                 return;
             }
 
@@ -251,11 +251,11 @@ public class PaymentServlet extends HttpServlet {
 
             con.commit();
 
-            resp.sendRedirect("invoice?bookingId=" + bookingId);
+            resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("payment?bookingId=" + bookingId);
+            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
         }
     }
 }

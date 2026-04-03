@@ -29,7 +29,7 @@ public class DeleteFlightServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                resp.sendRedirect("adminFlights");
+                resp.sendRedirect(req.getContextPath() + "/adminFlights");
                 return;
             }
 
@@ -38,7 +38,7 @@ public class DeleteFlightServlet extends HttpServlet {
 
             // ❌ Do NOT delete if seats booked
             if (total != available) {
-                resp.sendRedirect("adminFlights?error=booked");
+                resp.sendRedirect(req.getContextPath() + "/adminFlights?error=booked");
                 return;
             }
 
@@ -52,6 +52,6 @@ public class DeleteFlightServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect("adminFlights");
+        resp.sendRedirect(req.getContextPath() + "/adminFlights");
     }
 }

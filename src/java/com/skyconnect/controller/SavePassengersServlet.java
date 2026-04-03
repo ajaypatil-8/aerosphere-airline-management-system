@@ -26,7 +26,7 @@ public class SavePassengersServlet extends HttpServlet {
 
         String bookingIdStr = req.getParameter("bookingId");
         if (bookingIdStr == null) {
-            resp.sendRedirect("userDashboard");
+            resp.sendRedirect(request.getContextPath() + "/userDashboard");
             return;
         }
 
@@ -42,7 +42,7 @@ public class SavePassengersServlet extends HttpServlet {
 
         // Safety check
         if (names == null || names.length == 0) {
-            resp.sendRedirect("addPassengers?bookingId=" + bookingId);
+            resp.sendRedirect(req.getContextPath() + "/addPassengers?bookingId=" + bookingId);
             return;
         }
 
@@ -77,7 +77,7 @@ public class SavePassengersServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("addPassengers?bookingId=" + bookingId);
+            resp.sendRedirect(req.getContextPath() + "/addPassengers?bookingId=" + bookingId);
             return;
         }
 
@@ -137,7 +137,7 @@ public class SavePassengersServlet extends HttpServlet {
             if (rs.next()) {
                 flightId = rs.getInt("flight_id");
             } else {
-                resp.sendRedirect("userDashboard");
+                resp.sendRedirect(request.getContextPath() + "/userDashboard");
                 return;
             }
 
@@ -214,7 +214,7 @@ public class SavePassengersServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("addPassengers?bookingId=" + bookingId);
+            resp.sendRedirect(req.getContextPath() + "/addPassengers?bookingId=" + bookingId);
             return;
         }
 

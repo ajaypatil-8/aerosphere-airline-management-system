@@ -37,7 +37,7 @@ public class ApproveRefundServlet extends HttpServlet {
 
             if (!rs.next()) {
                 con.rollback();
-                resp.sendRedirect("adminRefunds");
+                resp.sendRedirect(req.getContextPath() + "/adminRefunds");
                 return;
             }
 
@@ -71,6 +71,6 @@ public class ApproveRefundServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect("adminRefunds");
+        resp.sendRedirect(req.getContextPath() + "/adminRefunds");
     }
 }

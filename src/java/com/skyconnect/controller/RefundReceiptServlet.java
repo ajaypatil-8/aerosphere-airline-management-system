@@ -51,6 +51,6 @@ public class RefundReceiptServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect("userRefundHistory");
+        resp.sendRedirect(req.getContextPath() + "/userRefundHistory");
     }
 }

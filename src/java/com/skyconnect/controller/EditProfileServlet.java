@@ -98,7 +98,7 @@ public class EditProfileServlet extends HttpServlet {
 
             ps.executeUpdate();
             session.setAttribute("userName", name.trim());
-            resp.sendRedirect("profile");
+            resp.sendRedirect(req.getContextPath() + "/profile");
             return;
 
         } catch (SQLIntegrityConstraintViolationException cve) {

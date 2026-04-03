@@ -26,7 +26,7 @@ public class EditFlightServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                resp.sendRedirect("adminFlights");
+                resp.sendRedirect(req.getContextPath() + "/adminFlights");
                 return;
             }
 
@@ -45,7 +45,7 @@ public class EditFlightServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("adminFlights");
+            resp.sendRedirect(req.getContextPath() + "/adminFlights");
         }
     }
 
@@ -78,6 +78,6 @@ public class EditFlightServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect("adminFlights");
+        resp.sendRedirect(req.getContextPath() + "/adminFlights");
     }
 }

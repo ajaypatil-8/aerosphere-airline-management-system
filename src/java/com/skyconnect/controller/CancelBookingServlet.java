@@ -51,7 +51,7 @@ public class CancelBookingServlet extends HttpServlet {
 
             if (!rs.next()) {
                 con.rollback();
-                resp.sendRedirect("userBookings");
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
                 return;
             }
 
@@ -65,7 +65,7 @@ public class CancelBookingServlet extends HttpServlet {
 
             if ("CANCELLED".equals(status)) {
                 con.rollback();
-                resp.sendRedirect("userBookings");
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
                 return;
             }
 
@@ -79,7 +79,7 @@ public class CancelBookingServlet extends HttpServlet {
             if (hoursLeft <= 0) {
                 con.rollback();
                 session.setAttribute("cancelError", "Flight already departed");
-                resp.sendRedirect("userBookings");
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
                 return;
             }
 
@@ -125,6 +125,6 @@ public class CancelBookingServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.sendRedirect("userBookings");
+        resp.sendRedirect(req.getContextPath() + "/userBookings");
     }
 }

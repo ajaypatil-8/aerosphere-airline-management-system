@@ -23,9 +23,9 @@ public class LoginServlet extends HttpServlet {
 
         HttpSession session = req.getSession(false);
 
+        // If already logged in, redirect to correct dashboard
         if (session != null && session.getAttribute("user") != null) {
             User u = (User) session.getAttribute("user");
-
             if ("ADMIN".equals(u.getRole())) {
                 resp.sendRedirect(req.getContextPath() + "/adminDashboard");
             } else {
@@ -34,20 +34,20 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // ✅ FIXED PATH
-        req.getRequestDispatcher(req.getContextPath() + "/login").forward(req, resp);
+        // NOTE: getRequestDispatcher() is always context-relative — never add getContextPath() here
+        req.getRequestDispatcher("/Views/auth/login.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String email = req.getParameter("email") == null ? "" : req.getParameter("email").trim();
+        String email    = req.getParameter("email")    == null ? "" : req.getParameter("email").trim();
         String password = req.getParameter("password") == null ? "" : req.getParameter("password");
 
         if (email.isEmpty() || password.isEmpty()) {
             req.setAttribute("error", "Email and password are required.");
-            req.getRequestDispatcher(req.getContextPath() + "/login").forward(req, resp);
+            req.getRequestDispatcher("/Views/auth/login.jsp").forward(req, resp);
             return;
         }
 
@@ -55,12 +55,14 @@ public class LoginServlet extends HttpServlet {
 
         if (user == null) {
             req.setAttribute("error", "Invalid email or password.");
-            req.getRequestDispatcher(req.getContextPath() + "/login").forward(req, resp);
+            req.getRequestDispatcher("/Views/auth/login.jsp").forward(req, resp);
             return;
         }
 
+        // Store ALL required session attributes
         HttpSession session = req.getSession(true);
-        session.setAttribute("user", user);
+        session.setAttribute("user",     user);
+        session.setAttribute("userId",   user.getId());   // needed by all protected servlets
         session.setAttribute("userName", user.getName());
         session.setAttribute("userRole", user.getRole());
 

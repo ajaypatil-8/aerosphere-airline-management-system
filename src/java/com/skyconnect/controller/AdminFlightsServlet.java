@@ -59,6 +59,6 @@ public class AdminFlightsServlet extends HttpServlet {
         }
 
         req.setAttribute("flights", flights);
-        req.getRequestDispatcher("adminflights.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/admin_flights.jsp").forward(req, resp);
     }
 }

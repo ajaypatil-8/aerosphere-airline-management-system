@@ -18,7 +18,7 @@ public class AddPassengerServlet extends HttpServlet {
 
         String bookingIdStr = req.getParameter("bookingId");
         if (bookingIdStr == null) {
-            resp.sendRedirect("userBookings");
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
             return;
         }
 
@@ -39,12 +39,12 @@ public class AddPassengerServlet extends HttpServlet {
 
                 req.getRequestDispatcher("/Views/user/addPassengers.jsp").forward(req, resp);
             } else {
-                resp.sendRedirect("userBookings");
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("userBookings");
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
         }
     }
 }
