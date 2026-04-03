@@ -44,7 +44,7 @@ public class RefundReceiptServlet extends HttpServlet {
 
             if (rs.next()) {
                 req.setAttribute("refund", rs);
-                req.getRequestDispatcher("refund_receipt.jsp").forward(req, resp);
+                req.getRequestDispatcher("/Views/user/refund_receipt.jsp").forward(req, resp);
                 return;
             }
         } catch (Exception e) {

@@ -42,6 +42,6 @@ public class ProfileServlet extends HttpServlet {
             req.setAttribute("error", "Error loading profile: " + e.getMessage());
         }
 
-        req.getRequestDispatcher("profile.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/profile.jsp").forward(req, resp);
     }
 }

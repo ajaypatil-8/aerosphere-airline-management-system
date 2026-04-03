@@ -21,7 +21,7 @@
 <div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a href="/Views/auth/index.jsp" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>

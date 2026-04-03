@@ -548,13 +548,13 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="/Views/auth/index.jsp" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-text">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="/Views/auth/index.jsp" class="nav-link">Home</a>
-        <a href="register.jsp" class="nav-link outline">Create Account</a>
+        <a href="${pageContext.request.contextPath}/" class="nav-link">Home</a>
+        <a href="${pageContext.request.contextPath}/register" class="nav-link outline">Create Account</a>
     </div>
 </nav>
 
@@ -626,7 +626,7 @@
             <% } %>
 
             <!-- USER FORM -->
-            <form action="login" method="post" id="userForm">
+            <form action="${pageContext.request.contextPath}/login" method="post" id="userForm">
                 <input type="hidden" name="loginType" value="USER">
 
                 <div class="field">
@@ -655,7 +655,7 @@
             </form>
 
             <!-- ADMIN FORM -->
-            <form action="login" method="post" id="adminForm">
+            <form action="${pageContext.request.contextPath}/login" method="post" id="adminForm">
                 <input type="hidden" name="loginType" value="ADMIN">
 
                 <div class="field">
@@ -686,7 +686,7 @@
             <div class="divider"><span>New to SkyConnect?</span></div>
 
             <div class="register-link-row">
-                <a href="register.jsp">Create a free account →</a>
+                <a href="${pageContext.request.contextPath}/register">Create a free account →</a>
             </div>
 
         </div>

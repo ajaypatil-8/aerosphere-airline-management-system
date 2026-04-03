@@ -62,6 +62,6 @@ public class ReportCancelledServlet extends HttpServlet {
         }
 
         req.setAttribute("cancelled", cancelled);
-        req.getRequestDispatcher("cancelled_report.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/cancelled_report.jsp").forward(req, resp);
     }
 }

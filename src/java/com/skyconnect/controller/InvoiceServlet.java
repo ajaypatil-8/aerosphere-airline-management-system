@@ -99,7 +99,7 @@ public class InvoiceServlet extends HttpServlet {
 
             req.setAttribute("passengers", passengers);
 
-            req.getRequestDispatcher("invoice.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/invoice.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,7 +220,7 @@ public class InvoiceServlet extends HttpServlet {
             req.setAttribute("passengers", passengers);
 
             // ================= FORWARD =================
-            req.getRequestDispatcher("invoice.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/invoice.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();

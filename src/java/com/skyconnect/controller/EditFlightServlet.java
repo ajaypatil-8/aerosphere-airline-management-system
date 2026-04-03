@@ -41,7 +41,7 @@ public class EditFlightServlet extends HttpServlet {
             req.setAttribute("totalSeats", rs.getInt("seats_total"));
             req.setAttribute("availableSeats", rs.getInt("seats_available"));
 
-            req.getRequestDispatcher("admin_edit_flight.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/admin/admin_edit_flight.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();

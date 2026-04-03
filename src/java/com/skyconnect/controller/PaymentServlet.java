@@ -20,7 +20,7 @@ public class PaymentServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -82,7 +82,7 @@ public class PaymentServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("payment.jsp?bookingId=" + bookingIdStr);
+            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingIdStr);
             return;
         }
 
@@ -166,7 +166,7 @@ public class PaymentServlet extends HttpServlet {
             req.setAttribute("gst", gst);
             req.setAttribute("finalAmount", finalAmount);
 
-            req.getRequestDispatcher("payment.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/payment.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();

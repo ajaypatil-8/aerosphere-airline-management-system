@@ -28,19 +28,19 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="/Views/auth/index.jsp" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="/Views/auth/index.jsp" class="nav-link">Home</a>
+        <a href="${pageContext.request.contextPath}/" class="nav-link">Home</a>
         <% if (userName != null) { %>
             <a href="userDashboard" class="nav-link">Dashboard</a>
             <a href="userBookings" class="nav-link">My Bookings</a>
             <div class="user-pill">👤 <%= userName %></div>
             <a href="logout" class="nav-link btn-danger">Logout</a>
         <% } else { %>
-            <a href="/Views/auth/login.jsp" class="nav-link btn-primary">Sign In</a>
+            <a href="${pageContext.request.contextPath}/login" class="nav-link btn-primary">Sign In</a>
         <% } %>
     </div>
 </nav>
@@ -72,7 +72,7 @@
         <div class="card card-pad" style="text-align:center;padding:60px 20px;">
             <div style="font-size:48px;margin-bottom:16px">🛫</div>
             <p style="color:var(--muted);font-size:1rem;margin-bottom:20px;">No flights found for the selected route and date.</p>
-            <a href="/Views/auth/index.jsp#search" class="btn btn-blue">Try Another Search</a>
+            <a href="${pageContext.request.contextPath}/#search" class="btn btn-blue">Try Another Search</a>
         </div>
     <% } else { %>
 
@@ -109,7 +109,7 @@
                     <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--white);">₹<%= String.format("%.0f", f.price) %></div>
                     <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">per seat · <%= f.seatsAvailable %> left</div>
                     <% if (userName == null) { %>
-                        <a href="/Views/auth/login.jsp" class="btn btn-blue btn-sm">Login to Book</a>
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-blue btn-sm">Login to Book</a>
                     <% } else if (f.seatsAvailable >= numSeats) { %>
                         <form action="bookFlight" method="post" style="display:inline;">
                             <input type="hidden" name="flightId" value="<%= f.id %>">

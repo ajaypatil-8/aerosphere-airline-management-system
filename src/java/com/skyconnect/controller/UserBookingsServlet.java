@@ -32,7 +32,7 @@ public class UserBookingsServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
         if (userId == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -64,7 +64,7 @@ public class UserBookingsServlet extends HttpServlet {
         }
 
         req.setAttribute("bookings", list);
-        req.getRequestDispatcher("user_bookings.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/user_bookings.jsp").forward(req, resp);
     }
 }
 */
@@ -114,7 +114,7 @@ public class UserBookingsServlet extends HttpServlet {
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -157,7 +157,7 @@ public class UserBookingsServlet extends HttpServlet {
         }
 
         req.setAttribute("bookings", bookings);
-        req.getRequestDispatcher("user_bookings.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/user_bookings.jsp").forward(req, resp);
     }
 }
 */
@@ -246,6 +246,6 @@ public class UserBookingsServlet extends HttpServlet {
         }
 
         req.setAttribute("bookings", list);
-        req.getRequestDispatcher("user_bookings.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/user_bookings.jsp").forward(req, resp);
     }
 }

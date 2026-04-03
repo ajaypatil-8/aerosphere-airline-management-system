@@ -75,7 +75,7 @@ public class UserDashboardServlet extends HttpServlet {
         req.setAttribute("recentBookings", bookings);
 
         // Move to dashboard page
-        req.getRequestDispatcher("user_dashboard.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/user_dashboard.jsp").forward(req, resp);
     }
 }
 
@@ -107,7 +107,7 @@ public class UserDashboardServlet extends HttpServlet {
         String userName = (String) session.getAttribute("userName");
 
         if (userId == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -177,7 +177,7 @@ public class UserDashboardServlet extends HttpServlet {
             }
 
             req.setAttribute("recentBookings", list);
-            req.getRequestDispatcher("user_dashboard.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/user_dashboard.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace(); // CHECK TOMCAT CONSOLE

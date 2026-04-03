@@ -62,12 +62,12 @@ public class SearchFlightsServlet extends HttpServlet {
             // send results to JSP
             req.setAttribute("flights", flights);
             req.setAttribute("searched", true);
-            req.getRequestDispatcher("search_flights.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("error", "Unable to search flights");
-            req.getRequestDispatcher("search_flights.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
         }
     }
 }

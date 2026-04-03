@@ -53,6 +53,6 @@ public class ReportUsersServlet extends HttpServlet {
         }
 
         req.setAttribute("users", users);
-        req.getRequestDispatcher("users_repor.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/users_repor.jsp").forward(req, resp);
     }
 }

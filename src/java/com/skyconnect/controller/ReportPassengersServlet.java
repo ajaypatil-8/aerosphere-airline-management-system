@@ -74,6 +74,6 @@ public class ReportPassengersServlet extends HttpServlet {
         }
 
         req.setAttribute("passengers", list);
-        req.getRequestDispatcher("passenger_report.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/passenger_report.jsp").forward(req, resp);
     }
 }

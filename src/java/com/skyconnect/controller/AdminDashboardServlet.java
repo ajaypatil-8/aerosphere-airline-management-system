@@ -98,7 +98,7 @@ try (PreparedStatement ps = con.prepareStatement(
             req.setAttribute("error", "Error loading dashboard: " + e.getMessage());
         }
 
-        req.getRequestDispatcher("admin_dashboard.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/admin_dashboard.jsp").forward(req, resp);
     }
 
     // ✅ helper method

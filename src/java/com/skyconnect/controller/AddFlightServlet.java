@@ -42,7 +42,7 @@ public class AddFlightServlet extends HttpServlet {
             || seatsStr == null || seatsStr.trim().isEmpty()) {
 
             session.setAttribute("flightError", "Please fill all required fields.");
-            resp.sendRedirect("admin_add_flight.jsp");
+            resp.sendRedirect(req.getContextPath() + "/addFlight");
             return;
         }
 
@@ -55,7 +55,7 @@ public class AddFlightServlet extends HttpServlet {
                 depSqlTime = Time.valueOf(lt);
             } catch (DateTimeParseException ex) {
                 session.setAttribute("flightError", "Invalid departure time. Use HH:mm.");
-                resp.sendRedirect("admin_add_flight.jsp");
+                resp.sendRedirect(req.getContextPath() + "/addFlight");
                 return;
             }
 
@@ -66,7 +66,7 @@ public class AddFlightServlet extends HttpServlet {
                     arrSqlTime = Time.valueOf(la);
                 } catch (DateTimeParseException ex) {
                     session.setAttribute("flightError", "Invalid arrival time. Use HH:mm.");
-                    resp.sendRedirect("admin_add_flight.jsp");
+                    resp.sendRedirect(req.getContextPath() + "/addFlight");
                     return;
                 }
             }
@@ -90,13 +90,13 @@ public class AddFlightServlet extends HttpServlet {
                 session.setAttribute("flightSuccess", "Flight added successfully.");
             }
 
-            resp.sendRedirect("admin_add_flight.jsp");
+            resp.sendRedirect(req.getContextPath() + "/addFlight");
             return;
 
         } catch (Exception e) {
             e.printStackTrace(); // server log
             session.setAttribute("flightError", "Error adding flight: " + e.getMessage());
-            resp.sendRedirect("admin_add_flight.jsp");
+            resp.sendRedirect(req.getContextPath() + "/addFlight");
         }
     }
 }

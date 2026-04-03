@@ -67,6 +67,6 @@ public class ReportPaymentsServlet extends HttpServlet {
         }
 
         req.setAttribute("payments", payments);
-        req.getRequestDispatcher("payments_report.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/payments_report.jsp").forward(req, resp);
     }
 }

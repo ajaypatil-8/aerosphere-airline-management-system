@@ -86,6 +86,6 @@ public class ReportFlightsServlet extends HttpServlet {
         }
 
         req.setAttribute("flights", flights);
-        req.getRequestDispatcher("flights_report.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/flights_report.jsp").forward(req, resp);
     }
 }

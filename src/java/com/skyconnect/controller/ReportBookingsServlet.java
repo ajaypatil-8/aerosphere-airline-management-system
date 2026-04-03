@@ -88,6 +88,6 @@ public class ReportBookingsServlet extends HttpServlet {
         }
 
         req.setAttribute("bookings", list);
-        req.getRequestDispatcher("bookings_report.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/bookings_report.jsp").forward(req, resp);
     }
 }

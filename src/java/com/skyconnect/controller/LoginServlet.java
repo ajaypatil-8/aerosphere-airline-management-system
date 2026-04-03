@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         // ✅ FIXED PATH
-        req.getRequestDispatcher("/Views/auth/login.jsp").forward(req, resp);
+        req.getRequestDispatcher(req.getContextPath() + "/login").forward(req, resp);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class LoginServlet extends HttpServlet {
 
         if (email.isEmpty() || password.isEmpty()) {
             req.setAttribute("error", "Email and password are required.");
-            req.getRequestDispatcher("/Views/auth/login.jsp").forward(req, resp);
+            req.getRequestDispatcher(req.getContextPath() + "/login").forward(req, resp);
             return;
         }
 
@@ -55,13 +55,12 @@ public class LoginServlet extends HttpServlet {
 
         if (user == null) {
             req.setAttribute("error", "Invalid email or password.");
-            req.getRequestDispatcher("/Views/auth/login.jsp").forward(req, resp);
+            req.getRequestDispatcher(req.getContextPath() + "/login").forward(req, resp);
             return;
         }
 
         HttpSession session = req.getSession(true);
         session.setAttribute("user", user);
-        session.setAttribute("userId", user.getId());
         session.setAttribute("userName", user.getName());
         session.setAttribute("userRole", user.getRole());
 

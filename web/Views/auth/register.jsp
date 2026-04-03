@@ -550,13 +550,13 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="/Views/auth/index.jsp" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-text">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="/Views/auth/index.jsp" class="nav-link">Home</a>
-        <a href="/Views/auth/login.jsp" class="nav-link cta">Sign In</a>
+        <a href="${pageContext.request.contextPath}/" class="nav-link">Home</a>
+        <a href="${pageContext.request.contextPath}/login" class="nav-link cta">Sign In</a>
     </div>
 </nav>
 
@@ -586,7 +586,7 @@
                 <div class="alert alert-success">✓ <%= success %></div>
             <% } %>
 
-            <form action="register" method="post" id="regForm">
+            <form action="${pageContext.request.contextPath}/register" method="post" id="regForm">
                 <div class="form-grid">
 
                     <!-- PERSONAL INFO LABEL -->
@@ -689,7 +689,7 @@
         </div>
 
         <p class="form-footer">
-            Already have an account? <a href="/Views/auth/login.jsp">Sign in here</a>
+            Already have an account? <a href="${pageContext.request.contextPath}/login">Sign in here</a>
         </p>
 
     </div>

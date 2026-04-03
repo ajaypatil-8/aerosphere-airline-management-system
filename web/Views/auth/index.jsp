@@ -604,7 +604,7 @@
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
-    <a href="/Views/auth/index.jsp" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>
@@ -621,8 +621,8 @@
             <div class="user-pill">👤 <%= userName %></div>
             <a href="logout" class="nav-link btn-nav">Logout</a>
         <% } else { %>
-            <a href="/Views/auth/login.jsp" class="nav-link">Sign In</a>
-            <a href="register.jsp" class="nav-link btn-nav">Register →</a>
+            <a href="${pageContext.request.contextPath}/login" class="nav-link">Sign In</a>
+            <a href="${pageContext.request.contextPath}/register" class="nav-link btn-nav">Register →</a>
         <% } %>
     </div>
 </nav>
@@ -649,7 +649,7 @@
             <% } %>
             <a href="#search" class="btn-hero secondary">Search Flights</a>
         <% } else { %>
-            <a href="register.jsp" class="btn-hero primary">Get Started Free →</a>
+            <a href="${pageContext.request.contextPath}/register" class="btn-hero primary">Get Started Free →</a>
             <a href="#search" class="btn-hero secondary">Search Flights</a>
         <% } %>
     </div>

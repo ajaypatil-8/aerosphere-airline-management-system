@@ -19,7 +19,7 @@ public class AdminRefundsServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         // FIX: was checking session.getAttribute("role") — should be "userRole"
         if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {
-            resp.sendRedirect(req.getContextPath() + "//Views/auth/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
@@ -60,6 +60,6 @@ public class AdminRefundsServlet extends HttpServlet {
         }
 
         req.setAttribute("refunds", refunds);
-        req.getRequestDispatcher("admin_refunds.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/admin_refunds.jsp").forward(req, resp);
     }
 }

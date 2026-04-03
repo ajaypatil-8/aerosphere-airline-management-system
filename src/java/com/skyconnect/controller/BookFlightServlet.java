@@ -18,7 +18,7 @@ public class BookFlightServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
         if (userId == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -26,7 +26,7 @@ public class BookFlightServlet extends HttpServlet {
         String numSeatsStr = req.getParameter("numSeats");
 
         if (flightIdStr == null || numSeatsStr == null) {
-            resp.sendRedirect("/Views/auth/index.jsp");
+            resp.sendRedirect(req.getContextPath() + "/");
             return;
         }
 
@@ -129,7 +129,7 @@ public class BookFlightServlet extends HttpServlet {
         // 🔐 Check login
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -146,7 +146,7 @@ public class BookFlightServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                resp.sendRedirect("search_flights.jsp");
+                resp.sendRedirect(req.getContextPath() + "/searchFlights");
                 return;
             }
 
@@ -155,7 +155,7 @@ public class BookFlightServlet extends HttpServlet {
 
             if (seatsAvailable <= 0) {
                 req.setAttribute("error", "No seats available");
-                req.getRequestDispatcher("search_flights.jsp").forward(req, resp);
+                req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
                 return;
             }
 

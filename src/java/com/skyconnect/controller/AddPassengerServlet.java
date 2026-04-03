@@ -37,7 +37,7 @@ public class AddPassengerServlet extends HttpServlet {
                 req.setAttribute("bookingId", bookingId);
                 req.setAttribute("seats", seats);
 
-                req.getRequestDispatcher("addPassengers.jsp").forward(req, resp);
+                req.getRequestDispatcher("/Views/user/addPassengers.jsp").forward(req, resp);
             } else {
                 resp.sendRedirect("userBookings");
             }

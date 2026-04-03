@@ -57,6 +57,6 @@ public class AdminBookingsServlet extends HttpServlet {
         }
 
         req.setAttribute("bookings", rows);
-        req.getRequestDispatcher("admin_bookings.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/admin/admin_bookings.jsp").forward(req, resp);
     }
 }

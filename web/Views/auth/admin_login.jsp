@@ -82,7 +82,7 @@
     <% } %>
 
     <!-- LOGIN FORM -->
-    <form action="login" method="post">
+    <form action="${pageContext.request.contextPath}/login" method="post">
 
         <div class="mb-3 text-start">
             <label class="form-label">
@@ -110,7 +110,7 @@
 
     <!-- BACK LINK -->
     <div class="mt-4">
-        <a href="/Views/auth/index.jsp" class="text-decoration-none">
+        <a href="${pageContext.request.contextPath}/" class="text-decoration-none">
             <i class="bi bi-arrow-left"></i> Back to Home
         </a>
     </div>

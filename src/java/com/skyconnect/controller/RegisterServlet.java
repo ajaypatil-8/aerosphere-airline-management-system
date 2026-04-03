@@ -11,6 +11,13 @@ import java.sql.*;
 public class RegisterServlet extends HttpServlet {
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        // Show the registration page
+        req.getRequestDispatcher("/Views/auth/register.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -41,11 +48,11 @@ public class RegisterServlet extends HttpServlet {
             ps.executeUpdate();
 
             req.setAttribute("success", "Account created successfully! Please login.");
-            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/auth/register.jsp").forward(req, resp);
 
         } catch (SQLException e) {
             req.setAttribute("error", "Registration failed: email already exists!");
-            req.getRequestDispatcher("register.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/auth/register.jsp").forward(req, resp);
         }
     }
 }

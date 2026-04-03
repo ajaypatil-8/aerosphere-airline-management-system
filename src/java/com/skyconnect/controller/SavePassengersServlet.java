@@ -20,7 +20,7 @@ public class SavePassengersServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -85,7 +85,7 @@ public class SavePassengersServlet extends HttpServlet {
         session.removeAttribute("numSeats");
 
         // ➡ Redirect to payment page
-        resp.sendRedirect("payment.jsp?bookingId=" + bookingId);
+        resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
     }
 }*/
 
@@ -221,7 +221,7 @@ public class SavePassengersServlet extends HttpServlet {
         session.removeAttribute("numSeats");
 
         // ➡ Go to payment
-        resp.sendRedirect("payment.jsp?bookingId=" + bookingId);
+        resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
     }
 }
 
