@@ -18,7 +18,7 @@ public class UserRefundHistoryServlet extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "//Views/auth/login.jsp");
             return;
         }
 

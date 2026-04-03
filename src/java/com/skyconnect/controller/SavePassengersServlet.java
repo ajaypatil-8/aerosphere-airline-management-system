@@ -20,7 +20,7 @@ public class SavePassengersServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
             return;
         }
 
@@ -109,7 +109,7 @@ public class SavePassengersServlet extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
-           resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+           resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 

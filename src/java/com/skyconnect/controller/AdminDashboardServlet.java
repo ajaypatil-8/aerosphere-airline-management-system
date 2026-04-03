@@ -30,7 +30,7 @@ public class AdminDashboardServlet extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {
-            resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 

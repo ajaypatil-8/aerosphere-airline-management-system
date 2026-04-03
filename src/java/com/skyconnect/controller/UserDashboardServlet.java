@@ -31,7 +31,7 @@ public class UserDashboardServlet extends HttpServlet {
 
         // Login required
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
@@ -107,7 +107,7 @@ public class UserDashboardServlet extends HttpServlet {
         String userName = (String) session.getAttribute("userName");
 
         if (userId == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
             return;
         }
 

@@ -2,7 +2,7 @@
 <%@ page import="java.text.DecimalFormat, java.util.*" %>
 <%
     String userName2 = (String) session.getAttribute("userName");
-    if (userName2 == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName2 == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     DecimalFormat df = new DecimalFormat("0.00");
     Integer bookingId   = (Integer) request.getAttribute("bookingId");
     String  uName       = (String)  request.getAttribute("userName");

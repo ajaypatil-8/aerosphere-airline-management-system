@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     String flightId  = request.getParameter("flightId")  != null ? request.getParameter("flightId")  : "";
     String numSeats  = request.getParameter("numSeats")  != null ? request.getParameter("numSeats")  : "1";
     String flightNo  = request.getParameter("flightNo")  != null ? request.getParameter("flightNo")  : "";

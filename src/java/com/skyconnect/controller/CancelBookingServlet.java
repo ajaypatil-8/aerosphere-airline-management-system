@@ -21,7 +21,7 @@ public class CancelBookingServlet extends HttpServlet {
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-            resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 

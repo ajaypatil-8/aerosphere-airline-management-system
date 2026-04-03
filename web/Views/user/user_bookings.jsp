@@ -3,7 +3,7 @@
 <%@ page import="com.skyconnect.servlet.UserBookingsServlet.BookingRow" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<BookingRow> bookings = (List<BookingRow>) request.getAttribute("bookings");
     String cancelSuccess = (String) session.getAttribute("cancelSuccess");
     String cancelError   = (String) session.getAttribute("cancelError");

@@ -3,7 +3,7 @@
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
-    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<Map<String,Object>> refunds = (List<Map<String,Object>>) request.getAttribute("refunds");
     String actionSuccess = (String) session.getAttribute("refundActionSuccess");
     String actionError   = (String) session.getAttribute("refundActionError");

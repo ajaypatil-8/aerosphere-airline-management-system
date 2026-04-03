@@ -19,7 +19,7 @@ public class RefundReceiptServlet extends HttpServlet {
         Integer userId = (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-            resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 

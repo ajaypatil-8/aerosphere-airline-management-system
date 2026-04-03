@@ -110,7 +110,7 @@
 
     <!-- BACK LINK -->
     <div class="mt-4">
-        <a href="index.jsp" class="text-decoration-none">
+        <a href="/Views/auth/index.jsp" class="text-decoration-none">
             <i class="bi bi-arrow-left"></i> Back to Home
         </a>
     </div>

@@ -550,13 +550,13 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="index.jsp" class="nav-brand">
+    <a href="/Views/auth/index.jsp" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-text">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="index.jsp" class="nav-link">Home</a>
-        <a href="login.jsp" class="nav-link cta">Sign In</a>
+        <a href="/Views/auth/index.jsp" class="nav-link">Home</a>
+        <a href="/Views/auth/login.jsp" class="nav-link cta">Sign In</a>
     </div>
 </nav>
 
@@ -689,7 +689,7 @@
         </div>
 
         <p class="form-footer">
-            Already have an account? <a href="login.jsp">Sign in here</a>
+            Already have an account? <a href="/Views/auth/login.jsp">Sign in here</a>
         </p>
 
     </div>

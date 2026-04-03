@@ -548,12 +548,12 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <a href="index.jsp" class="nav-brand">
+    <a href="/Views/auth/index.jsp" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-text">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="index.jsp" class="nav-link">Home</a>
+        <a href="/Views/auth/index.jsp" class="nav-link">Home</a>
         <a href="register.jsp" class="nav-link outline">Create Account</a>
     </div>
 </nav>

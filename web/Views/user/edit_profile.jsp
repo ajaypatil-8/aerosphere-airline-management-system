@@ -1,6 +1,6 @@
 <%
     String userName  = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     String curName    = (String) request.getAttribute("curName");
     String curEmail   = (String) request.getAttribute("curEmail");
     String curPhone   = (String) request.getAttribute("curPhone");

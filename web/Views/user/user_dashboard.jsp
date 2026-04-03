@@ -3,7 +3,7 @@
 <%@ page import="com.skyconnect.servlet.UserDashboardServlet.Booking" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     String firstName = userName.contains(" ") ? userName.split(" ")[0] : userName;
     List<Booking> recentBookings = (List<Booking>) request.getAttribute("recentBookings");
     String error = (String) request.getAttribute("error");

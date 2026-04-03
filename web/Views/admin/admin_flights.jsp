@@ -3,7 +3,7 @@
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
-    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<com.skyconnect.servlet.AdminFlightsServlet.Flight> flights =
         (List<com.skyconnect.servlet.AdminFlightsServlet.Flight>) request.getAttribute("flights");
     String deleteError   = (String) session.getAttribute("deleteError");

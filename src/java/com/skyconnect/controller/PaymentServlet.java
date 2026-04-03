@@ -20,7 +20,7 @@ public class PaymentServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(request.getContextPath() + "/views/auth//Views/auth/login.jsp");
             return;
         }
 
@@ -117,7 +117,7 @@ public class PaymentServlet extends HttpServlet {
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-            resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
@@ -185,7 +185,7 @@ public class PaymentServlet extends HttpServlet {
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-           resp.sendRedirect(req.getContextPath() + "/views/auth/login.jsp");
+           resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 

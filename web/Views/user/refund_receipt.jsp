@@ -2,7 +2,7 @@
 <%@ page import="java.sql.ResultSet" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     ResultSet refund = (ResultSet) request.getAttribute("refund");
     String refundId      = "";
     String bookingId     = "";

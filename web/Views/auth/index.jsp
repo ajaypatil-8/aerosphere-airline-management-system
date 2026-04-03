@@ -604,7 +604,7 @@
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
-    <a href="index.jsp" class="nav-brand">
+    <a href="/Views/auth/index.jsp" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>
@@ -621,7 +621,7 @@
             <div class="user-pill">👤 <%= userName %></div>
             <a href="logout" class="nav-link btn-nav">Logout</a>
         <% } else { %>
-            <a href="login.jsp" class="nav-link">Sign In</a>
+            <a href="/Views/auth/login.jsp" class="nav-link">Sign In</a>
             <a href="register.jsp" class="nav-link btn-nav">Register →</a>
         <% } %>
     </div>

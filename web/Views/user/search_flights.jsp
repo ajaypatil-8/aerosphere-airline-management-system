@@ -2,7 +2,7 @@
 <%@ page import="java.util.List, java.util.Map" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<Map<String,Object>> flights = (List<Map<String,Object>>) request.getAttribute("flights");
     Boolean searched = (Boolean) request.getAttribute("searched");
     String error     = (String)  request.getAttribute("error");

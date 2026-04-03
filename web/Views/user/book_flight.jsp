@@ -2,7 +2,7 @@
 <%@ page import="java.sql.*, com.skyconnect.util.DBConnection" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
 
     String flightIdStr = request.getParameter("flightId");
     String numSeatsStr = request.getParameter("numSeats");

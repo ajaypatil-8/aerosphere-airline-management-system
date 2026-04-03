@@ -2,7 +2,7 @@
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
-    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
 
     String id          = request.getAttribute("id")          != null ? String.valueOf(request.getAttribute("id"))          : "";
     String flightNo    = request.getAttribute("flightNo")    != null ? String.valueOf(request.getAttribute("flightNo"))    : "";

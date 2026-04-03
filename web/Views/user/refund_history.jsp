@@ -2,7 +2,7 @@
 <%@ page import="java.util.List, java.util.Map" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<Map<String, Object>> refunds = (List<Map<String, Object>>) request.getAttribute("refunds");
 %>
 <!DOCTYPE html>
@@ -21,7 +21,7 @@
 <div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a href="index.jsp" class="nav-brand">
+    <a href="/Views/auth/index.jsp" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>

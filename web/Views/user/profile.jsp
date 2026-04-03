@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%
     String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect("login.jsp"); return; }
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     String name      = (String) request.getAttribute("name");
     String email     = (String) request.getAttribute("email");
     String phone     = (String) request.getAttribute("phone");
