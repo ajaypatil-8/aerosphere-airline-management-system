@@ -24,6 +24,7 @@
     <a href="${pageContext.request.contextPath}/adminFlights"   class="nav-link">Flights</a>
     <a href="${pageContext.request.contextPath}/adminBookings"  class="nav-link">Bookings</a>
     <a href="${pageContext.request.contextPath}/adminRefunds"   class="nav-link active">Refunds</a>
+    <a href="${pageContext.request.contextPath}/reports"        class="nav-link">Reports</a>
     <a href="${pageContext.request.contextPath}/logout"         class="nav-link btn-danger">Logout</a>
   </div>
 </nav>
