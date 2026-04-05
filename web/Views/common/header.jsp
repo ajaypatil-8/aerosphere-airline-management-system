@@ -7,7 +7,7 @@
         <span style="color:#fff; margin-right:15px;">
             Welcome, <%= session.getAttribute("userName") %>
         </span>
-        <div><a href="adminDashboard">Back</a></div>
-        <a href="logout">Logout</a>
+        <div><a href="${pageContext.request.contextPath}/adminDashboard">Back</a></div>
+        <a href="${pageContext.request.contextPath}/logout">Logout</a>
     </div>
 </div>

@@ -137,7 +137,7 @@ public class PaymentServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                resp.sendRedirect(request.getContextPath() + "/userBookings");
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
                 return;
             }
 
@@ -170,7 +170,7 @@ public class PaymentServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect(request.getContextPath() + "/userBookings");
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
         }
     }
 
@@ -213,7 +213,7 @@ public class PaymentServlet extends HttpServlet {
 
             if (!rs.next()) {
                 con.rollback();
-                resp.sendRedirect(request.getContextPath() + "/userBookings");
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
                 return;
             }
 

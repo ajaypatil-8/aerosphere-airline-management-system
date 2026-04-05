@@ -1,188 +1,35 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*, java.text.SimpleDateFormat" %>
-<%@ page import="com.skyconnect.servlet.ReportFlightsServlet.FlightRow" %>
-
+<%@ page import="java.util.*,java.text.SimpleDateFormat" %>
+<%@ page import="com.skyconnect.controller.ReportFlightsServlet.FlightRow" %>
 <%
-    List<FlightRow> flights =
-            (List<FlightRow>) request.getAttribute("flights");
-
-    SimpleDateFormat sdf =
-            new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-
-    String generatedOn = sdf.format(new Date());
+    String userName = (String) session.getAttribute("userName");
+    String userRole = (String) session.getAttribute("userRole");
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    @SuppressWarnings("unchecked") List<FlightRow> flights = (List<FlightRow>) request.getAttribute("flights");
+    String gen = new SimpleDateFormat("dd MMM yyyy, hh:mm a").format(new Date());
 %>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>All Flights Report - SkyConnect</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-          rel="stylesheet">
-
-    <style>
-        body {
-            background: #f4f7fb;
-        }
-        .report-card {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,.08);
-        }
-        .badge-seat {
-            font-size: 14px;
-            padding: 6px 14px;
-            border-radius: 20px;
-        }
-        .report-header {
-            border-bottom: 2px solid #0d6efd;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container my-5">
-
-    <div class="report-card">
-
-        <!-- HEADER -->
-        <div class="report-header d-flex justify-content-between align-items-center">
-            <div>
-                <h3 class="mb-0">SkyConnect Airline Reservation System</h3>
-                <p class="text-primary fw-semibold mb-1">All Flights Report</p>
-                <small class="text-muted">
-                    Generated On: <%= generatedOn %>
-                </small>
-            </div>
-
-                <button onclick="exportFlightsCSV()" class="btn btn-success">
-                <i class="bi bi-download"></i> Export CSV
-                </button>
-        </div>
-
-        <!-- FILTER FORM -->
-        <form method="get" action="reportFlights" class="row g-3 mb-4">
-
-            <div class="col-md-4">
-                <label class="form-label">Route</label>
-                <select name="route" class="form-select">
-                    <option value="">All Routes</option>
-                    <option value="Mumbai-Delhi">Mumbai → Delhi</option>
-                    <option value="Delhi-Mumbai">Delhi → Mumbai</option>
-                    <option value="Ahmedabad-Jaipur">Ahmedabad → Jaipur</option>
-                    <option value="Jaipur-Ahmedabad">Jaipur → Ahmedabad</option>
-                    <option value="Nagpur-Delhi">Nagpur → Delhi</option>
-                    <option value="Delhi-Nagpur">Delhi → Nagpur</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Departure Date</label>
-                <input type="date" name="date" class="form-control">
-            </div>
-
-            <div class="col-md-4 d-flex align-items-end gap-2">
-                <button class="btn btn-primary w-50">
-                    <i class="bi bi-search"></i> Filter
-                </button>
-                <a href="reportFlights" class="btn btn-secondary w-50">
-                    Reset
-                </a>
-            </div>
-
-        </form>
-
-        <!-- TABLE -->
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-primary">
-                <tr>
-                    <th>ID</th>
-                    <th>Flight No</th>
-                    <th>Route</th>
-                    <th>Departure</th>
-                    <th>Arrival</th>
-                    <th>Price (₹)</th>
-                    <th>Total Seats</th>
-                    <th>Available</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <% if (flights == null || flights.isEmpty()) { %>
-                    <tr>
-                        <td colspan="8" class="text-center text-danger fw-semibold">
-                            No flights found
-                        </td>
-                    </tr>
-                <% } else {
-                    for (FlightRow f : flights) { %>
-                    <tr>
-                        <td><%= f.id %></td>
-                        <td><%= f.flightNo %></td>
-                        <td>
-                            <%= f.source %> → <%= f.destination %>
-                        </td>
-                        <td>
-                            <%= f.departDate %><br>
-                            <small class="text-muted">
-                                <%= f.departTime %>
-                            </small>
-                        </td>
-                        <td><%= f.arrivalTime %></td>
-                        <td>₹ <%= f.price %></td>
-                        <td><%= f.totalSeats %></td>
-                        <td>
-                            <span class="badge bg-success badge-seat">
-                                <%= f.availableSeats %>
-                            </span>
-                        </td>
-                        <td>
-   
-                            <%--<a href="getSeatMap?flightId=<%= f.id %>"
-       class="btn btn-sm btn-outline-primary">
-        <i class="bi bi-grid-3x3-gap"></i> Seat Map
-    </a>--%>
-</td>
-                    </tr>
-                <% }} %>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function exportFlightsCSV() {
-    let table = document.querySelector("table");
-    let rows = table.querySelectorAll("tr");
-    let csv = [];
-
-    rows.forEach(row => {
-        let cols = row.querySelectorAll("th, td");
-        let rowData = [];
-        cols.forEach(col => rowData.push('"' + col.innerText + '"'));
-        csv.push(rowData.join(","));
-    });
-
-    let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "All_Flights_Report.csv";
-    link.click();
-}
-</script>
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flights Report – SkyConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
+</head><body>
+<div class="page-bg"></div><div class="stars-layer" id="stars"></div>
+<nav class="navbar"><a href="${pageContext.request.contextPath}/adminDashboard" class="nav-brand"><div class="brand-icon">✈</div><span class="brand-name">Sky<span>Connect</span></span></a>
+<div class="nav-links"><a href="${pageContext.request.contextPath}/reports" class="nav-link">← Reports</a><button onclick="window.print()" class="btn btn-secondary btn-sm">🖨 Print</button></div></nav>
+<div class="page-wrapper"><div class="page-header animate-fadeup"><div><h1 class="page-title">✈ Flights Report</h1><p class="page-subtitle">Generated: <%= gen %></p></div></div>
+<div class="table-wrap animate-fadeup">
+<% if (flights == null || flights.isEmpty()) { %><div class="empty-state"><div class="empty-icon">✈</div><h3>No data</h3></div>
+<% } else { %>
+<table class="sc-table"><thead><tr><th>#</th><th>Flight</th><th>Route</th><th>Date</th><th>Dep</th><th>Arr</th><th>Price</th><th>Total</th><th>Available</th></tr></thead>
+<tbody><% int i=0; for(FlightRow f : flights) { i++; %>
+<tr><td><%= i %></td><td style="color:var(--sky-glow);font-weight:700"><%= f.flightNo %></td>
+<td><%= f.source %> → <%= f.destination %></td><td style="font-size:.82rem"><%= f.departDate %></td>
+<td style="font-size:.82rem"><%= f.departTime!=null?f.departTime.toString().substring(0,5):"—" %></td>
+<td style="font-size:.82rem"><%= f.arrivalTime!=null?f.arrivalTime.toString().substring(0,5):"—" %></td>
+<td style="color:var(--gold);font-weight:700">₹<%= String.format("%,.0f",f.price) %></td>
+<td><%= f.totalSeats %></td><td style="color:#34D399;font-weight:600"><%= f.availableSeats %></td></tr>
+<% } %></tbody></table><% } %></div></div>
+<script>const s=document.getElementById('stars');for(let i=0;i<40;i++){const e=document.createElement('div');e.className='star';const z=Math.random()*2+.5;e.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.3+Math.random()*.5};`;s.appendChild(e);}</script>
+</body></html>

@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*" %>
-<%@ page import="com.skyconnect.servlet.AdminFlightsServlet.Flight" %>
+<%@ page import="com.skyconnect.controller.AdminFlightsServlet.Flight" %>
 
 <!DOCTYPE html>
 <html>
@@ -35,10 +35,10 @@
             <i class="bi bi-airplane"></i> Admin • SkyConnect
         </span>
         <div>
-            <a href="adminDashboard" class="btn btn-outline-light btn-sm me-2">
+            <a href="${pageContext.request.contextPath}/adminDashboard" class="btn btn-outline-light btn-sm me-2">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
-            <a href="admin_add_flight.jsp" class="btn btn-light btn-sm">
+            <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-light btn-sm">
                 <i class="bi bi-plus-circle"></i> Add Flight
             </a>
         </div>
@@ -118,10 +118,10 @@
                     <%
                         if (f.availableSeats == f.totalSeats) {
                     %>
-                          <a href="editFlight?id=<%= f.id %>" class="btn btn-sm btn-warning me-1">
+                          <a href="${pageContext.request.contextPath}/editFlight?id=<%= f.id %>" class="btn btn-sm btn-warning me-1">
                             <i class="bi bi-pencil-square"></i>
                         </a>
-                        <a href="deleteFlight?id=<%= f.id %>"
+                        <a href="${pageContext.request.contextPath}/deleteFlight?id=<%= f.id %>"
                            onclick="return confirm('Delete this flight?')"
                            class="btn btn-sm btn-danger">
                             <i class="bi bi-trash"></i>

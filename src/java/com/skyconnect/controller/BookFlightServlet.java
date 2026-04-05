@@ -236,7 +236,7 @@ public class BookFlightServlet extends HttpServlet {
 
                 if (!rs.next()) {
                     con.rollback();
-                    resp.sendRedirect(request.getContextPath() + "/searchFlights");
+                    resp.sendRedirect(req.getContextPath() + "/searchFlights");
                     return;
                 }
 
@@ -247,7 +247,7 @@ public class BookFlightServlet extends HttpServlet {
             if (availableSeats < numSeats) {
                 con.rollback();
                 session.setAttribute("bookingError", "Not enough seats available");
-                resp.sendRedirect(request.getContextPath() + "/searchFlights");
+                resp.sendRedirect(req.getContextPath() + "/searchFlights");
                 return;
             }
 
@@ -294,7 +294,7 @@ public class BookFlightServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect(request.getContextPath() + "/userDashboard");
+            resp.sendRedirect(req.getContextPath() + "/userDashboard");
         }
     }
 }

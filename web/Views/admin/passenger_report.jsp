@@ -1,147 +1,36 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,java.text.SimpleDateFormat" %>
-<%@ page import="com.skyconnect.servlet.ReportPassengersServlet.PassengerRow" %>
-
+<%@ page import="com.skyconnect.controller.ReportPassengersServlet.PassengerRow" %>
 <%
-    List<PassengerRow> passengers =
-        (List<PassengerRow>) request.getAttribute("passengers");
-
-    SimpleDateFormat sdf =
-        new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-    String generatedOn = sdf.format(new Date());
+    String userName = (String) session.getAttribute("userName");
+    String userRole = (String) session.getAttribute("userRole");
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    @SuppressWarnings("unchecked") List<PassengerRow> passengers = (List<PassengerRow>) request.getAttribute("passengers");
+    String gen = new SimpleDateFormat("dd MMM yyyy, hh:mm a").format(new Date());
 %>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Passenger Report - SkyConnect</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        body { background:#f4f7fb; }
-        .report-card {
-            background:#fff;
-            border-radius:18px;
-            padding:30px;
-            box-shadow:0 20px 40px rgba(0,0,0,.1);
-        }
-        .report-header {
-            border-bottom:2px solid #0d6efd;
-            padding-bottom:15px;
-            margin-bottom:25px;
-        }
-        .seat-badge {
-            font-size:14px;
-            padding:6px 14px;
-            border-radius:20px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container my-5">
-<div class="report-card">
-
-<!-- HEADER -->
-<div class="report-header">
-    <h4 class="fw-bold mb-0">SkyConnect Airline Reservation System</h4>
-    <p class="text-primary fw-semibold mb-1">
-        Passenger Report (Seat-wise per Flight)
-    </p>
-    <small class="text-muted">
-        Generated On: <%= generatedOn %>
-    </small>
-</div>
-
-<!-- TABLE -->
-<div class="table-responsive">
-<table class="table table-bordered table-hover align-middle" id="passengerTable">
-<thead class="table-primary">
-<tr>
-    <th>#</th>
-    <th>Flight</th>
-    <th>Route</th>
-    <th>Passenger Name</th>
-    <th>Age</th>
-    <th>Gender</th>
-    <th>Seat No</th>
-    <th>Booking ID</th>
-    <th>Status</th>
-</tr>
-</thead>
-
-<tbody>
-<%
-int i = 1;
-if (passengers == null || passengers.isEmpty()) {
-%>
-<tr>
-    <td colspan="9" class="text-center text-danger fw-semibold">
-        No passenger records found
-    </td>
-</tr>
-<%
-} else {
-for (PassengerRow p : passengers) {
-%>
-<tr>
-    <td><%= i++ %></td>
-    <td><%= p.flightNo %></td>
-    <td><%= p.source %> → <%= p.destination %></td>
-    <td><%= p.passengerName %></td>
-    <td><%= p.age %></td>
-    <td><%= p.gender %></td>
-    <td>
-        <span class="badge bg-success seat-badge">
-            <%= p.seatNo != null ? p.seatNo : "AUTO" %>
-        </span>
-    </td>
-    <td><%= p.bookingId %></td>
-    <td>
-        <span class="badge bg-<%= "CANCELLED".equals(p.bookingStatus)
-                ? "danger" : "success" %>">
-            <%= p.bookingStatus %>
-        </span>
-    </td>
-</tr>
-<%
-}}
-%>
-</tbody>
-</table>
-</div>
-
-<!-- EXPORT -->
-<div class="text-end mt-3">
-    <button onclick="exportCSV()" class="btn btn-success">
-        <i class="bi bi-download"></i> Export CSV
-    </button>
-</div>
-
-</div>
-</div>
-
-<script>
-function exportCSV() {
-    let rows = document.querySelectorAll("#passengerTable tr");
-    let csv = [];
-    rows.forEach(row => {
-        let cols = row.querySelectorAll("th,td");
-        let rowData = [];
-        cols.forEach(col => rowData.push('"' + col.innerText + '"'));
-        csv.push(rowData.join(","));
-    });
-
-    let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Passenger_Seatwise_Report.csv";
-    link.click();
-}
-</script>
-
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Passengers Report – SkyConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
+</head><body>
+<div class="page-bg"></div><div class="stars-layer" id="stars"></div>
+<nav class="navbar"><a href="${pageContext.request.contextPath}/adminDashboard" class="nav-brand"><div class="brand-icon">✈</div><span class="brand-name">Sky<span>Connect</span></span></a>
+<div class="nav-links"><a href="${pageContext.request.contextPath}/reports" class="nav-link">← Reports</a><button onclick="window.print()" class="btn btn-secondary btn-sm">🖨 Print</button></div></nav>
+<div class="page-wrapper"><div class="page-header animate-fadeup"><div><h1 class="page-title">👥 Passengers Report</h1><p class="page-subtitle">Generated: <%= gen %></p></div></div>
+<div class="table-wrap animate-fadeup">
+<% if (passengers == null || passengers.isEmpty()) { %><div class="empty-state"><div class="empty-icon">👥</div><h3>No data</h3></div>
+<% } else { %>
+<table class="sc-table"><thead><tr><th>#</th><th>Passenger</th><th>Flight</th><th>Route</th><th>Seat</th><th>Age</th><th>Gender</th><th>Booking Status</th></tr></thead>
+<tbody><% int i=0; for(PassengerRow p : passengers) { i++;
+  String st=p.bookingStatus!=null?p.bookingStatus.toLowerCase():"booked";
+  String bc=st.equals("paid")?"badge-paid":st.equals("cancelled")?"badge-cancelled":"badge-booked"; %>
+<tr><td><%= i %></td><td style="font-weight:600"><%= p.passengerName %></td>
+<td><strong><%= p.flightNo %></strong></td><td><%= p.source %> → <%= p.destination %></td>
+<td style="color:var(--sky-glow);font-weight:700"><%= p.seatNo!=null?p.seatNo:"—" %></td>
+<td><%= p.age %></td><td><%= p.gender %></td>
+<td><span class="badge <%= bc %>"><%= st.substring(0,1).toUpperCase()+st.substring(1) %></span></td></tr>
+<% } %></tbody></table><% } %></div></div>
+<script>const s=document.getElementById('stars');for(let i=0;i<40;i++){const e=document.createElement('div');e.className='star';const z=Math.random()*2+.5;e.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.3+Math.random()*.5};`;s.appendChild(e);}</script>
+</body></html>

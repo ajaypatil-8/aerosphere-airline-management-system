@@ -1,117 +1,37 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*, java.text.SimpleDateFormat" %>
-<%@ page import="com.skyconnect.servlet.ReportCancelledServlet.CancelledRow" %>
-
+<%@ page import="java.util.*,java.text.SimpleDateFormat" %>
+<%@ page import="com.skyconnect.controller.ReportCancelledServlet.CancelledRow" %>
 <%
-    List<CancelledRow> cancelled =
-        (List<CancelledRow>) request.getAttribute("cancelled");
-
-    SimpleDateFormat sdf =
-        new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-
-    String generatedOn = sdf.format(new Date());
+    String userName = (String) session.getAttribute("userName");
+    String userRole = (String) session.getAttribute("userRole");
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    @SuppressWarnings("unchecked") List<CancelledRow> cancelled = (List<CancelledRow>) request.getAttribute("cancelled");
+    String gen = new SimpleDateFormat("dd MMM yyyy, hh:mm a").format(new Date());
 %>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Cancelled Bookings Report - SkyConnect</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        body {
-            background: #f4f7fb;
-        }
-        .report-card {
-            background: #fff;
-            border-radius: 18px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,.08);
-        }
-        .badge-status {
-            font-size: 13px;
-            padding: 6px 14px;
-            border-radius: 20px;
-        }
-        .report-header {
-            border-bottom: 2px solid #dc3545;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container my-5">
-
-    <div class="report-card">
-
-        <!-- HEADER -->
-        <div class="report-header d-flex justify-content-between align-items-center">
-            <div>
-                <h3 class="mb-0">SkyConnect Airline Reservation System</h3>
-                <p class="text-danger fw-semibold mb-1">Cancelled Bookings Report</p>
-                <small class="text-muted">
-                    Generated On: <%= generatedOn %>
-                </small>
-            </div>
-            <a href="reports.jsp" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back
-            </a>
-        </div>
-
-        <!-- TABLE -->
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-danger">
-                <tr>
-                    <th>Booking ID</th>
-                    <th>User</th>
-                    <th>Flight</th>
-                    <th>Route</th>
-                    <th>Booking Date</th>
-                    <th>Seats</th>
-                    <th>Amount (₹)</th>
-                    <th>Payment Status</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <% if (cancelled == null || cancelled.isEmpty()) { %>
-                    <tr>
-                        <td colspan="8" class="text-center text-danger fw-semibold">
-                            No cancelled bookings found
-                        </td>
-                    </tr>
-                <% } else {
-                    for (CancelledRow c : cancelled) { %>
-                    <tr>
-                        <td><%= c.bookingId %></td>
-                        <td><%= c.userName %></td>
-                        <td><%= c.flightNo %></td>
-                        <td><%= c.route %></td>
-                        <td><%= sdf.format(c.bookingDate) %></td>
-                        <td><%= c.seats %></td>
-                        <td>₹ <%= c.amount %></td>
-
-                        <td>
-                            <span class="badge badge-status
-                            <%= "REFUNDED".equals(c.paymentStatus) ? "bg-success" : "bg-warning text-dark" %>">
-                                <%= c.paymentStatus %>
-                            </span>
-                        </td>
-                    </tr>
-                <% }} %>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cancellations Report – SkyConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
+</head><body>
+<div class="page-bg"></div><div class="stars-layer" id="stars"></div>
+<nav class="navbar"><a href="${pageContext.request.contextPath}/adminDashboard" class="nav-brand"><div class="brand-icon">✈</div><span class="brand-name">Sky<span>Connect</span></span></a>
+<div class="nav-links"><a href="${pageContext.request.contextPath}/reports" class="nav-link">← Reports</a><button onclick="window.print()" class="btn btn-secondary btn-sm">🖨 Print</button></div></nav>
+<div class="page-wrapper"><div class="page-header animate-fadeup"><div><h1 class="page-title">❌ Cancellations Report</h1><p class="page-subtitle">Generated: <%= gen %></p></div></div>
+<div class="table-wrap animate-fadeup">
+<% if (cancelled == null || cancelled.isEmpty()) { %><div class="empty-state"><div class="empty-icon">❌</div><h3>No cancellations</h3></div>
+<% } else { %>
+<table class="sc-table"><thead><tr><th>#</th><th>Booking ID</th><th>Passenger</th><th>Flight</th><th>Route</th><th>Seats</th><th>Amount</th><th>Payment</th><th>Booked On</th></tr></thead>
+<tbody><% int i=0; for(CancelledRow c : cancelled) { i++;
+  String ps=c.paymentStatus!=null?c.paymentStatus.toLowerCase():"pending";
+  String bc=ps.equals("paid")||ps.equals("refunded")?"badge-paid":"badge-pending"; %>
+<tr><td><%= i %></td><td style="color:var(--sky-glow)">#<%= c.bookingId %></td>
+<td><%= c.userName %></td><td><strong><%= c.flightNo %></strong></td>
+<td><%= c.route %></td><td><%= c.seats %></td>
+<td style="color:var(--gold);font-weight:700">₹<%= String.format("%,.0f",c.amount) %></td>
+<td><span class="badge <%= bc %>"><%= ps.substring(0,1).toUpperCase()+ps.substring(1) %></span></td>
+<td style="font-size:.8rem;color:var(--muted)"><%= c.bookingDate!=null?c.bookingDate.toString().substring(0,10):"—" %></td></tr>
+<% } %></tbody></table><% } %></div></div>
+<script>const s=document.getElementById('stars');for(let i=0;i<40;i++){const e=document.createElement('div');e.className='star';const z=Math.random()*2+.5;e.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.3+Math.random()*.5};`;s.appendChild(e);}</script>
+</body></html>

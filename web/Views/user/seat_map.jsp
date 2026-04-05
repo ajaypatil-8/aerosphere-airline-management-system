@@ -16,7 +16,7 @@
     <title>Select Seats – SkyConnect</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
     <style>
         .seat-page { max-width: 900px; margin: 0 auto; }
 
@@ -113,15 +113,15 @@
 <div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a href="userDashboard" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="userDashboard" class="nav-link">Dashboard</a>
-        <a href="searchFlights"  class="nav-link">Search Flights</a>
-        <a href="userBookings"   class="nav-link">My Bookings</a>
-        <a href="logout"         class="nav-link btn-primary">Logout</a>
+        <a href="${pageContext.request.contextPath}/userDashboard" class="nav-link">Dashboard</a>
+        <a href="${pageContext.request.contextPath}/searchFlights"  class="nav-link">Search Flights</a>
+        <a href="${pageContext.request.contextPath}/userBookings"   class="nav-link">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/logout"         class="nav-link btn-primary">Logout</a>
     </div>
 </nav>
 
@@ -131,7 +131,7 @@
             <h1 class="page-title">💺 Select Your Seats</h1>
             <p class="page-subtitle">Choose <%= numSeats %> seat<%= Integer.parseInt(numSeats) > 1 ? "s" : "" %> for your journey</p>
         </div>
-        <a href="searchFlights" class="btn btn-ghost">← Change Flight</a>
+        <a href="${pageContext.request.contextPath}/searchFlights" class="btn btn-ghost">← Change Flight</a>
     </div>
 
     <div class="seat-page">
@@ -193,7 +193,7 @@
                     <span class="sp-val" id="selectedCount" style="color:var(--gold);">0 / <%= numSeats %></span>
                 </div>
                 <div class="selected-seats-list" id="selectedList"></div>
-                <form action="bookFlight" method="post" id="proceedForm">
+                <form action="${pageContext.request.contextPath}/bookFlight" method="post" id="proceedForm">
                     <input type="hidden" name="flightId" value="<%= flightId %>">
                     <input type="hidden" name="numSeats" value="<%= numSeats %>">
                     <input type="hidden" name="selectedSeats" id="selectedSeatsInput" value="">

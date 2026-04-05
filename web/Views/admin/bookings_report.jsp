@@ -1,164 +1,37 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,java.text.SimpleDateFormat" %>
-<%@ page import="com.skyconnect.servlet.ReportBookingsServlet.BookingRow" %>
-
+<%@ page import="com.skyconnect.controller.ReportBookingsServlet.BookingRow" %>
 <%
-    List<BookingRow> bookings =
-        (List<BookingRow>) request.getAttribute("bookings");
-
-    SimpleDateFormat sdf =
-        new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-    String generatedOn = sdf.format(new Date());
+    String userName = (String) session.getAttribute("userName");
+    String userRole = (String) session.getAttribute("userRole");
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    @SuppressWarnings("unchecked") List<BookingRow> bookings = (List<BookingRow>) request.getAttribute("bookings");
+    String gen = new SimpleDateFormat("dd MMM yyyy, hh:mm a").format(new Date());
 %>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Bookings Report - SkyConnect</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        body { background:#f4f7fb; }
-        .report-card {
-            background:#fff;
-            border-radius:18px;
-            padding:30px;
-            box-shadow:0 20px 40px rgba(0,0,0,.1);
-        }
-        .report-header {
-            border-bottom:2px solid #0d6efd;
-            padding-bottom:15px;
-            margin-bottom:25px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container my-5">
-<div class="report-card">
-
-<!-- HEADER -->
-<div class="report-header d-flex justify-content-between align-items-center">
-    <div>
-        <h4 class="fw-bold mb-0">SkyConnect Airline Reservation System</h4>
-        <p class="text-primary fw-semibold mb-1">Bookings Report</p>
-        <small class="text-muted">Generated On: <%= generatedOn %></small>
-    </div>
-    <button onclick="exportCSV()" class="btn btn-success">
-        <i class="bi bi-download"></i> Export CSV
-    </button>
-</div>
-
-<!-- FILTER -->
-<form method="get" action="reportBookings" class="row g-3 mb-4">
-    <div class="col-md-3">
-        <label>Status</label>
-        <select name="status" class="form-select">
-            <option value="">All</option>
-            <option>BOOKED</option>
-            <option>PAID</option>
-            <option>CANCELLED</option>
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <label>Payment</label>
-        <select name="payment" class="form-select">
-            <option value="">All</option>
-            <option>PAID</option>
-            <option>PENDING</option>
-            <option>REFUNDED</option>
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <label>Date</label>
-        <input type="date" name="date" class="form-control">
-    </div>
-
-    <div class="col-md-3 d-flex align-items-end gap-2">
-        <button class="btn btn-primary w-50">Filter</button>
-        <a href="reportBookings" class="btn btn-secondary w-50">Reset</a>
-    </div>
-</form>
-
-<!-- TABLE -->
-<div class="table-responsive">
-<table class="table table-bordered table-hover align-middle" id="bookingsTable">
-<thead class="table-primary">
-<tr>
-    <th>ID</th>
-    <th>User</th>
-    <th>Flight</th>
-    <th>Route</th>
-    <th>Seats</th>
-    <th>Amount (₹)</th>
-    <th>Status</th>
-    <th>Payment</th>
-    <th>Booked On</th>
-</tr>
-</thead>
-
-<tbody>
-<% if (bookings == null || bookings.isEmpty()) { %>
-<tr>
-    <td colspan="9" class="text-center text-danger fw-semibold">
-        No bookings found
-    </td>
-</tr>
-<% } else {
-   for (BookingRow b : bookings) { %>
-<tr>
-    <td><%= b.id %></td>
-    <td><%= b.userName %></td>
-    <td><%= b.flightNo %></td>
-    <td><%= b.source %> → <%= b.destination %></td>
-    <td><%= b.seats %></td>
-    <td>₹ <%= b.amount %></td>
-    <td>
-        <span class="badge bg-<%= "CANCELLED".equals(b.status) ? "danger" :
-                                "PAID".equals(b.status) ? "success" : "warning" %>">
-            <%= b.status %>
-        </span>
-    </td>
-    <td>
-        <span class="badge bg-<%= "PAID".equals(b.paymentStatus) ? "success" :
-                                "REFUNDED".equals(b.paymentStatus) ? "info" : "secondary" %>">
-            <%= b.paymentStatus %>
-        </span>
-    </td>
-    <td><%= b.bookingDate %></td>
-</tr>
-<% }} %>
-</tbody>
-</table>
-</div>
-
-</div>
-</div>
-
-<!-- CSV EXPORT -->
-<script>
-function exportCSV() {
-    let rows = document.querySelectorAll("#bookingsTable tr");
-    let csv = [];
-    rows.forEach(row => {
-        let cols = row.querySelectorAll("th,td");
-        let rowData = [];
-        cols.forEach(col => rowData.push('"' + col.innerText + '"'));
-        csv.push(rowData.join(","));
-    });
-
-    let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Bookings_Report.csv";
-    link.click();
-}
-</script>
-
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bookings Report – SkyConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
+</head><body>
+<div class="page-bg"></div><div class="stars-layer" id="stars"></div>
+<nav class="navbar"><a href="${pageContext.request.contextPath}/adminDashboard" class="nav-brand"><div class="brand-icon">✈</div><span class="brand-name">Sky<span>Connect</span></span></a>
+<div class="nav-links"><a href="${pageContext.request.contextPath}/reports" class="nav-link">← Reports</a><button onclick="window.print()" class="btn btn-secondary btn-sm">🖨 Print</button></div></nav>
+<div class="page-wrapper"><div class="page-header animate-fadeup"><div><h1 class="page-title">🎫 Bookings Report</h1><p class="page-subtitle">Generated: <%= gen %></p></div></div>
+<div class="table-wrap animate-fadeup">
+<% if (bookings == null || bookings.isEmpty()) { %><div class="empty-state"><div class="empty-icon">🎫</div><h3>No data</h3></div>
+<% } else { %>
+<table class="sc-table"><thead><tr><th>#</th><th>ID</th><th>Passenger</th><th>Flight</th><th>Route</th><th>Seats</th><th>Amount</th><th>Status</th><th>Payment</th><th>Date</th></tr></thead>
+<tbody><% int i=0; for(BookingRow b : bookings) { i++;
+  String st=b.status!=null?b.status.toLowerCase():"booked";
+  String bc=st.equals("paid")?"badge-paid":st.equals("cancelled")?"badge-cancelled":"badge-booked"; %>
+<tr><td><%= i %></td><td style="color:var(--sky-glow)">#<%= b.id %></td><td><%= b.userName %></td><td><strong><%= b.flightNo %></strong></td>
+<td><%= b.source %> → <%= b.destination %></td><td><%= b.seats %></td>
+<td style="color:var(--gold);font-weight:700;">₹<%= String.format("%,.0f",b.amount) %></td>
+<td><span class="badge <%= bc %>"><%= st.substring(0,1).toUpperCase()+st.substring(1) %></span></td>
+<td style="font-size:.8rem"><%= b.paymentStatus %></td>
+<td style="font-size:.8rem;color:var(--muted)"><%= b.bookingDate!=null?b.bookingDate.toString().substring(0,10):"—" %></td></tr>
+<% } %></tbody></table><% } %></div></div>
+<script>const s=document.getElementById('stars');for(let i=0;i<40;i++){const e=document.createElement('div');e.className='star';const z=Math.random()*2+.5;e.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.3+Math.random()*.5};`;s.appendChild(e);}</script>
+</body></html>

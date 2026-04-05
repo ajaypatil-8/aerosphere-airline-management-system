@@ -613,13 +613,13 @@
 
         <% if (userName != null) { %>
             <% if ("ADMIN".equals(userRole)) { %>
-                <a href="adminDashboard" class="nav-link">Dashboard</a>
+                <a href="${pageContext.request.contextPath}/adminDashboard" class="nav-link">Dashboard</a>
             <% } else { %>
-                <a href="userDashboard" class="nav-link">Dashboard</a>
-                <a href="userBookings" class="nav-link">My Bookings</a>
+                <a href="${pageContext.request.contextPath}/userDashboard" class="nav-link">Dashboard</a>
+                <a href="${pageContext.request.contextPath}/userBookings" class="nav-link">My Bookings</a>
             <% } %>
             <div class="user-pill">👤 <%= userName %></div>
-            <a href="logout" class="nav-link btn-nav">Logout</a>
+            <a href="${pageContext.request.contextPath}/logout" class="nav-link btn-nav">Logout</a>
         <% } else { %>
             <a href="${pageContext.request.contextPath}/login" class="nav-link">Sign In</a>
             <a href="${pageContext.request.contextPath}/register" class="nav-link btn-nav">Register →</a>
@@ -643,9 +643,9 @@
     <div class="hero-actions">
         <% if (userName != null) { %>
             <% if ("ADMIN".equals(userRole)) { %>
-                <a href="adminDashboard" class="btn-hero primary">Admin Dashboard →</a>
+                <a href="${pageContext.request.contextPath}/adminDashboard" class="btn-hero primary">Admin Dashboard →</a>
             <% } else { %>
-                <a href="userDashboard" class="btn-hero primary">My Dashboard →</a>
+                <a href="${pageContext.request.contextPath}/userDashboard" class="btn-hero primary">My Dashboard →</a>
             <% } %>
             <a href="#search" class="btn-hero secondary">Search Flights</a>
         <% } else { %>
@@ -669,7 +669,7 @@
             <span>Find the best routes instantly</span>
         </div>
 
-        <form action="searchFlights" method="get">
+        <form action="${pageContext.request.contextPath}/searchFlights" method="get">
             <div class="search-grid">
 
                 <div class="sf">

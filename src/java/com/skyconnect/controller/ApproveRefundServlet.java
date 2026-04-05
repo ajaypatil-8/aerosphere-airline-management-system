@@ -17,7 +17,7 @@ public class ApproveRefundServlet extends HttpServlet {
             throws IOException {
 
         HttpSession session = req.getSession(false);
-        if (session == null || !"ADMIN".equals(session.getAttribute("role"))) {
+        if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }

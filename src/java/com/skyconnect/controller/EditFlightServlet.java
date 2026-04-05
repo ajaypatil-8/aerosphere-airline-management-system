@@ -68,7 +68,11 @@ public class EditFlightServlet extends HttpServlet {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setDate(1, Date.valueOf(date));
             ps.setTime(2, Time.valueOf(depart));
-            ps.setTime(3, Time.valueOf(arrival));
+            if (arrival != null && !arrival.trim().isEmpty()) {
+                ps.setTime(3, Time.valueOf(arrival));
+            } else {
+                ps.setNull(3, java.sql.Types.TIME);
+            }
             ps.setDouble(4, price);
             ps.setInt(5, id);
 

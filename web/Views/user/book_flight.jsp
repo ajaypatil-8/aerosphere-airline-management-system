@@ -6,7 +6,7 @@
 
     String flightIdStr = request.getParameter("flightId");
     String numSeatsStr = request.getParameter("numSeats");
-    if (flightIdStr == null) { response.sendRedirect("search_flights.jsp"); return; }
+    if (flightIdStr == null) { response.sendRedirect(request.getContextPath() + "/searchFlights"); return; }
 
     int flightId = Integer.parseInt(flightIdStr);
     int numSeats = (numSeatsStr != null) ? Integer.parseInt(numSeatsStr) : 1;
@@ -41,7 +41,7 @@
     <title>Confirm Booking – SkyConnect</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
 </head>
 <body>
 
@@ -49,15 +49,15 @@
 <div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a href="userDashboard" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="userDashboard" class="nav-link">Dashboard</a>
-        <a href="search_flights.jsp" class="nav-link">Search</a>
-        <a href="userBookings" class="nav-link">My Bookings</a>
-        <a href="logout" class="nav-link btn-danger">Logout</a>
+        <a href="${pageContext.request.contextPath}/userDashboard" class="nav-link">Dashboard</a>
+        <a href="${pageContext.request.contextPath}/searchFlights" class="nav-link">Search</a>
+        <a href="${pageContext.request.contextPath}/userBookings" class="nav-link">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/logout" class="nav-link btn-danger">Logout</a>
     </div>
 </nav>
 
@@ -144,7 +144,7 @@
 
             <hr class="divider">
 
-            <form action="bookFlight" method="post">
+            <form action="${pageContext.request.contextPath}/bookFlight" method="post">
                 <input type="hidden" name="flightId" value="<%= flightId %>">
                 <div class="field" style="margin-bottom:18px;">
                     <label>Number of Seats</label>

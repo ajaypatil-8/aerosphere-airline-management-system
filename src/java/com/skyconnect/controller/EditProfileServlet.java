@@ -40,7 +40,7 @@ public class EditProfileServlet extends HttpServlet {
             req.setAttribute("error", "Error: " + e.getMessage());
         }
 
-        req.getRequestDispatcher("/Views/user/edit_/Views/user/profile.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/edit_profile.jsp").forward(req, resp);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class EditProfileServlet extends HttpServlet {
         if (name == null || email == null || name.trim().isEmpty() || email.trim().isEmpty()) {
             req.setAttribute("error", "Name and email cannot be empty.");
             reloadForm(req, userId);
-            req.getRequestDispatcher("/Views/user/edit_/Views/user/profile.jsp").forward(req, resp);
+            req.getRequestDispatcher("/Views/user/edit_profile.jsp").forward(req, resp);
             return;
         }
 
@@ -109,7 +109,7 @@ public class EditProfileServlet extends HttpServlet {
         }
 
         reloadForm(req, userId);
-        req.getRequestDispatcher("/Views/user/edit_/Views/user/profile.jsp").forward(req, resp);
+        req.getRequestDispatcher("/Views/user/edit_profile.jsp").forward(req, resp);
     }
 
     /** Reload current DB values into request for re-displaying the form */

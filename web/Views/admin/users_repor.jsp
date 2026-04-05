@@ -1,143 +1,35 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*, java.text.SimpleDateFormat" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>All Users Report - SkyConnect</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        body {
-            background: #f4f7fb;
-        }
-        .report-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,.1);
-        }
-        .report-header {
-            border-bottom: 2px solid #0d6efd;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-        .project-title {
-            font-weight: 700;
-            font-size: 22px;
-        }
-        .report-title {
-            font-size: 18px;
-            color: #0d6efd;
-        }
-    </style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-dark bg-primary">
-    <div class="container-fluid">
-        <span class="navbar-brand fw-bold">✈ Admin • SkyConnect</span>
-        <a href="reports" class="btn btn-light btn-sm">⬅ Back</a>
-    </div>
-</nav>
-
-<div class="container mt-4">
-    <div class="report-card">
-
-        <%
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
-            String reportDate = sdf.format(new Date());
-            List users = (List) request.getAttribute("users");
-        %>
-
-        <!-- REPORT HEADER -->
-        <div class="report-header">
-            <div class="project-title">SkyConnect Airline Reservation System</div>
-            <div class="report-title">All Users Report</div>
-            <div class="text-muted">Report Generated On: <strong><%= reportDate %></strong></div>
-        </div>
-
-        <!-- EXPORT BUTTON -->
-        <div class="mb-3 text-end">
-            <button onclick="exportCSV()" class="btn btn-success">
-                <i class="bi bi-file-earmark-arrow-down"></i> Export CSV
-            </button>
-        </div>
-
-        <!-- USERS TABLE -->
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle" id="usersTable">
-                <thead class="table-primary">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Phone</th>
-                        <th>Created Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <%
-                    if (users == null || users.isEmpty()) {
-                %>
-                    <tr>
-                        <td colspan="6" class="text-center text-danger">No users found</td>
-                    </tr>
-                <%
-                    } else {
-                        for (Object obj : users) {
-                            com.skyconnect.servlet.ReportUsersServlet.UserRow u =
-                                (com.skyconnect.servlet.ReportUsersServlet.UserRow) obj;
-                %>
-                    <tr>
-                        <td><%= u.id %></td>
-                        <td><%= u.name %></td>
-                        <td><%= u.email %></td>
-                        <td>
-                            <span class="badge bg-<%= "ADMIN".equals(u.role) ? "danger" : "secondary" %>">
-                                <%= u.role %>
-                            </span>
-                        </td>
-                        <td><%= u.phone != null ? u.phone : "-" %></td>
-                        <td><%= u.createdAt %></td>
-                    </tr>
-                <%
-                        }
-                    }
-                %>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-</div>
-
-<!-- EXPORT CSV SCRIPT -->
-<script>
-function exportCSV() {
-    let table = document.getElementById("usersTable");
-    let rows = table.querySelectorAll("tr");
-    let csv = [];
-
-    rows.forEach(row => {
-        let cols = row.querySelectorAll("th, td");
-        let rowData = [];
-        cols.forEach(col => rowData.push('"' + col.innerText + '"'));
-        csv.push(rowData.join(","));
-    });
-
-    let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(csvFile);
-    link.download = "All_Users_Report.csv";
-    link.click();
-}
-</script>
-
-</body>
-</html>
+<%@ page import="java.util.*,java.text.SimpleDateFormat" %>
+<%@ page import="com.skyconnect.controller.ReportUsersServlet.UserRow" %>
+<%
+    String userName = (String) session.getAttribute("userName");
+    String userRole = (String) session.getAttribute("userRole");
+    if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    @SuppressWarnings("unchecked") List<UserRow> users = (List<UserRow>) request.getAttribute("users");
+    String gen = new SimpleDateFormat("dd MMM yyyy, hh:mm a").format(new Date());
+%>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Users Report – SkyConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
+</head><body>
+<div class="page-bg"></div><div class="stars-layer" id="stars"></div>
+<nav class="navbar"><a href="${pageContext.request.contextPath}/adminDashboard" class="nav-brand"><div class="brand-icon">✈</div><span class="brand-name">Sky<span>Connect</span></span></a>
+<div class="nav-links"><a href="${pageContext.request.contextPath}/reports" class="nav-link">← Reports</a><button onclick="window.print()" class="btn btn-secondary btn-sm">🖨 Print</button></div></nav>
+<div class="page-wrapper"><div class="page-header animate-fadeup"><div><h1 class="page-title">👤 Users Report</h1><p class="page-subtitle">Generated: <%= gen %></p></div></div>
+<div class="table-wrap animate-fadeup">
+<% if (users == null || users.isEmpty()) { %><div class="empty-state"><div class="empty-icon">👤</div><h3>No data</h3></div>
+<% } else { %>
+<table class="sc-table"><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th></tr></thead>
+<tbody><% int i=0; for(UserRow u : users) { i++;
+  String bc="ADMIN".equals(u.role)?"badge-paid":"badge-booked"; %>
+<tr><td><%= i %></td><td style="color:var(--sky-glow)">#<%= u.id %></td>
+<td style="font-weight:600"><%= u.name %></td><td style="font-size:.85rem"><%= u.email %></td>
+<td style="font-size:.82rem"><%= u.phone!=null?u.phone:"—" %></td>
+<td><span class="badge <%= bc %>"><%= u.role %></span></td>
+<td style="font-size:.8rem;color:var(--muted)"><%= u.createdAt!=null?u.createdAt.toString():"—" %></td></tr>
+<% } %></tbody></table><% } %></div></div>
+<script>const s=document.getElementById('stars');for(let i=0;i<40;i++){const e=document.createElement('div');e.className='star';const z=Math.random()*2+.5;e.style.cssText=`width:${z}px;height:${z}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${.3+Math.random()*.5};`;s.appendChild(e);}</script>
+</body></html>

@@ -127,9 +127,11 @@ public class InvoiceServlet extends HttpServlet {
     // ================= PASSENGER MODEL =================
     public static class Passenger {
         public String name;
+        public String fullName; // alias — set equal to name
         public int age;
         public String gender;
-        public String seatNo;   // ✅ SEAT NUMBER
+        public String seatNo;
+        public String phone;
     }
 
     @Override
@@ -199,7 +201,7 @@ public class InvoiceServlet extends HttpServlet {
             List<Passenger> passengers = new ArrayList<>();
 
             String psgSql =
-                "SELECT full_name, age, gender, seat_no " +
+                "SELECT full_name, age, gender, seat_no, phone " +
                 "FROM passengers " +
                 "WHERE booking_id = ? " +
                 "ORDER BY seat_no";   // ✅ SEAT ORDER
@@ -210,10 +212,12 @@ public class InvoiceServlet extends HttpServlet {
 
             while (rs3.next()) {
                 Passenger p = new Passenger();
-                p.name   = rs3.getString("full_name");
-                p.age    = rs3.getInt("age");
-                p.gender = rs3.getString("gender");
-                p.seatNo = rs3.getString("seat_no"); // ✅
+                p.name     = rs3.getString("full_name");
+                p.fullName = rs3.getString("full_name");
+                p.age      = rs3.getInt("age");
+                p.gender   = rs3.getString("gender");
+                p.seatNo   = rs3.getString("seat_no");
+                p.phone    = rs3.getString("phone");
                 passengers.add(p);
             }
 

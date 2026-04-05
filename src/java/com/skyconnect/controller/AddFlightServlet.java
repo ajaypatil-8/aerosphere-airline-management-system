@@ -99,4 +99,16 @@ public class AddFlightServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/addFlight");
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+        req.getRequestDispatcher("/Views/admin/admin_add_flight.jsp").forward(req, resp);
+    }
+
 }

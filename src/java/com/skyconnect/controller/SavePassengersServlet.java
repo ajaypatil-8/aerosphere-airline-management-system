@@ -137,7 +137,7 @@ public class SavePassengersServlet extends HttpServlet {
             if (rs.next()) {
                 flightId = rs.getInt("flight_id");
             } else {
-                resp.sendRedirect(request.getContextPath() + "/userDashboard");
+                resp.sendRedirect(req.getContextPath() + "/userDashboard");
                 return;
             }
 

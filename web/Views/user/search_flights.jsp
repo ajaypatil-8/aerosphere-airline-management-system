@@ -19,7 +19,7 @@
     <title>Search Flights – SkyConnect</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/dashboard.css">
     <style>
         .search-bar {
             background: rgba(10,18,45,.7); border: 1px solid var(--border-glow);
@@ -48,15 +48,15 @@
 <div class="stars-layer" id="stars"></div>
 
 <nav class="navbar">
-    <a href="userDashboard" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
         <div class="brand-icon">✈</div>
         <span class="brand-name">Sky<span>Connect</span></span>
     </a>
     <div class="nav-links">
-        <a href="userDashboard"  class="nav-link">Dashboard</a>
-        <a href="userBookings"   class="nav-link">My Bookings</a>
-        <a href="profile"        class="nav-link">Profile</a>
-        <a href="logout"         class="nav-link btn-danger">Logout</a>
+        <a href="${pageContext.request.contextPath}/userDashboard"  class="nav-link">Dashboard</a>
+        <a href="${pageContext.request.contextPath}/userBookings"   class="nav-link">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/profile"        class="nav-link">Profile</a>
+        <a href="${pageContext.request.contextPath}/logout"         class="nav-link btn-danger">Logout</a>
     </div>
 </nav>
 
@@ -69,7 +69,7 @@
     </div>
 
     <!-- SEARCH BAR -->
-    <form action="searchFlights" method="get" class="search-bar">
+    <form action="${pageContext.request.contextPath}/searchFlights" method="get" class="search-bar">
         <div>
             <label>From</label>
             <input type="text" name="source" value="<%= srcParam %>" placeholder="e.g. Mumbai" required>
@@ -134,7 +134,7 @@
                         <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--gold);">
                             Total: ₹<%= String.format("%,.0f", (Double)f.get("price") * Integer.parseInt(seatsParam)) %>
                         </div>
-                        <form action="bookFlight" method="post" style="margin:0;">
+                        <form action="${pageContext.request.contextPath}/bookFlight" method="post" style="margin:0;">
                             <input type="hidden" name="flightId"  value="<%= f.get("id") %>">
                             <input type="hidden" name="numSeats"  value="<%= seatsParam %>">
                             <button type="submit" class="btn btn-blue btn-sm">Book Now →</button>
