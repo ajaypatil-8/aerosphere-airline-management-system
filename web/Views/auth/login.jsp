@@ -620,6 +620,8 @@
             <!-- Error -->
             <%
                 String err = (String) request.getAttribute("error");
+                String activeTab = (String) request.getAttribute("activeTab");
+                if (activeTab == null) activeTab = "USER";
             %>
             <% if (err != null) { %>
                 <div class="alert">⚠ <%= err %></div>
@@ -704,6 +706,10 @@
         s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--opacity:${0.3+Math.random()*0.6};`;
         starsEl.appendChild(s);
     }
+
+    // Restore tab from server (e.g. after error)
+    const initialTab = '<%= activeTab %>'.toLowerCase() === 'admin' ? 'admin' : 'user';
+    switchTab(initialTab);
 
     // Tab switch
     function switchTab(tab) {
