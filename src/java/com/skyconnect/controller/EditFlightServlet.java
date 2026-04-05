@@ -1,7 +1,6 @@
 package com.skyconnect.controller;
 
 import com.skyconnect.util.DBConnection;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -11,17 +10,35 @@ import java.sql.*;
 @WebServlet("/editFlight")
 public class EditFlightServlet extends HttpServlet {
 
-    // ================= LOAD FORM =================
+    // ── Guard helper ──────────────────────────────────────────────────────────
+    private boolean isAdmin(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return false;
+        }
+        return true;
+    }
+
+    // ── Load the edit form ────────────────────────────────────────────────────
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        int id = Integer.parseInt(req.getParameter("id"));
+        // FIX: was missing auth check
+        if (!isAdmin(req, resp)) return;
+
+        String idParam = req.getParameter("id");
+        if (idParam == null) {
+            resp.sendRedirect(req.getContextPath() + "/adminFlights");
+            return;
+        }
+
+        int id = Integer.parseInt(idParam);
 
         try (Connection con = DBConnection.getConnection()) {
-
-            String sql = "SELECT * FROM flights WHERE id=?";
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM flights WHERE id=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -30,15 +47,15 @@ public class EditFlightServlet extends HttpServlet {
                 return;
             }
 
-            req.setAttribute("id", id);
-            req.setAttribute("flightNo", rs.getString("flight_no"));
-            req.setAttribute("source", rs.getString("source"));
-            req.setAttribute("destination", rs.getString("destination"));
-            req.setAttribute("date", rs.getDate("depart_date"));
-            req.setAttribute("departTime", rs.getTime("depart_time"));
-            req.setAttribute("arrivalTime", rs.getTime("arrival_time"));
-            req.setAttribute("price", rs.getDouble("price"));
-            req.setAttribute("totalSeats", rs.getInt("seats_total"));
+            req.setAttribute("id",             id);
+            req.setAttribute("flightNo",       rs.getString("flight_no"));
+            req.setAttribute("source",         rs.getString("source"));
+            req.setAttribute("destination",    rs.getString("destination"));
+            req.setAttribute("date",           rs.getDate("depart_date"));
+            req.setAttribute("departTime",     rs.getTime("depart_time"));
+            req.setAttribute("arrivalTime",    rs.getTime("arrival_time"));
+            req.setAttribute("price",          rs.getDouble("price"));
+            req.setAttribute("totalSeats",     rs.getInt("seats_total"));
             req.setAttribute("availableSeats", rs.getInt("seats_available"));
 
             req.getRequestDispatcher("/Views/admin/admin_edit_flight.jsp").forward(req, resp);
@@ -49,37 +66,42 @@ public class EditFlightServlet extends HttpServlet {
         }
     }
 
-    // ================= UPDATE FLIGHT =================
+    // ── Save changes ──────────────────────────────────────────────────────────
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+            throws ServletException, IOException {
+
+        // FIX: was missing auth check
+        if (!isAdmin(req, resp)) return;
 
         int id = Integer.parseInt(req.getParameter("id"));
-        String date = req.getParameter("depart_date");
-        String depart = req.getParameter("depart_time");
+        String date    = req.getParameter("depart_date");
+        String depart  = req.getParameter("depart_time");
         String arrival = req.getParameter("arrival_time");
-        double price = Double.parseDouble(req.getParameter("price"));
+        double price   = Double.parseDouble(req.getParameter("price"));
 
         try (Connection con = DBConnection.getConnection()) {
-
             String sql =
                 "UPDATE flights SET depart_date=?, depart_time=?, arrival_time=?, price=? WHERE id=?";
-
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setDate(1, Date.valueOf(date));
-            ps.setTime(2, Time.valueOf(depart));
+            ps.setTime(2, Time.valueOf(depart + ":00"));
             if (arrival != null && !arrival.trim().isEmpty()) {
-                ps.setTime(3, Time.valueOf(arrival));
+                ps.setTime(3, Time.valueOf(arrival + ":00"));
             } else {
-                ps.setNull(3, java.sql.Types.TIME);
+                ps.setNull(3, Types.TIME);
             }
             ps.setDouble(4, price);
             ps.setInt(5, id);
-
             ps.executeUpdate();
+
+            HttpSession session = req.getSession(false);
+            if (session != null) session.setAttribute("editSuccess", "Flight updated successfully.");
 
         } catch (Exception e) {
             e.printStackTrace();
+            HttpSession session = req.getSession(false);
+            if (session != null) session.setAttribute("deleteError", "Update failed: " + e.getMessage());
         }
 
         resp.sendRedirect(req.getContextPath() + "/adminFlights");

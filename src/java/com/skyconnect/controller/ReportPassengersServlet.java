@@ -28,6 +28,12 @@ public class ReportPassengersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
 
         List<PassengerRow> list = new ArrayList<>();
 
