@@ -5,30 +5,44 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Aerosphere — Database Connection Utility
- * Returns a fresh JDBC connection each call.
- * For production: replace with a connection pool (e.g. HikariCP or DBCP).
+ * AeroSphere — Database Connection Utility
+ *
+ * Credentials are now loaded from META-INF/context.xml via AppConfig.
+ * Nothing is hardcoded here anymore.
+ *
+ * Usage (always use try-with-resources to auto-close):
+ *
+ *   try (Connection conn = DBConnection.getConnection()) {
+ *       // use conn
+ *   }
+ *
+ * For production: consider upgrading to HikariCP connection pool.
+ * (See Section 5 of improvements for HikariCP setup)
  */
 public class DBConnection {
-
-    private static final String URL      = "jdbc:mysql://localhost:3306/airlinedb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USER     = "root";
-    private static final String PASSWORD = "11012516@Mysql";   // ← change to your MySQL password
 
     static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            throw new ExceptionInInitializerError("MySQL Driver not found: " + e.getMessage());
+            throw new ExceptionInInitializerError("MySQL JDBC Driver not found: " + e.getMessage());
         }
     }
 
-    /** Returns a new connection. Caller must close it. */
+    /**
+     * Returns a fresh JDBC connection.
+     * CALLER MUST CLOSE IT — always use try-with-resources.
+     */
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        AppConfig cfg = AppConfig.get();
+        return DriverManager.getConnection(
+            cfg.getDbUrl(),
+            cfg.getDbUser(),
+            cfg.getDbPassword()
+        );
     }
 
-    /** Safely close a connection (null-safe). */
+    /** Null-safe connection close (convenience helper). */
     public static void close(Connection conn) {
         if (conn != null) {
             try { conn.close(); } catch (SQLException ignored) {}

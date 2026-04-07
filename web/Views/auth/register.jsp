@@ -1,4 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil" %>
+<%@ page import="com.skyconnect.util.HtmlUtils" %>
+<%
+    String error    = (String) request.getAttribute("error");
+    String success  = (String) request.getAttribute("success");
+    String csrfToken = CsrfUtil.getToken(request);
+%>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -7,6 +14,16 @@
     <title>Register – AeroSphere</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <%-- ══ THEME: apply BEFORE body renders to kill the white flash ══ --%>
+    <script>
+        (function(){
+            var t = localStorage.getItem('aerosphere-theme') ||
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <style>
         :root {
             --primary:#10B981; --primary-dark:#059669; --primary-glow:rgba(16,185,129,0.18);
@@ -141,20 +158,23 @@
         </div>
 
         <div class="form-card">
-            <%
-                String error = (String) request.getAttribute("error");
-                String success = (String) request.getAttribute("success");
-            %>
-            <% if (error != null) { %><div class="alert alert-error">⚠ <%= error %></div><% } %>
-            <% if (success != null) { %><div class="alert alert-success">✓ <%= success %></div><% } %>
+            <% if (error != null) { %>
+                <div class="alert alert-error">⚠ <%= HtmlUtils.e(error) %></div>
+            <% } %>
+            <% if (success != null) { %>
+                <div class="alert alert-success">✓ <%= HtmlUtils.e(success) %></div>
+            <% } %>
 
             <form action="${pageContext.request.contextPath}/register" method="post" id="regForm">
+                <%-- CSRF Token — protects against cross-site request forgery --%>
+                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
+
                 <div class="form-grid">
                     <div class="section-label"><span>Personal Info</span></div>
 
                     <div class="field full">
                         <label>Full Name</label>
-                        <div class="field-wrap"><span class="field-icon">👤</span><input type="text" name="name" placeholder="Your full name" required autocomplete="name"></div>
+                        <div class="field-wrap"><span class="field-icon">👤</span><input type="text" name="name" placeholder="Your full name" required autocomplete="name" maxlength="100"></div>
                     </div>
                     <div class="field">
                         <label>Email Address</label>
@@ -162,17 +182,17 @@
                     </div>
                     <div class="field">
                         <label>Phone Number</label>
-                        <div class="field-wrap"><span class="field-icon">📱</span><input type="text" name="phone" maxlength="10" placeholder="10-digit number" required></div>
+                        <div class="field-wrap"><span class="field-icon">📱</span><input type="tel" name="phone" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit number"></div>
                     </div>
                     <div class="field">
                         <label>Date of Birth</label>
-                        <div class="field-wrap"><span class="field-icon">🎂</span><input type="date" name="dob" required></div>
+                        <div class="field-wrap"><span class="field-icon">🎂</span><input type="date" name="dob"></div>
                     </div>
                     <div class="field">
                         <label>Gender</label>
                         <div class="field-wrap">
                             <span class="field-icon">⚧</span>
-                            <select name="gender" required>
+                            <select name="gender">
                                 <option value="">Select gender</option>
                                 <option value="MALE">Male</option>
                                 <option value="FEMALE">Female</option>
@@ -182,7 +202,7 @@
                     </div>
                     <div class="field full">
                         <label>Address</label>
-                        <div class="field-wrap"><span class="field-icon" style="top:18px;transform:none">📍</span><textarea name="address" placeholder="Your full residential address" required></textarea></div>
+                        <div class="field-wrap"><span class="field-icon" style="top:18px;transform:none">📍</span><textarea name="address" placeholder="Your full residential address"></textarea></div>
                     </div>
 
                     <div class="section-label"><span>Security</span></div>
@@ -190,14 +210,13 @@
                         <label>Password</label>
                         <div class="field-wrap">
                             <span class="field-icon">🔒</span>
-                            <input type="password" name="password" id="pwInput" placeholder="Create a strong password" required autocomplete="new-password">
+                            <input type="password" name="password" id="pwInput" placeholder="Min 8 characters" required autocomplete="new-password" minlength="8">
                             <button type="button" class="toggle-pw" onclick="togglePw()">👁</button>
                         </div>
                         <div class="strength-bar"><div class="strength-seg" id="s1"></div><div class="strength-seg" id="s2"></div><div class="strength-seg" id="s3"></div><div class="strength-seg" id="s4"></div></div>
                     </div>
                 </div>
 
-                <input type="hidden" name="role" value="USER">
                 <button type="submit" class="btn-submit"><span>Create My Account</span><span>→</span></button>
             </form>
         </div>
@@ -207,31 +226,44 @@
 </div>
 
 <script>
-    const savedTheme = localStorage.getItem('aerosphere-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    // ── Theme: apply correct icon after DOM renders ───────────────────
+    (function() {
+        var t = document.documentElement.getAttribute('data-theme') || 'light';
+        var btn = document.getElementById('themeToggle');
+        if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    })();
+
     function toggleTheme() {
-        const n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        var n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', n);
         localStorage.setItem('aerosphere-theme', n);
         document.getElementById('themeToggle').textContent = n === 'dark' ? '☀️' : '🌙';
     }
-    function togglePw() { const i=document.getElementById('pwInput'); i.type=i.type==='password'?'text':'password'; }
+
+    function togglePw() {
+        var i = document.getElementById('pwInput');
+        i.type = i.type === 'password' ? 'text' : 'password';
+    }
 
     document.getElementById('pwInput').addEventListener('input', function() {
-        const v=this.value, segs=['s1','s2','s3','s4'].map(id=>document.getElementById(id));
-        let score=0;
-        if(v.length>=6)score++; if(v.length>=10)score++;
-        if(/[A-Z]/.test(v)&&/[0-9]/.test(v))score++;
-        if(/[^A-Za-z0-9]/.test(v))score++;
-        const cls=score<=1?'seg-weak':score<=2?'seg-medium':'seg-strong';
-        segs.forEach((s,i)=>{s.className='strength-seg';if(i<score)s.classList.add(cls);});
+        var v = this.value;
+        var segs = ['s1','s2','s3','s4'].map(function(id){ return document.getElementById(id); });
+        var score = 0;
+        if (v.length >= 8) score++;
+        if (v.length >= 12) score++;
+        if (/[A-Z]/.test(v) && /[0-9]/.test(v)) score++;
+        if (/[^A-Za-z0-9]/.test(v)) score++;
+        var cls = score <= 1 ? 'seg-weak' : score <= 2 ? 'seg-medium' : 'seg-strong';
+        segs.forEach(function(s, i) {
+            s.className = 'strength-seg';
+            if (i < score) s.classList.add(cls);
+        });
     });
 
-    document.querySelectorAll('.field').forEach((f, i) => {
-        f.style.opacity='0'; f.style.transform='translateY(12px)';
-        f.style.transition=`all 0.4s ease ${0.2+i*0.04}s`;
-        setTimeout(()=>{f.style.opacity='1';f.style.transform='translateY(0)'},50);
+    document.querySelectorAll('.field').forEach(function(f, i) {
+        f.style.opacity = '0'; f.style.transform = 'translateY(12px)';
+        f.style.transition = 'all 0.4s ease ' + (0.2 + i * 0.04) + 's';
+        setTimeout(function(){ f.style.opacity = '1'; f.style.transform = 'translateY(0)'; }, 50);
     });
 </script>
 </body>

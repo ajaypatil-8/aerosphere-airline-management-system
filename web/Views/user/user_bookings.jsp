@@ -15,6 +15,13 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Bookings – AeroSphere</title>
+<%-- FIX: Apply theme before paint --%>
+<script>
+(function(){
+  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -30,14 +37,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:8px;font-size:.86rem;font-weight:500;transition:all .2s}
 .nav-link:hover{color:var(--text);background:var(--border)}.nav-link.active{color:var(--primary);background:var(--primary-glow)}.nav-link.btn-danger{color:#DC2626;background:rgba(220,38,38,.08)}.nav-link.btn-danger:hover{background:rgba(220,38,38,.15)}
 .theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
-/* PAGE */
 .page-wrapper{max-width:1100px;margin:0 auto;padding:32px 24px}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;animation:fadeUp .5s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .page-title{font-size:1.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
 .page-subtitle{color:var(--text-muted);font-size:.9rem}
 /* ALERTS */
-.alert{padding:12px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px}
+.alert{padding:12px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;animation:fadeUp .4s ease both}
 .alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626}
 [data-theme="dark"] .alert-error{color:#FCA5A5}
 .alert-success{background:var(--primary-glow);border:1px solid var(--primary);color:var(--primary)}
@@ -48,38 +54,37 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .filter-input{width:100%;padding:10px 12px 10px 36px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s}
 .filter-input:focus{border-color:var(--primary)}
 .filter-select{padding:10px 14px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s;appearance:none;cursor:pointer;min-width:140px}
-.filter-select:focus{border-color:var(--primary)}
 /* TABLE */
 .table-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s ease both .1s}
 .table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:760px}
-thead th{padding:12px 16px;text-align:left;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap}
-tbody td{padding:12px 16px;font-size:.87rem;border-bottom:1px solid var(--border);vertical-align:middle}
+table{width:100%;border-collapse:collapse}
+thead th{padding:12px 16px;text-align:left;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border)}
+tbody td{padding:12px 16px;font-size:.87rem;border-bottom:1px solid var(--border)}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--bg)}
-/* BADGES */
+tbody tr:hover{background:var(--primary-glow)}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:.74rem;font-weight:700}
 .badge-paid{background:rgba(16,185,129,.12);color:var(--primary);border:1px solid var(--primary)}
 .badge-booked{background:rgba(59,130,246,.1);color:#2563EB;border:1px solid rgba(59,130,246,.3)}
 [data-theme="dark"] .badge-booked{color:#93C5FD}
 .badge-cancelled{background:rgba(239,68,68,.1);color:#DC2626;border:1px solid rgba(239,68,68,.2)}
 [data-theme="dark"] .badge-cancelled{color:#FCA5A5}
-/* ROUTE */
-.route-cell{display:flex;align-items:center;gap:5px}
+.route-cell{display:flex;align-items:center;gap:6px;font-size:.85rem}
 .route-arrow{color:var(--primary)}
-/* ACTIONS */
-.action-group{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:8px;font-size:.78rem;font-weight:600;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;background:var(--card-bg);color:var(--text)}
-.btn:hover{border-color:var(--primary);color:var(--primary)}
-.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 2px 6px var(--primary-glow)}.btn-primary:hover{background:var(--primary-dark);color:#fff}
-.btn-danger{background:rgba(220,38,38,.08);color:#DC2626;border-color:rgba(220,38,38,.2)}.btn-danger:hover{background:rgba(220,38,38,.15)}
-.btn-lg{padding:9px 18px;font-size:.87rem}
 .amount{color:var(--primary);font-weight:700}
+/* ACTION BUTTONS */
+.action-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:.78rem;font-weight:600;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:var(--card-bg);color:var(--text);font-family:'Inter',sans-serif}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn-primary{background:var(--primary);color:#fff!important;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-danger{background:rgba(239,68,68,.08);color:#DC2626;border-color:rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.14)}
 /* EMPTY */
 .empty-state{padding:60px 20px;text-align:center}
 .empty-icon{font-size:3rem;margin-bottom:14px;opacity:.4}
 .empty-state h3{font-size:1.1rem;font-weight:700;margin-bottom:8px}
 .empty-state p{color:var(--text-muted);font-size:.88rem}
+@media(max-width:768px){.navbar{padding:12px 16px}.page-wrapper{padding:20px 14px}}
 </style>
 </head>
 <body>
@@ -89,11 +94,11 @@ tbody tr:hover{background:var(--bg)}
         <div class="brand-icon">✈</div><span class="brand-name">Aero<span>Sphere</span></span>
     </a>
     <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">Dashboard</a>
-        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link active">My Bookings</a>
-        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">Refunds</a>
-        <a href="${pageContext.request.contextPath}/profile"           class="nav-link">Profile</a>
-        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">Logout</a>
+        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
+        <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search</a>
+        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link active">🎫 Bookings</a>
+        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refunds</a>
+        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
         <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
     </div>
 </nav>
@@ -102,15 +107,21 @@ tbody tr:hover{background:var(--bg)}
     <div class="page-header">
         <div>
             <div class="page-title">🎫 My Bookings</div>
-            <div class="page-subtitle"><%= bookings != null ? bookings.size() : 0 %> booking(s) found</div>
+            <div class="page-subtitle">View, pay, and manage your flight bookings</div>
         </div>
-        <a href="${pageContext.request.contextPath}/userDashboard" class="btn btn-lg">← Search Flights</a>
+        <a href="${pageContext.request.contextPath}/searchFlights" class="btn btn-primary">+ Book a Flight</a>
     </div>
 
-    <% if (cancelError != null)   { %><div class="alert alert-error">⚠ <%= cancelError %></div><% } %>
-    <% if (cancelSuccess != null) { %><div class="alert alert-success">✅ <%= cancelSuccess %></div><% } %>
+    <%-- Cancel success message (set by CancelBookingServlet) --%>
+    <% if (cancelSuccess != null) { %>
+    <div class="alert alert-success" id="successAlert">✅ <%= cancelSuccess %></div>
+    <% } %>
 
-    <!-- FILTER BAR -->
+    <%-- Cancel error message (set by CancelBookingServlet) --%>
+    <% if (cancelError != null) { %>
+    <div class="alert alert-error" id="errorAlert">⚠️ <%= cancelError %></div>
+    <% } %>
+
     <div class="filter-bar">
         <div class="search-input-wrap">
             <span class="search-icon">🔍</span>
@@ -143,7 +154,8 @@ tbody tr:hover{background:var(--bg)}
                String st = b.status != null ? b.status.toLowerCase() : "booked";
                String bc = st.equals("paid")?"badge-paid":st.equals("cancelled")?"badge-cancelled":"badge-booked";
                boolean canCancel = !st.equals("cancelled");
-               boolean canPay    = "booked".equals(st) && "pending".equalsIgnoreCase(b.paymentStatus != null ? b.paymentStatus : "");
+               // FIX: Pay button links to /payment (not /processPayment)
+               boolean canPay    = ("booked".equals(st) || "pending".equals(st)) && "pending".equalsIgnoreCase(b.paymentStatus != null ? b.paymentStatus : "");
             %>
             <tr>
                 <td style="color:var(--text-muted);font-size:.8rem"><%= sno++ %></td>
@@ -156,14 +168,16 @@ tbody tr:hover{background:var(--bg)}
                 <td><span class="badge <%= bc %>"><%= st.substring(0,1).toUpperCase()+st.substring(1) %></span></td>
                 <td>
                     <div class="action-group">
-                        <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= b.id %>" class="btn">🎫</a>
+                        <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= b.id %>" class="btn" title="View Invoice">🎫</a>
                         <% if (canPay) { %>
-                            <a href="${pageContext.request.contextPath}/processPayment?bookingId=<%= b.id %>" class="btn btn-primary">💳 Pay</a>
+                            <%-- FIX: URL is /payment not /processPayment --%>
+                            <a href="${pageContext.request.contextPath}/payment?bookingId=<%= b.id %>" class="btn btn-primary">💳 Pay</a>
                         <% } %>
                         <% if (canCancel) { %>
-                        <form action="${pageContext.request.contextPath}/cancelBooking" method="post" style="margin:0" onsubmit="return confirm('Cancel booking #<%= b.id %>?')">
+                        <form action="${pageContext.request.contextPath}/cancelBooking" method="post" style="margin:0"
+                              onsubmit="return confirm('Cancel booking #<%= b.id %>?\n\nRefund policy:\n• >24h before departure: 100% refund\n• 2–24h before departure: 50% refund\n• Cannot cancel within 2 hours of departure')">
                             <input type="hidden" name="bookingId" value="<%= b.id %>">
-                            <button type="submit" class="btn btn-danger">✕</button>
+                            <button type="submit" class="btn btn-danger" title="Cancel booking">✕ Cancel</button>
                         </form>
                         <% } %>
                     </div>
@@ -178,18 +192,34 @@ tbody tr:hover{background:var(--bg)}
 </div>
 
 <script>
-const t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-document.documentElement.setAttribute('data-theme',t);
-document.getElementById('themeToggle').textContent=t==='dark'?'☀️':'🌙';
-function toggleTheme(){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('aerosphere-theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';}
-function filterTable(){
-    const q=document.getElementById('searchBox').value.toLowerCase();
-    const sv=document.getElementById('statusFilter').value.toLowerCase();
-    document.querySelectorAll('#bookTable tbody tr').forEach(r=>{
-        r.style.display=(r.textContent.toLowerCase().includes(q)&&(sv===''||r.textContent.toLowerCase().includes(sv)))?'':'none';
-    });
+// FIX: Set correct toggle icon immediately
+(function(){
+  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeToggle');
+  if(btn) btn.textContent=t==='dark'?'☀️':'🌙';
+})();
+function toggleTheme(){
+  var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem('aerosphere-theme',n);
+  document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';
 }
-document.getElementById('searchBox')?.addEventListener('input',filterTable);
-document.getElementById('statusFilter')?.addEventListener('change',filterTable);
+function filterTable(){
+  var q=document.getElementById('searchBox').value.toLowerCase();
+  var sv=document.getElementById('statusFilter').value.toLowerCase();
+  document.querySelectorAll('#bookTable tbody tr').forEach(function(r){
+    r.style.display=(r.textContent.toLowerCase().includes(q)&&(sv===''||r.textContent.toLowerCase().includes(sv)))?'':'none';
+  });
+}
+document.getElementById('searchBox')&&document.getElementById('searchBox').addEventListener('input',filterTable);
+document.getElementById('statusFilter')&&document.getElementById('statusFilter').addEventListener('change',filterTable);
+// Auto-dismiss success/error alerts after 6 seconds
+setTimeout(function(){
+  ['successAlert','errorAlert'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.style.transition='opacity .5s';el.style.opacity='0';setTimeout(function(){el.style.display='none';},520);}
+  });
+},6000);
 </script>
 </body></html>

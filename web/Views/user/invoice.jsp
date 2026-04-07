@@ -24,12 +24,21 @@
     List<Passenger> passengers = (List<Passenger>) request.getAttribute("passengers");
     if (amount == null) amount = 0.0;
     String statusClass = "paid".equalsIgnoreCase(status) ? "badge-paid" : "cancelled".equalsIgnoreCase(status) ? "badge-cancelled" : "badge-booked";
+    // Only show download button if booking is paid/booked (not cancelled/pending)
+    boolean showDownload = !"CANCELLED".equalsIgnoreCase(status) && !"PENDING".equalsIgnoreCase(status);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Invoice #<%= bookingId %> – AeroSphere</title>
+<%-- FIX: Apply theme BEFORE any rendering to prevent flash --%>
+<script>
+(function(){
+  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -47,6 +56,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;background:var(--card-bg);color:var(--text)}
 .btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn-primary{background:var(--primary);color:#fff!important;border-color:var(--primary);box-shadow:0 3px 10px var(--primary-glow)}
+.btn-primary:hover{background:var(--primary-dark);color:#fff}
+.btn-pdf{background:rgba(239,68,68,.08);color:#DC2626;border-color:rgba(239,68,68,.2)}
+.btn-pdf:hover{background:rgba(239,68,68,.14);color:#DC2626;border-color:rgba(239,68,68,.4)}
 /* PAGE */
 .page-wrapper{max-width:820px;margin:0 auto;padding:28px 24px}
 /* INVOICE CARD */
@@ -56,14 +69,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .invoice-logo{font-size:1.5rem;font-weight:900;letter-spacing:-.5px;margin-top:6px}
 .invoice-logo span{color:var(--primary)}
 .invoice-id{font-size:.78rem;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-/* BADGE */
 .badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:.76rem;font-weight:700;margin-top:10px}
 .badge-paid{background:rgba(16,185,129,.12);color:var(--primary);border:1px solid var(--primary)}
 .badge-booked{background:rgba(59,130,246,.1);color:#2563EB;border:1px solid rgba(59,130,246,.3)}
 [data-theme="dark"] .badge-booked{color:#93C5FD}
 .badge-cancelled{background:rgba(239,68,68,.1);color:#DC2626;border:1px solid rgba(239,68,68,.2)}
 [data-theme="dark"] .badge-cancelled{color:#FCA5A5}
-/* ROUTE BANNER */
 .route-banner{display:flex;align-items:center;justify-content:space-between;background:var(--primary-glow);border-bottom:1px solid var(--border);padding:20px 28px}
 .route-city{font-size:1.8rem;font-weight:900;letter-spacing:-1px}
 .route-lbl{font-size:.74rem;color:var(--text-muted);margin-top:3px}
@@ -71,40 +82,30 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .route-fno{font-size:.72rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
 .route-icon{font-size:1.5rem;color:var(--primary)}
 .route-date{font-size:.72rem;color:var(--text-muted);margin-top:4px}
-/* BODY */
 .invoice-body{padding:24px 28px}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px}
-/* SECTION TITLE */
 .sec-title{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-/* INFO ROWS */
 .info-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
 .info-row:last-child{border-bottom:none}
 .info-icon{width:30px;height:30px;background:var(--primary-glow);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 .info-label{font-size:.72rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
 .info-value{font-size:.88rem;font-weight:600;margin-top:1px}
-/* INVOICE ROWS */
 .invoice-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem}
 .invoice-row:last-child{border-bottom:none}
 .invoice-row .label{color:var(--text-muted)}
 .invoice-total{display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid var(--primary);margin-top:4px}
 .invoice-total .label{font-weight:700;font-size:.95rem}
 .invoice-total .value{font-size:1.2rem;font-weight:900;color:var(--primary)}
-/* TABLE */
 .table-section{padding:0 28px 20px}
 .table-title{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 table{width:100%;border-collapse:collapse}
 thead th{padding:9px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border)}
 tbody td{padding:10px 12px;font-size:.86rem;border-bottom:1px solid var(--border)}
 tbody tr:last-child td{border-bottom:none}
-/* THANK YOU */
 .thank-you{margin:16px 28px 24px;background:var(--primary-glow);border:1px solid var(--primary);border-radius:11px;padding:16px 20px;text-align:center}
 .thank-you strong{display:block;color:var(--primary);font-weight:700;margin-bottom:4px}
 .thank-you small{font-size:.78rem;color:var(--text-muted)}
-/* ACTIONS */
-.actions{display:flex;gap:12px;justify-content:center;margin-top:20px;animation:fadeUp .5s ease both .1s}
-.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 3px 10px var(--primary-glow)}
-.btn-primary:hover{background:var(--primary-dark);color:#fff}
-/* PRINT */
+.actions{display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap;animation:fadeUp .5s ease both .1s}
 @media print{
     .navbar,.no-print,.actions{display:none!important}
     body{background:#fff;color:#000}
@@ -209,17 +210,32 @@ tbody tr:last-child td{border-bottom:none}
         </div>
     </div>
 
-    <!-- ACTIONS -->
-    <div class="actions">
+    <!-- ACTIONS — PDF download button added here -->
+    <div class="actions no-print">
         <a href="${pageContext.request.contextPath}/userBookings" class="btn">← My Bookings</a>
         <button onclick="window.print()" class="btn btn-primary">🖨 Print Invoice</button>
+        <% if (showDownload) { %>
+        <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= bookingId %>&download=true"
+           class="btn btn-pdf" title="Download PDF">
+            📄 Download PDF
+        </a>
+        <% } %>
     </div>
 </div>
 
 <script>
-const t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-document.documentElement.setAttribute('data-theme',t);
-document.getElementById('themeToggle').textContent=t==='dark'?'☀️':'🌙';
-function toggleTheme(){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('aerosphere-theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';}
+// FIX: Read localStorage theme and set toggle icon immediately (no flash, no wrong icon)
+(function(){
+  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeToggle');
+  if(btn) btn.textContent=t==='dark'?'☀️':'🌙';
+})();
+function toggleTheme(){
+  var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem('aerosphere-theme',n);
+  document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';
+}
 </script>
 </body></html>

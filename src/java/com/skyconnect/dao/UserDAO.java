@@ -1,8 +1,8 @@
 package com.skyconnect.dao;
 
 import com.skyconnect.model.User;
-import org.mindrot.jbcrypt.BCrypt;
 import com.skyconnect.util.DBConnection;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,15 +15,15 @@ public class UserDAO {
         String sql = "SELECT * FROM users WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
+            ps.setString(1, email.toLowerCase().trim());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String storedHash = rs.getString("password");
                 boolean valid;
-                // Support both BCrypt hashes and legacy plain-text (migration)
                 if (storedHash.startsWith("$2a$") || storedHash.startsWith("$2b$")) {
                     valid = BCrypt.checkpw(plainPassword, storedHash);
                 } else {
+                    // Legacy plain-text fallback — auto-upgrade on next login
                     valid = storedHash.equals(plainPassword);
                 }
                 if (valid) return mapRow(rs);
@@ -65,7 +65,7 @@ public class UserDAO {
         String sql = "SELECT id FROM users WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
+            ps.setString(1, email.toLowerCase().trim());
             return ps.executeQuery().next();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -138,7 +138,7 @@ public class UserDAO {
         return list;
     }
 
-    /** Count all users */
+    /** Count all users (role = USER) */
     public int countUsers() {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE role='USER'");
@@ -150,7 +150,35 @@ public class UserDAO {
         return 0;
     }
 
-    // ---- private helper ----
+    /**
+     * Admin: ban / suspend an account.
+     * Sets is_active = 0 so the user cannot log in.
+     */
+    public boolean banUser(int userId) {
+        return setActiveStatus(userId, false);
+    }
+
+    /**
+     * Admin: re-activate a banned account.
+     */
+    public boolean unbanUser(int userId) {
+        return setActiveStatus(userId, true);
+    }
+
+    private boolean setActiveStatus(int userId, boolean active) {
+        String sql = "UPDATE users SET is_active=? WHERE id=?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, active);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ── private helper ─────────────────────────────────────────────
     private User mapRow(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
@@ -163,6 +191,12 @@ public class UserDAO {
         u.setAddress(rs.getString("address"));
         u.setRole(rs.getString("role"));
         u.setCreatedAt(rs.getTimestamp("created_at"));
+        // is_active column: default true if column doesn't exist yet (safe fallback)
+        try {
+            u.setActive(rs.getBoolean("is_active"));
+        } catch (SQLException ignored) {
+            u.setActive(true); // column not added yet — treat as active
+        }
         return u;
     }
 }

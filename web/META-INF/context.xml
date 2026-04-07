@@ -1,2 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/airline"/>
+<!--
+  ══════════════════════════════════════════════════════════════════
+  AeroSphere — Application Configuration  (META-INF/context.xml)
+  ══════════════════════════════════════════════════════════════════
+  This file is processed by Tomcat and is NOT served to browsers.
+  Safe to put credentials here (unlike web.xml or .properties).
+
+  ⚠  FILL IN your values below and restart Tomcat.
+  ══════════════════════════════════════════════════════════════════
+-->
+<Context path="/airline">
+
+    <!-- ─────────────────────────────────────────────────────────
+         1. DATABASE
+         Paste your MySQL root password below.
+         (Currently hardcoded in DBConnection.java — now moved here)
+         ───────────────────────────────────────────────────────── -->
+    <Parameter name="db.url"
+               value="jdbc:mysql://localhost:3306/airlinedb?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"
+               override="false"/>
+    <Parameter name="db.user"
+               value="root"
+               override="false"/>
+    <!-- ▼▼▼  PASTE YOUR MYSQL PASSWORD HERE  ▼▼▼ -->
+    <Parameter name="db.password"
+               value="11012516@Mysql"
+               override="false"/>
+
+    <!-- ─────────────────────────────────────────────────────────
+         2. RAZORPAY PAYMENT GATEWAY
+         Steps to get keys:
+           1. Go to https://dashboard.razorpay.com/app/keys
+           2. Create a Test Mode API key pair
+           3. Paste key_id and key_secret below
+         ───────────────────────────────────────────────────────── -->
+    <!-- ▼▼▼  PASTE YOUR RAZORPAY TEST KEY ID HERE  ▼▼▼ -->
+    <Parameter name="razorpay.key_id"
+               value="rzp_test_XXXXXXXXXXXXXXXX"
+               override="false"/>
+    <!-- ▼▼▼  PASTE YOUR RAZORPAY TEST KEY SECRET HERE  ▼▼▼ -->
+    <Parameter name="razorpay.key_secret"
+               value="YOUR_RAZORPAY_SECRET_HERE"
+               override="false"/>
+
+    <!-- ─────────────────────────────────────────────────────────
+         3. EMAIL / SMTP  (for booking confirmations, OTP)
+         For Gmail:
+           1. Enable 2-Step Verification on your Google account
+           2. Go to: https://myaccount.google.com/apppasswords
+           3. Create an app password  (select "Mail" + "Other")
+           4. Copy the 16-character password and paste below
+         ───────────────────────────────────────────────────────── -->
+    <Parameter name="smtp.host"     value="smtp.gmail.com" override="false"/>
+    <Parameter name="smtp.port"     value="587"            override="false"/>
+    <!-- ▼▼▼  PASTE YOUR GMAIL ADDRESS HERE  ▼▼▼ -->
+    <Parameter name="smtp.user"     value="your_gmail@gmail.com" override="false"/>
+    <!-- ▼▼▼  PASTE YOUR GMAIL APP PASSWORD HERE (16 chars, no spaces)  ▼▼▼ -->
+    <Parameter name="smtp.password" value="xxxx xxxx xxxx xxxx"   override="false"/>
+    <Parameter name="smtp.from"     value="AeroSphere &lt;your_gmail@gmail.com&gt;" override="false"/>
+
+    <!-- ─────────────────────────────────────────────────────────
+         4. SMS / OTP  (Fast2SMS — Indian gateway)
+         Steps:
+           1. Register at https://www.fast2sms.com/
+           2. Go to Dev API → API Key
+           3. Paste your API key below
+         ───────────────────────────────────────────────────────── -->
+    <!-- ▼▼▼  PASTE YOUR FAST2SMS API KEY HERE  ▼▼▼ -->
+    <Parameter name="sms.api.key"   value="YOUR_FAST2SMS_API_KEY_HERE" override="false"/>
+
+    <!-- ─────────────────────────────────────────────────────────
+         5. APP SETTINGS
+         ───────────────────────────────────────────────────────── -->
+    <Parameter name="app.name"    value="AeroSphere"                    override="false"/>
+    <Parameter name="app.baseUrl" value="http://localhost:8080/airline" override="false"/>
+
+</Context>

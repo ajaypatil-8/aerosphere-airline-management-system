@@ -1,100 +1,6 @@
-/*package com.skyconnect.servlet;
-
-import com.skyconnect.util.DBConnection;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
-@WebServlet("/processPayment")
-public class PaymentServlet extends HttpServlet {
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        HttpSession session = req.getSession(false);
-
-        if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        String bookingIdStr = req.getParameter("bookingId");
-        String paymentMethod = req.getParameter("paymentMethod");
-
-        if (bookingIdStr == null || paymentMethod == null || paymentMethod.isEmpty()) {
-            resp.sendRedirect(request.getContextPath() + "/userDashboard");
-            return;
-        }
-
-        int bookingId = Integer.parseInt(bookingIdStr);
-
-        try (Connection con = DBConnection.getConnection()) {
-
-            con.setAutoCommit(false);
-
-            double amount = 0;
-
-            // 1️⃣ Get booking amount
-            String fetchSql =
-                "SELECT total_amount FROM bookings WHERE id=? AND status='BOOKED'";
-
-            try (PreparedStatement ps = con.prepareStatement(fetchSql)) {
-                ps.setInt(1, bookingId);
-                ResultSet rs = ps.executeQuery();
-
-                if (!rs.next()) {
-                    con.rollback();
-                    resp.sendRedirect(request.getContextPath() + "/userDashboard");
-                    return;
-                }
-
-                amount = rs.getDouble("total_amount");
-            }
-
-            // 2️⃣ Insert payment record
-            String insertPaymentSql =
-                "INSERT INTO payments (booking_id, payment_date, amount, payment_method, payment_status) " +
-                "VALUES (?, NOW(), ?, ?, 'SUCCESS')";
-
-            try (PreparedStatement ps = con.prepareStatement(insertPaymentSql)) {
-                ps.setInt(1, bookingId);
-                ps.setDouble(2, amount);
-                ps.setString(3, paymentMethod);
-                ps.executeUpdate();
-            }
-
-            // 3️⃣ Update booking status
-            String updateBookingSql =
-                "UPDATE bookings SET status='PAID', payment_status='PAID' WHERE id=?";
-
-            try (PreparedStatement ps = con.prepareStatement(updateBookingSql)) {
-                ps.setInt(1, bookingId);
-                ps.executeUpdate();
-            }
-
-            con.commit();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingIdStr);
-            return;
-        }
-
-        // ✅ Payment done → go to My Bookings
-        resp.sendRedirect(request.getContextPath() + "/userBookings");
-    }
-}
-*/
-
-
 package com.skyconnect.controller;
 
+import com.skyconnect.service.EmailService;
 import com.skyconnect.util.DBConnection;
 
 import javax.servlet.ServletException;
@@ -102,13 +8,29 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.*;
+import java.util.logging.Logger;
 
-@WebServlet("/processPayment")
+/**
+ * AeroSphere — PaymentServlet (UPDATED)
+ *
+ * CRITICAL FIX: Was mapped to /processPayment — now correctly mapped to /payment
+ * (matches all JSP form actions and the prompt's URL mapping table).
+ *
+ * Changes vs original:
+ *  1. @WebServlet changed from /processPayment → /payment
+ *  2. Sends booking confirmation email after successful payment (async)
+ *  3. On payment failure: sets error attribute so JSP can show message
+ *  4. Status set to 'BOOKED' (not 'PAID') on success — aligns with DB design
+ *
+ * GET /payment?bookingId=X  → show payment.jsp  (unchanged)
+ * POST /payment             → process payment   (fixed)
+ */
+@WebServlet("/payment")
 public class PaymentServlet extends HttpServlet {
 
-    // =========================
-    // SHOW PAYMENT PAGE
-    // =========================
+    private static final Logger LOG = Logger.getLogger(PaymentServlet.class.getName());
+
+    // ── SHOW PAYMENT PAGE ─────────────────────────────────────────
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -121,19 +43,27 @@ public class PaymentServlet extends HttpServlet {
             return;
         }
 
-        int bookingId = Integer.parseInt(req.getParameter("bookingId"));
+        String bookingIdParam = req.getParameter("bookingId");
+        if (bookingIdParam == null) {
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
+            return;
+        }
+
+        int bookingId;
+        try { bookingId = Integer.parseInt(bookingIdParam); }
+        catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
+            return;
+        }
 
         try (Connection con = DBConnection.getConnection()) {
 
-            // 🔒 Load booking safely
             String sql =
                 "SELECT total_amount, status, payment_status " +
                 "FROM bookings WHERE id=? AND user_id=?";
-
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, bookingId);
             ps.setInt(2, userId);
-
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -143,40 +73,34 @@ public class PaymentServlet extends HttpServlet {
 
             String bookingStatus = rs.getString("status");
             String paymentStatus = rs.getString("payment_status");
-            double amount = rs.getDouble("total_amount");
+            double amount        = rs.getDouble("total_amount");
 
-            // ❌ Already cancelled
             if ("CANCELLED".equals(bookingStatus)) {
                 resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
                 return;
             }
-
-            // ✅ Already paid → skip payment
             if ("PAID".equals(paymentStatus)) {
                 resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
                 return;
             }
 
-            // GST calculation
-            double gst = amount * 0.05;
+            double gst         = amount * 0.05;
             double finalAmount = amount + gst;
 
-            req.setAttribute("bookingId", bookingId);
-            req.setAttribute("baseAmount", amount);
-            req.setAttribute("gst", gst);
+            req.setAttribute("bookingId",   bookingId);
+            req.setAttribute("baseAmount",  amount);
+            req.setAttribute("gst",         gst);
             req.setAttribute("finalAmount", finalAmount);
 
             req.getRequestDispatcher("/Views/user/payment.jsp").forward(req, resp);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.severe("PaymentServlet GET error: " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/userBookings");
         }
     }
 
-    // =========================
-    // PROCESS PAYMENT
-    // =========================
+    // ── PROCESS PAYMENT ───────────────────────────────────────────
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -185,30 +109,44 @@ public class PaymentServlet extends HttpServlet {
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-           resp.sendRedirect(req.getContextPath() + "/login");
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-        int bookingId = Integer.parseInt(req.getParameter("bookingId"));
+        String bookingIdParam = req.getParameter("bookingId");
         String method = req.getParameter("paymentMethod");
 
-        if (method == null || method.isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
+        if (bookingIdParam == null || method == null || method.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
+            return;
+        }
+
+        int bookingId;
+        try { bookingId = Integer.parseInt(bookingIdParam); }
+        catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/userBookings");
             return;
         }
 
         try (Connection con = DBConnection.getConnection()) {
             con.setAutoCommit(false);
 
-            // 🔒 Lock booking
+            // Lock booking + validate ownership
             String fetch =
-                "SELECT total_amount, payment_status " +
-                "FROM bookings WHERE id=? AND user_id=? FOR UPDATE";
+                "SELECT b.total_amount, b.payment_status, b.status, " +
+                "u.email AS user_email, u.name AS user_name, " +
+                "f.flight_no, f.source, f.destination, " +
+                "DATE_FORMAT(f.depart_date,'%d %b %Y') AS depart_date, " +
+                "TIME_FORMAT(f.depart_time,'%H:%i') AS depart_time, " +
+                "b.num_seats " +
+                "FROM bookings b " +
+                "JOIN users u ON b.user_id = u.id " +
+                "JOIN flights f ON b.flight_id = f.id " +
+                "WHERE b.id=? AND b.user_id=? FOR UPDATE";
 
             PreparedStatement ps = con.prepareStatement(fetch);
             ps.setInt(1, bookingId);
             ps.setInt(2, userId);
-
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -217,45 +155,70 @@ public class PaymentServlet extends HttpServlet {
                 return;
             }
 
-            String paymentStatus = rs.getString("payment_status");
-
-            // ❌ Already paid
-            if ("PAID".equals(paymentStatus)) {
+            if ("PAID".equals(rs.getString("payment_status"))) {
                 con.rollback();
                 resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
                 return;
             }
 
-            double amount = rs.getDouble("total_amount");
-            double gst = amount * 0.05;
-            double finalAmount = amount + gst;
+            if ("CANCELLED".equals(rs.getString("status"))) {
+                con.rollback();
+                resp.sendRedirect(req.getContextPath() + "/userBookings");
+                return;
+            }
 
-            // 💳 Insert payment
+            double amount      = rs.getDouble("total_amount");
+            double gst         = amount * 0.05;
+            double finalAmount = amount + gst;
+            String userEmail   = rs.getString("user_email");
+            String userName    = rs.getString("user_name");
+            String flightNo    = rs.getString("flight_no");
+            String source      = rs.getString("source");
+            String destination = rs.getString("destination");
+            String departDate  = rs.getString("depart_date");
+            String departTime  = rs.getString("depart_time");
+            int    numSeats    = rs.getInt("num_seats");
+
+            // Insert payment record
             String paySql =
                 "INSERT INTO payments (booking_id, amount, payment_method, payment_status) " +
                 "VALUES (?, ?, ?, 'SUCCESS')";
-
             PreparedStatement ps2 = con.prepareStatement(paySql);
             ps2.setInt(1, bookingId);
             ps2.setDouble(2, finalAmount);
-            ps2.setString(3, method);
+            ps2.setString(3, method.trim());
             ps2.executeUpdate();
 
-            // ✅ Update booking
-            String updateBooking =
-                "UPDATE bookings SET payment_status='PAID', status='PAID' WHERE id=?";
-
-            PreparedStatement ps3 = con.prepareStatement(updateBooking);
+            // Update booking: BOOKED + PAID (status=BOOKED is correct per DB design)
+            String updateSql =
+                "UPDATE bookings SET payment_status='PAID', status='BOOKED' WHERE id=?";
+            PreparedStatement ps3 = con.prepareStatement(updateSql);
             ps3.setInt(1, bookingId);
             ps3.executeUpdate();
 
             con.commit();
 
+            LOG.info("Payment SUCCESS for booking #" + bookingId +
+                     " | method=" + method + " | amount=₹" + finalAmount);
+
+            // Send booking confirmation email (async — does not block response)
+            if (userEmail != null && !userEmail.isEmpty()) {
+                EmailService.sendBookingConfirmation(
+                    userEmail, userName,
+                    String.valueOf(bookingId), flightNo,
+                    source, destination,
+                    departDate, departTime,
+                    numSeats, finalAmount
+                );
+            }
+
             resp.sendRedirect(req.getContextPath() + "/invoice?bookingId=" + bookingId);
 
         } catch (Exception e) {
+            LOG.severe("PaymentServlet POST error: " + e.getMessage());
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
+            // Don't lose the user — send them back to payment page with error
+            resp.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId + "&error=1");
         }
     }
 }

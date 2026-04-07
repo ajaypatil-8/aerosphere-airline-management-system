@@ -1,4 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil" %>
+<%@ page import="com.skyconnect.util.HtmlUtils" %>
+<%
+    String err       = (String) request.getAttribute("error");
+    String activeTab = (String) request.getAttribute("activeTab");
+    if (activeTab == null) activeTab = "USER";
+    String csrfToken = CsrfUtil.getToken(request);
+%>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -7,6 +15,16 @@
     <title>Sign In – AeroSphere</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <%-- ══ THEME: apply BEFORE body renders to kill the white flash ══ --%>
+    <script>
+        (function(){
+            var t = localStorage.getItem('aerosphere-theme') ||
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <style>
         :root {
             --primary: #10B981; --primary-dark: #059669; --primary-glow: rgba(16,185,129,0.2);
@@ -164,6 +182,7 @@
     <div class="nav-right">
         <a href="${pageContext.request.contextPath}/" class="nav-link">Home</a>
         <a href="${pageContext.request.contextPath}/register" class="nav-link outline">Create Account</a>
+        <%-- Icon set by inline script below after theme is known --%>
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeToggle">🌙</button>
     </div>
 </nav>
@@ -197,24 +216,21 @@
                 <button class="tab-btn" id="tabAdmin" onclick="switchTab('admin')">Admin</button>
             </div>
 
-            <%
-                String err = (String) request.getAttribute("error");
-                String activeTab = (String) request.getAttribute("activeTab");
-                if (activeTab == null) activeTab = "USER";
-            %>
             <% if (err != null) { %>
-                <div class="alert">⚠ <%= err %></div>
+                <%-- XSS-safe error output using HtmlUtils.e() --%>
+                <div class="alert">⚠ <%= HtmlUtils.e(err) %></div>
             <% } %>
 
-            <!-- USER FORM -->
+            <!-- USER FORM — CSRF token added -->
             <form action="${pageContext.request.contextPath}/login" method="post" id="userForm">
                 <input type="hidden" name="loginType" value="USER">
+                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                 <div class="field">
                     <label>Email Address</label>
                     <div class="input-wrap">
                         <span class="input-icon">✉</span>
                         <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
-                        </div>
+                    </div>
                 </div>
                 <div class="field">
                     <label>Password</label>
@@ -227,9 +243,10 @@
                 <button type="submit" class="btn-login"><span>Sign In</span><span>→</span></button>
             </form>
 
-            <!-- ADMIN FORM -->
+            <!-- ADMIN FORM — CSRF token added -->
             <form action="${pageContext.request.contextPath}/login" method="post" id="adminForm">
                 <input type="hidden" name="loginType" value="ADMIN">
+                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                 <div class="field">
                     <label>Admin Email</label>
                     <div class="input-wrap">
@@ -255,25 +272,35 @@
 </div>
 
 <script>
-    const savedTheme = localStorage.getItem('aerosphere-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    // ── Theme: set correct icon now that DOM exists ──────────────────
+    (function() {
+        var t = document.documentElement.getAttribute('data-theme') || 'light';
+        var btn = document.getElementById('themeToggle');
+        if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    })();
+
     function toggleTheme() {
-        const n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        var n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', n);
         localStorage.setItem('aerosphere-theme', n);
         document.getElementById('themeToggle').textContent = n === 'dark' ? '☀️' : '🌙';
     }
 
-    const initialTab = '<%= activeTab %>'.toLowerCase() === 'admin' ? 'admin' : 'user';
+    // ── Tab switching ─────────────────────────────────────────────────
+    var initialTab = '<%= HtmlUtils.escapeJs(activeTab) %>'.toLowerCase() === 'admin' ? 'admin' : 'user';
     switchTab(initialTab);
+
     function switchTab(tab) {
-        document.getElementById('userForm').style.display  = tab === 'user' ? 'block' : 'none';
+        document.getElementById('userForm').style.display  = tab === 'user'  ? 'block' : 'none';
         document.getElementById('adminForm').style.display = tab === 'admin' ? 'block' : 'none';
         document.getElementById('tabUser').classList.toggle('active', tab === 'user');
         document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
     }
-    function togglePw(id) { const i=document.getElementById(id); i.type=i.type==='password'?'text':'password'; }
+
+    function togglePw(id) {
+        var i = document.getElementById(id);
+        i.type = i.type === 'password' ? 'text' : 'password';
+    }
 </script>
 </body>
 </html>

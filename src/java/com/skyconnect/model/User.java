@@ -3,6 +3,10 @@ package com.skyconnect.model;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+/**
+ * AeroSphere — User POJO
+ * Updated: added isActive field for account ban/suspend support.
+ */
 public class User {
     private int id;
     private String name;
@@ -13,6 +17,7 @@ public class User {
     private String gender;
     private String address;
     private String role;
+    private boolean active = true;   // ← new field (DB column: is_active)
     private Timestamp createdAt;
 
     public User() {}
@@ -27,6 +32,7 @@ public class User {
     public String getGender()       { return gender; }
     public String getAddress()      { return address; }
     public String getRole()         { return role; }
+    public boolean isActive()       { return active; }
     public Timestamp getCreatedAt() { return createdAt; }
 
     // ---------- Setters ----------
@@ -39,5 +45,6 @@ public class User {
     public void setGender(String gender)         { this.gender = gender; }
     public void setAddress(String address)       { this.address = address; }
     public void setRole(String role)             { this.role = role; }
+    public void setActive(boolean active)        { this.active = active; }
     public void setCreatedAt(Timestamp t)        { this.createdAt = t; }
 }
