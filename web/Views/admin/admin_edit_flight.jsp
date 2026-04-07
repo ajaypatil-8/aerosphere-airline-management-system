@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
@@ -15,6 +16,7 @@
     Integer availSeats= (Integer) request.getAttribute("availableSeats");
     String depTimeStr = depTime != null ? depTime.toString().substring(0,5) : "";
     String arrTimeStr = arrTime != null ? arrTime.toString().substring(0,5) : "";
+    String csrfToken  = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -104,6 +106,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 
   <div class="card animate-fadeup">
     <form action="${pageContext.request.contextPath}/editFlight" method="post">
+      <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
       <input type="hidden" name="id" value="<%= id %>">
       <div class="form-grid">
         <div class="form-group">

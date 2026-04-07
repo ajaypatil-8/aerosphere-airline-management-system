@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.skyconnect.controller.AdminFlightsServlet.Flight" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
@@ -9,6 +10,7 @@
     String deleteError   = (String) session.getAttribute("deleteError");
     String deleteSuccess = (String) session.getAttribute("deleteSuccess");
     session.removeAttribute("deleteError"); session.removeAttribute("deleteSuccess");
+    String csrfToken = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -140,6 +142,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
             <% if (f.availableSeats == f.totalSeats) { %>
             <a href="${pageContext.request.contextPath}/editFlight?id=<%= f.id %>" class="btn-edit">✏️ Edit</a>
             <form action="${pageContext.request.contextPath}/deleteFlight" method="post" style="margin:0;" onsubmit="return confirm('Delete flight <%= f.flightNo %>?')">
+              <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
               <input type="hidden" name="id" value="<%= f.id %>">
               <button type="submit" class="btn-danger-sm">🗑 Delete</button>
             </form>

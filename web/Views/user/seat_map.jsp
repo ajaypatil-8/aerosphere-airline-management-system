@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
@@ -7,6 +8,9 @@
     String flightNo  = request.getParameter("flightNo")     != null ? request.getParameter("flightNo")     : "";
     String source    = request.getParameter("source")       != null ? request.getParameter("source")       : "";
     String dest      = request.getParameter("destination")  != null ? request.getParameter("destination")  : "";
+    int numSeatsInt = 1;
+    try { numSeatsInt = Integer.parseInt(numSeats); if (numSeatsInt < 1) numSeatsInt = 1; } catch (NumberFormatException ignored) { numSeatsInt = 1; numSeats = "1"; }
+    String csrfToken = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -101,7 +105,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
     <div class="page-header">
         <div>
             <div class="page-title">💺 Select Your Seats</div>
-            <div class="page-subtitle">Choose <%= numSeats %> seat<%= Integer.parseInt(numSeats) > 1 ? "s" : "" %> for your journey</div>
+            <div class="page-subtitle">Choose <%= numSeatsInt %> seat<%= numSeatsInt > 1 ? "s" : "" %> for your journey</div>
         </div>
         <a href="${pageContext.request.contextPath}/searchFlights" class="nav-link" style="border:1px solid var(--border);border-radius:8px">← Change Flight</a>
     </div>
@@ -153,6 +157,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
             <div class="sp-row"><span class="sp-key">Selected</span><span class="sp-val" id="selectedCount" style="color:var(--primary)">0 / <%= numSeats %></span></div>
             <div class="selected-tags" id="selectedList"></div>
             <form action="${pageContext.request.contextPath}/bookFlight" method="post" id="proceedForm">
+                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                 <input type="hidden" name="flightId" value="<%= flightId %>">
                 <input type="hidden" name="numSeats" value="<%= numSeats %>">
                 <input type="hidden" name="selectedSeats" id="selectedSeatsInput" value="">

@@ -1,4 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil" %>
+<%@ page import="com.skyconnect.util.HtmlUtils" %>
+<%
+    String error = (String) request.getAttribute("error");
+    String csrfToken = CsrfUtil.getToken(request);
+%>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -44,10 +50,9 @@ input::placeholder{color:var(--text-muted)}
   <div style="text-align:center"><span class="admin-badge">🔐 Secure Admin Access</span></div>
 
   <%
-    String error = (String) request.getAttribute("error");
     if (error != null) {
   %>
-  <div class="alert-error">⚠️ <%= error %></div>
+  <div class="alert-error">⚠️ <%= HtmlUtils.e(error) %></div>
   <% } %>
 
   <form action="${pageContext.request.contextPath}/login" method="post">
@@ -60,6 +65,7 @@ input::placeholder{color:var(--text-muted)}
       <input type="password" name="password" placeholder="Enter your password" required>
     </div>
     <input type="hidden" name="loginType" value="ADMIN">
+    <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
     <button type="submit" class="btn-submit">Login as Administrator →</button>
   </form>
 

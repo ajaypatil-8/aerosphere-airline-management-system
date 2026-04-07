@@ -24,7 +24,7 @@
                override="false"/>
     <!-- ▼▼▼  PASTE YOUR MYSQL PASSWORD HERE  ▼▼▼ -->
     <Parameter name="db.password"
-               value="11012516@Mysql"
+               value="YOUR_MYSQL_PASSWORD_HERE"
                override="false"/>
 
     <!-- ─────────────────────────────────────────────────────────

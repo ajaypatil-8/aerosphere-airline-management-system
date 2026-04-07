@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.skyconnect.controller.AdminDashboardServlet.RecentBooking" %>
+<%@ page import="com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
@@ -147,7 +148,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
     <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary">+ Add Flight</a>
   </div>
 
-  <% if (error != null) { %><div class="alert alert-error">⚠ <%= error %></div><% } %>
+  <% if (error != null) { %><div class="alert alert-error">⚠ <%= HtmlUtils.e(error) %></div><% } %>
 
   <!-- STATS -->
   <div class="stats-grid">

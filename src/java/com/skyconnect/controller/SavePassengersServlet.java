@@ -113,7 +113,15 @@ public class SavePassengersServlet extends HttpServlet {
             return;
         }
 
-        int bookingId = Integer.parseInt(req.getParameter("bookingId"));
+        int userId;
+        int bookingId;
+        try {
+            userId    = (Integer) session.getAttribute("userId");
+            bookingId = Integer.parseInt(req.getParameter("bookingId"));
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/userDashboard");
+            return;
+        }
 
         String[] names   = req.getParameterValues("full_name[]");
         String[] ages    = req.getParameterValues("age[]");
@@ -127,12 +135,13 @@ public class SavePassengersServlet extends HttpServlet {
 
             con.setAutoCommit(false);
 
-            /* ================= 1️⃣ GET FLIGHT ID ================= */
+            /* ================= 1️⃣ GET FLIGHT ID + OWNERSHIP CHECK ================= */
             int flightId = 0;
             PreparedStatement ps = con.prepareStatement(
-                "SELECT flight_id FROM bookings WHERE id=?"
+                "SELECT flight_id FROM bookings WHERE id=? AND user_id=?"
             );
             ps.setInt(1, bookingId);
+            ps.setInt(2, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 flightId = rs.getInt("flight_id");

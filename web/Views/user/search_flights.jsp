@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List, java.util.Map" %>
+<%@ page import="com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
@@ -10,6 +11,13 @@
     String dstParam  = request.getParameter("destination")  != null ? request.getParameter("destination") : "";
     String datParam  = request.getParameter("departDate")   != null ? request.getParameter("departDate") : "";
     String seatsParam= request.getParameter("numSeats")     != null ? request.getParameter("numSeats") : "1";
+    // FIX: safe parseInt — prevents NumberFormatException crash if URL is tampered
+    int numSeatsInt = 1;
+    try { numSeatsInt = Integer.parseInt(seatsParam); if (numSeatsInt < 1) numSeatsInt = 1; } catch (Exception ignored) { numSeatsInt = 1; seatsParam = "1"; }
+    // FIX: HTML-escape user-controlled params to prevent XSS
+    String srcParamE = HtmlUtils.e(srcParam);
+    String dstParamE = HtmlUtils.e(dstParam);
+    String datParamE = HtmlUtils.e(datParam);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -114,15 +122,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
     <form action="${pageContext.request.contextPath}/searchFlights" method="get" class="search-bar">
         <div>
             <label>From</label>
-            <input type="text" name="source" value="<%= srcParam %>" placeholder="e.g. Mumbai" required>
+            <input type="text" name="source" value="<%= srcParamE %>" placeholder="e.g. Mumbai" required>
         </div>
         <div>
             <label>To</label>
-            <input type="text" name="destination" value="<%= dstParam %>" placeholder="e.g. Delhi" required>
+            <input type="text" name="destination" value="<%= dstParamE %>" placeholder="e.g. Delhi" required>
         </div>
         <div>
             <label>Date</label>
-            <input type="date" name="departDate" value="<%= datParam %>" required>
+            <input type="date" name="departDate" value="<%= datParamE %>" required>
         </div>
         <div>
             <label>Passengers</label>
@@ -133,7 +141,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
         <div class="btn-col"><button type="submit" class="btn-search">🔍 Search</button></div>
     </form>
 
-    <% if (error != null) { %><div class="alert alert-error">⚠ <%= error %></div><% } %>
+    <% if (error != null) { %><div class="alert alert-error">⚠ <%= HtmlUtils.e(error) %></div><% } %>
 
     <% if (Boolean.TRUE.equals(searched)) { %>
         <% if (flights == null || flights.isEmpty()) { %>
@@ -143,7 +151,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
                 <p style="color:var(--text-muted);font-size:.88rem">Try a different date or route</p>
             </div>
         <% } else { %>
-            <p class="results-count"><strong><%= flights.size() %></strong> flight<%= flights.size()!=1?"s":"" %> found for <strong><%= srcParam %> → <%= dstParam %></strong> on <%= datParam %></p>
+            <p class="results-count"><strong><%= flights.size() %></strong> flight<%= flights.size()!=1?"s":"" %> found for <strong><%= srcParamE %> → <%= dstParamE %></strong> on <%= datParamE %></p>
             <% int fi=0; for (Map<String,Object> f : flights) { fi++;
                int avail = (Integer)f.get("seats_available"); %>
             <div class="flight-card" style="animation-delay:<%= fi*0.07 %>s">
@@ -170,7 +178,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
                     <div class="price-block">
                         <div class="price-big">₹<%= String.format("%,.0f",(Double)f.get("price")) %></div>
                         <div class="price-sub">per seat · <%= avail %> left</div>
-                        <% if (avail >= Integer.parseInt(seatsParam)) { %>
+                        <% if (avail >= numSeatsInt) { %>
                         <form action="${pageContext.request.contextPath}/bookFlight" method="post" style="margin:0">
                             <input type="hidden" name="flightId" value="<%= f.get("id") %>">
                             <input type="hidden" name="numSeats" value="<%= seatsParam %>">
@@ -182,8 +190,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
                 <div class="flight-footer">
                     <span class="flight-meta-item">📅 <%= f.get("depart_date") %></span>
                     <span class="flight-meta-item">💺 <%= avail %> seats available</span>
-                    <span class="flight-meta-item">👥 <%= seatsParam %> passenger<%= Integer.parseInt(seatsParam)>1?"s":"" %></span>
-                    <span class="flight-meta-item" style="margin-left:auto;font-weight:700;color:var(--primary)">Total: ₹<%= String.format("%,.0f",(Double)f.get("price")*Integer.parseInt(seatsParam)) %></span>
+                    <span class="flight-meta-item">👥 <%= seatsParam %> passenger<%= numSeatsInt>1?"s":"" %></span>
+                    <span class="flight-meta-item" style="margin-left:auto;font-weight:700;color:var(--primary)">Total: ₹<%= String.format("%,.0f",(Double)f.get("price")*numSeatsInt) %></span>
                 </div>
             </div>
             <% } %>

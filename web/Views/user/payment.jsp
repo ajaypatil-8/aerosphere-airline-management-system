@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
@@ -12,6 +13,7 @@
     // Show error if payment failed (?error=1 from PaymentServlet redirect)
     String payError = "1".equals(request.getParameter("error"))
         ? "Payment processing failed. Please try again." : null;
+    String csrfToken = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -126,6 +128,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
                 <div class="card-title">Choose Payment Method</div>
                 <%-- FIX: form action changed from /processPayment → /payment --%>
                 <form action="${pageContext.request.contextPath}/payment" method="post" id="payForm">
+                    <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                     <input type="hidden" name="bookingId" value="<%= bookingId %>">
 
                     <label class="pay-option" onclick="selectPay(this)">

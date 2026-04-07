@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.sql.*, com.skyconnect.util.DBConnection" %>
+<%@ page import="java.sql.*, com.skyconnect.util.DBConnection, com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
@@ -8,8 +8,16 @@
     String numSeatsStr = request.getParameter("numSeats");
     if (flightIdStr == null) { response.sendRedirect(request.getContextPath() + "/searchFlights"); return; }
 
-    int flightId = Integer.parseInt(flightIdStr);
-    int numSeats = (numSeatsStr != null) ? Integer.parseInt(numSeatsStr) : 1;
+    int flightId;
+    int numSeats;
+    try {
+        flightId = Integer.parseInt(flightIdStr);
+        numSeats = (numSeatsStr != null) ? Integer.parseInt(numSeatsStr) : 1;
+        if (numSeats < 1) numSeats = 1;
+    } catch (NumberFormatException e) {
+        response.sendRedirect(request.getContextPath() + "/searchFlights"); return;
+    }
+    String csrfToken = CsrfUtil.getToken(request);
 
     String flightNo="", source="", destination="", departDate="", departTime="", arrivalTime="";
     double price = 0;
@@ -171,6 +179,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
             <hr class="divider">
 
             <form action="${pageContext.request.contextPath}/bookFlight" method="post">
+                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                 <input type="hidden" name="flightId" value="<%= flightId %>">
                 <div class="field">
                     <label>Number of Seats</label>

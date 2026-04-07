@@ -1,5 +1,6 @@
 <%@ page import="java.util.List, java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     @SuppressWarnings("unchecked")
@@ -10,6 +11,9 @@
     String error = (String) request.getAttribute("error");
     String src = request.getParameter("source"); if (src == null) src = "";
     String dst = request.getParameter("destination"); if (dst == null) dst = "";
+    // FIX: HTML-escape user-controlled params to prevent XSS
+    String srcE = HtmlUtils.e(src);
+    String dstE = HtmlUtils.e(dst);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -89,7 +93,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
     <div class="page-header">
         <div>
             <div class="page-title">
-                <% if (!src.isEmpty() && !dst.isEmpty()) { %><%= src %> → <%= dst %><% } else { %>Available Flights<% } %>
+                <% if (!src.isEmpty() && !dst.isEmpty()) { %><%= srcE %> → <%= dstE %><% } else { %>Available Flights<% } %>
             </div>
             <div class="page-subtitle">
                 <% if (flights != null) { %><%= flights.size() %> flight(s) found &middot; <%= numSeats %> seat(s)<% } %>

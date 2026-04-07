@@ -189,11 +189,12 @@ public class PaymentServlet extends HttpServlet {
             ps2.setString(3, method.trim());
             ps2.executeUpdate();
 
-            // Update booking: BOOKED + PAID (status=BOOKED is correct per DB design)
+            // Update booking: BOOKED + PAID + sync total_amount to GST-inclusive final amount
             String updateSql =
-                "UPDATE bookings SET payment_status='PAID', status='BOOKED' WHERE id=?";
+                "UPDATE bookings SET payment_status='PAID', status='BOOKED', total_amount=? WHERE id=?";
             PreparedStatement ps3 = con.prepareStatement(updateSql);
-            ps3.setInt(1, bookingId);
+            ps3.setDouble(1, finalAmount);
+            ps3.setInt(2, bookingId);
             ps3.executeUpdate();
 
             con.commit();

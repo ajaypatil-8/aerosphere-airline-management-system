@@ -1,8 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
     if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    String csrfToken     = CsrfUtil.getToken(request);
     String flightError   = (String) session.getAttribute("flightError");
     String flightSuccess = (String) session.getAttribute("flightSuccess");
     session.removeAttribute("flightError");
@@ -93,6 +95,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 
   <div class="card animate-fadeup">
     <form action="${pageContext.request.contextPath}/addFlight" method="post">
+        <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
       <div class="form-grid">
         <div class="form-group">
           <label>Flight Number *</label>

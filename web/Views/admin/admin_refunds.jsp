@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List, java.util.Map" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
@@ -7,6 +8,7 @@
     @SuppressWarnings("unchecked")
     List<Map<String,Object>> refunds = (List<Map<String,Object>>) request.getAttribute("refunds");
     String error = (String) request.getAttribute("error");
+    String csrfToken = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -118,11 +120,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
           <% if ("PENDING".equals(status)) { %>
           <div class="action-btns">
             <form action="${pageContext.request.contextPath}/approveRefund" method="post" style="margin:0;">
+              <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
               <input type="hidden" name="refundId" value="<%= r.get("id") %>">
               <input type="hidden" name="action" value="APPROVE">
               <button type="submit" class="btn-approve" onclick="return confirm('Approve this refund?')">✅ Approve</button>
             </form>
             <form action="${pageContext.request.contextPath}/approveRefund" method="post" style="margin:0;">
+              <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
               <input type="hidden" name="refundId" value="<%= r.get("id") %>">
               <input type="hidden" name="action" value="REJECT">
               <button type="submit" class="btn-reject" onclick="return confirm('Reject this refund?')">❌ Reject</button>

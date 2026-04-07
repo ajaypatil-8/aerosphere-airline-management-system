@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
@@ -9,6 +10,7 @@
     String curGender  = (String) request.getAttribute("curGender");
     String curAddress = (String) request.getAttribute("curAddress");
     String error      = (String) request.getAttribute("error");
+    String csrfToken  = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -92,22 +94,23 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="card">
         <div class="card-inner">
             <form action="${pageContext.request.contextPath}/editProfile" method="post">
+                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Full Name *</label>
-                        <div class="field-wrap"><span class="fi">👤</span><input type="text" name="name" value="<%= curName != null ? curName : "" %>" required></div>
+                        <div class="field-wrap"><span class="fi">👤</span><input type="text" name="name" value="<%= HtmlUtils.e(curName != null ? curName : "") %>" required></div>
                     </div>
                     <div class="form-group">
                         <label>Email *</label>
-                        <div class="field-wrap"><span class="fi">✉</span><input type="email" name="email" value="<%= curEmail != null ? curEmail : "" %>" required></div>
+                        <div class="field-wrap"><span class="fi">✉</span><input type="email" name="email" value="<%= HtmlUtils.e(curEmail != null ? curEmail : "") %>" required></div>
                     </div>
                     <div class="form-group">
                         <label>Phone</label>
-                        <div class="field-wrap"><span class="fi">📱</span><input type="tel" name="phone" value="<%= curPhone != null ? curPhone : "" %>" placeholder="+91 XXXXXXXXXX"></div>
+                        <div class="field-wrap"><span class="fi">📱</span><input type="tel" name="phone" value="<%= HtmlUtils.e(curPhone != null ? curPhone : "") %>" placeholder="+91 XXXXXXXXXX"></div>
                     </div>
                     <div class="form-group">
                         <label>Date of Birth</label>
-                        <div class="field-wrap"><span class="fi">🎂</span><input type="date" name="dob" value="<%= curDob != null ? curDob : "" %>"></div>
+                        <div class="field-wrap"><span class="fi">🎂</span><input type="date" name="dob" value="<%= HtmlUtils.e(curDob != null ? curDob : "") %>"></div>
                     </div>
                     <div class="form-group">
                         <label>Gender</label>
@@ -127,7 +130,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:22px 0}
                     </div>
                     <div class="form-group full">
                         <label>Address</label>
-                        <div class="field-wrap"><span class="fi top">📍</span><textarea name="address" placeholder="Your full address"><%= curAddress != null ? curAddress : "" %></textarea></div>
+                        <div class="field-wrap"><span class="fi top">📍</span><textarea name="address" placeholder="Your full address"><%= HtmlUtils.e(curAddress != null ? curAddress : "") %></textarea></div>
                     </div>
                 </div>
                 <hr class="divider">

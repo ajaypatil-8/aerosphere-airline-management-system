@@ -1,10 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     Integer bookingId = (Integer) request.getAttribute("bookingId");
     Integer seats     = (Integer) request.getAttribute("seats");
     if (seats == null) seats = 1;
+    String csrfToken = CsrfUtil.getToken(request);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -102,6 +104,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.6}
     </div>
 
     <form action="${pageContext.request.contextPath}/savePassengers" method="post">
+        <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
         <input type="hidden" name="bookingId" value="<%= bookingId %>">
 
         <% for (int i = 1; i <= seats; i++) { %>
