@@ -1,9 +1,9 @@
-# ─── Build outputs ──────────────────────────────────────────────
+
 build/
 dist/
 target/
 
-# ─── IDE / NetBeans ─────────────────────────────────────────────
+
 nbproject/private/
 .idea/
 *.iml
@@ -13,32 +13,36 @@ nbproject/private/
 .project
 .settings/
 
-# ─── Compiled classes ───────────────────────────────────────────
+
 *.class
+
 *.jar
-# Keep lib JARs that are part of the project
 !web/WEB-INF/lib/*.jar
 
-# ─── Logs ───────────────────────────────────────────────────────
+# Logs
 *.log
 logs/
 
-# ─── 🔐 SECRETS — NEVER COMMIT THESE ───────────────────────────
-# context.xml holds DB password, Razorpay keys, Gmail app password
-web/META-INF/context.xml
-build/web/META-INF/context.xml
 
-# Any .properties files that may hold credentials
-*.properties
-!nbproject/project.properties
-!nbproject/genfiles.properties
+*.tmp
+*.bak
+*.swp
 
-# ─── OS junk ────────────────────────────────────────────────────
+
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ─── Temp / misc ────────────────────────────────────────────────
-*.tmp
-*.bak
-*.swp
+
+web/META-INF/context.xml
+build/web/META-INF/context.xml
+
+
+application.properties
+db.properties
+config.properties
+.env
+
+
+!nbproject/project.properties
+!nbproject/genfiles.properties

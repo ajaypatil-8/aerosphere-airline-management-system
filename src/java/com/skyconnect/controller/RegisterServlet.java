@@ -13,13 +13,16 @@ import java.time.LocalDate;
 import java.util.logging.Logger;
 
 /**
- * AeroSphere — RegisterServlet (UPDATED)
+ * AeroSphere — RegisterServlet (with OTP verification)
  *
- * Changes vs Section 1 version:
- *  1. Sends welcome email after successful registration (async, non-blocking)
+ * GET  /register → show register.jsp
+ * POST /register → validate OTP from session, then create user account
  *
- * All CSRF, BCrypt, validation logic from Section 1 is preserved exactly.
- * URL: /register (GET + POST — unchanged)
+ * OTP flow:
+ *   1. User fills form, enters email, clicks "Send OTP" → SendOtpServlet (AJAX)
+ *   2. OTP stored in session (otp_code, otp_email, otp_expiry)
+ *   3. User enters OTP in modal and submits the full form
+ *   4. This servlet verifies OTP matches session before creating account
  */
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
@@ -29,6 +32,7 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        CsrfUtil.ensureToken(req);
         req.getRequestDispatcher("/Views/auth/register.jsp").forward(req, resp);
     }
 
@@ -36,8 +40,8 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // ── CSRF check (from Section 1) ────────────────────────────
-        if (!CsrfUtil.validate(req)) {
+        // ── CSRF check ────────────────────────────────────────────
+        if (!CsrfUtil.isValid(req)) {
             req.setAttribute("error", "Invalid request. Please try again.");
             req.getRequestDispatcher("/Views/auth/register.jsp").forward(req, resp);
             return;
@@ -50,8 +54,9 @@ public class RegisterServlet extends HttpServlet {
         String dobStr   = trim(req.getParameter("dob"));
         String gender   = trim(req.getParameter("gender"));
         String address  = trim(req.getParameter("address"));
+        String otpInput = trim(req.getParameter("otp"));
 
-        // ── Validation ────────────────────────────────────────────
+        // ── Field validation ──────────────────────────────────────
         if (name.isEmpty() || email.isEmpty() || password == null || password.isEmpty()) {
             forward(req, resp, "Name, email, and password are required.");
             return;
@@ -73,7 +78,48 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // ── Parse DOB safely ─────────────────────────────────────
+        // ── OTP verification ──────────────────────────────────────
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            forward(req, resp, "Session expired. Please send the OTP again.");
+            return;
+        }
+
+        String sessionOtp    = (String) session.getAttribute("otp_code");
+        String sessionEmail  = (String) session.getAttribute("otp_email");
+        Long   sessionExpiry = (Long)   session.getAttribute("otp_expiry");
+
+        if (otpInput.isEmpty()) {
+            forward(req, resp, "Please enter the OTP sent to your email.");
+            return;
+        }
+        if (sessionOtp == null || sessionEmail == null || sessionExpiry == null) {
+            forward(req, resp, "OTP not found. Please click 'Send OTP' first.");
+            return;
+        }
+        if (System.currentTimeMillis() > sessionExpiry) {
+            // Clear expired OTP
+            session.removeAttribute("otp_code");
+            session.removeAttribute("otp_email");
+            session.removeAttribute("otp_expiry");
+            forward(req, resp, "OTP has expired. Please request a new one.");
+            return;
+        }
+        if (!sessionEmail.equalsIgnoreCase(email.trim())) {
+            forward(req, resp, "OTP was sent to a different email. Please send OTP to: " + email);
+            return;
+        }
+        if (!sessionOtp.equals(otpInput)) {
+            forward(req, resp, "Invalid OTP. Please check the code sent to your email.");
+            return;
+        }
+
+        // OTP verified — clear from session so it can't be reused
+        session.removeAttribute("otp_code");
+        session.removeAttribute("otp_email");
+        session.removeAttribute("otp_expiry");
+
+        // ── Parse DOB safely ──────────────────────────────────────
         java.sql.Date dob = null;
         if (!dobStr.isEmpty()) {
             try {
@@ -89,15 +135,16 @@ public class RegisterServlet extends HttpServlet {
             }
         }
 
-        // ── Create User ───────────────────────────────────────────
+        // ── Build User object ─────────────────────────────────────
         User user = new User();
         user.setName(name);
-        user.setEmail(email.toLowerCase());
+        user.setEmail(email.toLowerCase().trim());
         user.setPhone(phone.isEmpty() ? null : phone);
         user.setDob(dob);
         user.setGender(gender.isEmpty() ? null : gender);
         user.setAddress(address.isEmpty() ? null : address);
         user.setRole("USER");
+        user.setPassword(password);
 
         UserDAO dao = new UserDAO();
 
@@ -106,16 +153,11 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        int newId = dao.createUser(user, password);
+        int newId = dao.register(user);
 
         if (newId > 0) {
             LOG.info("New user registered: " + email + " (id=" + newId + ")");
-
-            // ── Send welcome email (async) ─────────────────────────
-            // Fires in background thread — registration redirect is instant
             EmailService.sendWelcome(user.getEmail(), user.getName());
-
-            // ── Redirect to login with success message ─────────────
             resp.sendRedirect(req.getContextPath() + "/login?registered=1");
         } else {
             forward(req, resp, "Registration failed. Please try again.");

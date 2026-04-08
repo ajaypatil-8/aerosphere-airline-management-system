@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
+<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils, com.skyconnect.util.AppConfig" %>
 <%
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
@@ -10,23 +10,25 @@
     if (baseAmount  == null) baseAmount  = 0.0;
     if (gst         == null) gst         = 0.0;
     if (finalAmount == null) finalAmount = 0.0;
-    // Show error if payment failed (?error=1 from PaymentServlet redirect)
     String payError = "1".equals(request.getParameter("error"))
         ? "Payment processing failed. Please try again." : null;
     String csrfToken = CsrfUtil.getToken(request);
+    // Amount in paise for Razorpay
+    long amountPaise = Math.round(finalAmount * 100);
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Payment – AeroSphere</title>
-<%-- FIX: Apply theme before paint to prevent flash --%>
 <script>
 (function(){
   var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
   document.documentElement.setAttribute('data-theme',t);
 })();
 </script>
+<!-- Razorpay Checkout SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -55,7 +57,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .page-header{margin-bottom:20px}
 .page-title{font-size:1.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
 .page-subtitle{color:var(--text-muted);font-size:.9rem}
-/* ERROR ALERT */
 .alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626;border-radius:11px;padding:12px 16px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:20px}
 [data-theme="dark"] .alert-error{color:#FCA5A5}
 .two-col{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
@@ -79,6 +80,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .btn-pay:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .secure-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.08);border:1px solid var(--primary);color:var(--primary);border-radius:8px;padding:7px 14px;font-size:.76rem;font-weight:600;margin-top:12px;width:100%;justify-content:center}
 .pay-note{font-size:.75rem;color:var(--text-muted);margin-top:10px;line-height:1.55}
+.razorpay-badge{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--text-muted);margin-top:8px;justify-content:center}
 hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
 @media(max-width:768px){.two-col{grid-template-columns:1fr}}
 </style>
@@ -113,10 +115,9 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
 
     <div class="page-header">
         <div class="page-title">💳 Complete Payment</div>
-        <div class="page-subtitle">Booking #<%= bookingId %> · Secure checkout</div>
+        <div class="page-subtitle">Booking #<%= bookingId %> · Secure Razorpay checkout</div>
     </div>
 
-    <%-- FIX: Show payment error if ?error=1 returned from PaymentServlet --%>
     <% if (payError != null) { %>
     <div class="alert-error">⚠️ <%= payError %></div>
     <% } %>
@@ -126,38 +127,42 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
         <div class="card">
             <div class="card-inner">
                 <div class="card-title">Choose Payment Method</div>
-                <%-- FIX: form action changed from /processPayment → /payment --%>
-                <form action="${pageContext.request.contextPath}/payment" method="post" id="payForm">
-                    <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
-                    <input type="hidden" name="bookingId" value="<%= bookingId %>">
 
-                    <label class="pay-option" onclick="selectPay(this)">
+                <!-- Razorpay handles UPI / Card / Net Banking inside its popup -->
+                <!-- We just need a method preference for the record -->
+                <div id="payMethodPicker">
+                    <label class="pay-option" onclick="selectPay(this,'UPI')">
                         <input type="radio" name="paymentMethod" value="UPI" required>
                         <div class="pay-icon">📱</div>
                         <div><div class="pay-label">UPI</div><div class="pay-sub">Google Pay, PhonePe, Paytm</div></div>
                     </label>
-                    <label class="pay-option" onclick="selectPay(this)">
+                    <label class="pay-option" onclick="selectPay(this,'CREDIT_CARD')">
                         <input type="radio" name="paymentMethod" value="CREDIT_CARD">
                         <div class="pay-icon">💳</div>
-                        <div><div class="pay-label">Credit Card</div><div class="pay-sub">Visa, Mastercard, Amex</div></div>
+                        <div><div class="pay-label">Credit / Debit Card</div><div class="pay-sub">Visa, Mastercard, Amex, Rupay</div></div>
                     </label>
-                    <label class="pay-option" onclick="selectPay(this)">
-                        <input type="radio" name="paymentMethod" value="DEBIT_CARD">
-                        <div class="pay-icon">🏦</div>
-                        <div><div class="pay-label">Debit Card</div><div class="pay-sub">All major bank cards</div></div>
-                    </label>
-                    <label class="pay-option" onclick="selectPay(this)">
+                    <label class="pay-option" onclick="selectPay(this,'NET_BANKING')">
                         <input type="radio" name="paymentMethod" value="NET_BANKING">
                         <div class="pay-icon">🌐</div>
                         <div><div class="pay-label">Net Banking</div><div class="pay-sub">50+ banks supported</div></div>
                     </label>
+                    <label class="pay-option" onclick="selectPay(this,'WALLET')">
+                        <input type="radio" name="paymentMethod" value="WALLET">
+                        <div class="pay-icon">👛</div>
+                        <div><div class="pay-label">Wallets</div><div class="pay-sub">Paytm, Mobikwik, Freecharge</div></div>
+                    </label>
+                </div>
 
-                    <hr class="divider">
-                    <button type="submit" class="btn-pay" id="payBtn" disabled>
-                        🔒 Pay ₹<%= String.format("%,.0f", finalAmount) %> Securely
-                    </button>
-                    <div class="secure-badge">🔒 256-bit SSL encrypted · 100% secure</div>
-                </form>
+                <hr class="divider">
+
+                <button type="button" class="btn-pay" id="payBtn" onclick="startRazorpayPayment()" disabled>
+                    🔒 Pay ₹<%= String.format("%,.0f", finalAmount) %> via Razorpay
+                </button>
+                <div class="secure-badge">🔒 256-bit SSL encrypted · Powered by Razorpay</div>
+                <div class="razorpay-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#3395FF"/><path d="M2 17l10 5 10-5" stroke="#3395FF" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#3395FF" stroke-width="2" stroke-linecap="round"/></svg>
+                    Secured by Razorpay Payment Gateway
+                </div>
             </div>
         </div>
 
@@ -179,7 +184,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
 </div>
 
 <script>
-// FIX: Set correct toggle icon immediately from localStorage
+// ── Theme ────────────────────────────────────────────────────────────
 (function(){
   var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
   document.documentElement.setAttribute('data-theme',t);
@@ -192,19 +197,120 @@ function toggleTheme(){
   localStorage.setItem('aerosphere-theme',n);
   document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';
 }
-function selectPay(el){
+
+// ── Payment method selection ─────────────────────────────────────────
+var selectedMethod = null;
+function selectPay(el, method){
   document.querySelectorAll('.pay-option').forEach(function(o){o.classList.remove('selected');});
   el.classList.add('selected');
-  el.querySelector('input').checked=true;
-  var btn=document.getElementById('payBtn');
-  btn.disabled=false;
-  btn.textContent='🔒 Pay ₹<%= String.format("%,.0f", finalAmount) %> Securely';
+  el.querySelector('input').checked = true;
+  selectedMethod = method;
+  document.getElementById('payBtn').disabled = false;
 }
-// Prevent double-submit
-document.getElementById('payForm').addEventListener('submit',function(){
-  var btn=document.getElementById('payBtn');
-  btn.disabled=true;
-  btn.textContent='⏳ Processing payment...';
-});
+
+// ── Razorpay Payment Flow ────────────────────────────────────────────
+function startRazorpayPayment(){
+  var btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Opening payment gateway...';
+
+  var bookingId = <%= bookingId %>;
+  var contextPath = '${pageContext.request.contextPath}';
+
+  // Step 1: Create Razorpay order on backend
+  fetch(contextPath + '/createRazorpayOrder?bookingId=' + bookingId, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    if(data.error){
+      showError('Failed to initiate payment: ' + data.error);
+      resetBtn();
+      return;
+    }
+
+    // Step 2: Open Razorpay popup
+    var options = {
+      key:         data.keyId,
+      amount:      data.amount,
+      currency:    data.currency,
+      name:        'AeroSphere',
+      description: 'Flight Booking #' + bookingId,
+      order_id:    data.orderId,
+      theme:       { color: '#10B981' },
+      prefill: {
+        name:  '${userName}'
+      },
+      handler: function(response){
+        // Step 3: Verify payment on backend
+        verifyPayment(response, bookingId, contextPath);
+      },
+      modal: {
+        ondismiss: function(){
+          resetBtn();
+        }
+      }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response){
+      showError('Payment failed: ' + response.error.description);
+      resetBtn();
+    });
+    rzp.open();
+  })
+  .catch(function(err){
+    showError('Network error. Please try again.');
+    resetBtn();
+  });
+}
+
+function verifyPayment(response, bookingId, contextPath){
+  var btn = document.getElementById('payBtn');
+  btn.textContent = '⏳ Verifying payment...';
+
+  var params = new URLSearchParams();
+  params.append('razorpay_order_id',   response.razorpay_order_id);
+  params.append('razorpay_payment_id', response.razorpay_payment_id);
+  params.append('razorpay_signature',  response.razorpay_signature);
+  params.append('bookingId',           bookingId);
+
+  fetch(contextPath + '/verifyPayment', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: params.toString()
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    if(data.success){
+      btn.textContent = '✅ Payment successful! Redirecting...';
+      window.location.href = data.redirect;
+    } else {
+      showError('Payment verification failed: ' + (data.error || 'Please contact support.'));
+      resetBtn();
+    }
+  })
+  .catch(function(err){
+    showError('Verification error. Please contact support with your payment ID: ' + response.razorpay_payment_id);
+    resetBtn();
+  });
+}
+
+function resetBtn(){
+  var btn = document.getElementById('payBtn');
+  btn.disabled = (selectedMethod === null);
+  btn.textContent = '🔒 Pay ₹<%= String.format("%,.0f", finalAmount) %> via Razorpay';
+}
+
+function showError(msg){
+  var existing = document.querySelector('.alert-error');
+  if(existing) existing.remove();
+  var div = document.createElement('div');
+  div.className = 'alert-error';
+  div.innerHTML = '⚠️ ' + msg;
+  document.querySelector('.page-wrapper').insertBefore(div, document.querySelector('.two-col'));
+}
 </script>
-</body></html>
+</body>
+</html>

@@ -21,9 +21,33 @@ public class SearchFlightsServlet extends HttpServlet {
         String departDate = req.getParameter("departDate");
         String numSeatsStr = req.getParameter("numSeats");
 
+        // Default seats
         int numSeats = 1;
-        if (numSeatsStr != null) {
-            numSeats = Integer.parseInt(numSeatsStr);
+        try {
+            if (numSeatsStr != null && !numSeatsStr.isEmpty()) {
+                numSeats = Integer.parseInt(numSeatsStr);
+            }
+        } catch (NumberFormatException e) {
+            numSeats = 1;
+        }
+
+        // Input validation
+        if (source == null || destination == null || departDate == null ||
+            source.isEmpty() || destination.isEmpty() || departDate.isEmpty()) {
+
+            req.setAttribute("error", "All fields are required");
+            req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
+            return;
+        }
+
+        java.sql.Date sqlDate;
+
+        try {
+            sqlDate = java.sql.Date.valueOf(departDate); // expects yyyy-MM-dd
+        } catch (IllegalArgumentException e) {
+            req.setAttribute("error", "Invalid date format. Please select a valid date.");
+            req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
+            return;
         }
 
         List<Map<String, Object>> flights = new ArrayList<>();
@@ -38,8 +62,7 @@ public class SearchFlightsServlet extends HttpServlet {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, source);
             ps.setString(2, destination);
-            ps.setDate(3, java.sql.Date.valueOf(departDate));
-// IMPORTANT
+            ps.setDate(3, sqlDate);
             ps.setInt(4, numSeats);
 
             ResultSet rs = ps.executeQuery();
@@ -59,15 +82,14 @@ public class SearchFlightsServlet extends HttpServlet {
                 flights.add(flight);
             }
 
-            // send results to JSP
             req.setAttribute("flights", flights);
             req.setAttribute("searched", true);
-            req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("error", "Unable to search flights");
-            req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
         }
+
+        req.getRequestDispatcher("/Views/user/search_flights.jsp").forward(req, resp);
     }
 }

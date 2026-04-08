@@ -2,7 +2,7 @@ package com.skyconnect.service;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-
+import com.itextpdf.text.pdf.draw.LineSeparator;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Level;

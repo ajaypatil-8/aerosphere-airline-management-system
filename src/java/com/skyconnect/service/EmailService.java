@@ -13,27 +13,23 @@ import java.util.logging.Logger;
 /**
  * AeroSphere — EmailService
  *
- * Sends transactional emails (booking confirmation, cancellation, refund).
- * All sends are ASYNC — fire-and-forget on a background thread so the
- * user request is never blocked waiting for SMTP.
+ * Sends transactional emails (booking confirmation, cancellation, refund, OTP).
+ *
+ * OTP is sent SYNCHRONOUSLY so errors can be detected and reported to the user.
+ * All other sends are ASYNC — fire-and-forget on a background thread.
  *
  * Configuration (via context.xml / AppConfig):
  *   smtp.host     = smtp.gmail.com
  *   smtp.port     = 587
  *   smtp.user     = YOUR_GMAIL@gmail.com
- *   smtp.password = YOUR_APP_PASSWORD_16_CHARS
+ *   smtp.password = YOUR_APP_PASSWORD_16_CHARS   (no spaces)
  *   smtp.from     = AeroSphere
- *
- * Gmail setup:
- *   1. myaccount.google.com → Security → 2-Step Verification → ON
- *   2. myaccount.google.com/apppasswords → App = "Mail", Device = "AeroSphere"
- *   3. Paste the 16-char password into context.xml smtp.password
  */
 public class EmailService {
 
     private static final Logger LOG = Logger.getLogger(EmailService.class.getName());
 
-    // Single background thread for all email sending
+    // Single background thread for all non-critical async email sending
     private static final ExecutorService EXEC = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "aerosphere-mailer");
         t.setDaemon(true);
@@ -45,6 +41,40 @@ public class EmailService {
     // ─────────────────────────────────────────────────────────────────
     // Public API
     // ─────────────────────────────────────────────────────────────────
+
+    /**
+     * OTP verification email for registration.
+     *
+     * SYNCHRONOUS — blocks until the email is sent (or fails).
+     * Returns true on success, false on any failure.
+     * Callers should report the failure to the user instead of silently ignoring it.
+     */
+    public static boolean sendOtp(String toEmail, String otp) {
+        String subject = "Your AeroSphere Verification Code: " + otp;
+        String body = buildHtml(
+            "Email Verification 🔐",
+            "Hi there,",
+            "You requested a one-time password (OTP) to verify your email address for AeroSphere registration.",
+            "<div style='text-align:center;margin:28px 0;'>"
+            + "<div style='display:inline-block;background:#f0fdf4;border:2px dashed #10B981;"
+            + "border-radius:14px;padding:20px 40px;'>"
+            + "<div style='font-size:2.2rem;font-weight:900;letter-spacing:8px;color:#059669;"
+            + "font-family:monospace;'>" + otp + "</div>"
+            + "<div style='font-size:0.78rem;color:#6b7280;margin-top:6px;'>Valid for 10 minutes</div>"
+            + "</div></div>",
+            "If you did not request this OTP, please ignore this email. Do not share this code with anyone.",
+            "#10B981"
+        );
+
+        // OTP is on the critical path — send synchronously so we can report failure
+        try {
+            doSend(toEmail, subject, body);
+            return true;
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "[EmailService] Failed to send OTP to " + toEmail + ": " + e.getMessage(), e);
+            return false;
+        }
+    }
 
     /** Booking confirmation email */
     public static void sendBookingConfirmation(
@@ -161,12 +191,13 @@ public class EmailService {
             try {
                 doSend(to, subject, htmlBody);
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Failed to send email to " + to + ": " + e.getMessage(), e);
+                LOG.log(Level.WARNING, "[EmailService] Failed to send email to " + to + ": " + e.getMessage(), e);
             }
         });
     }
 
-    private static void doSend(String to, String subject, String htmlBody) throws MessagingException {
+    private static void doSend(String to, String subject, String htmlBody)
+            throws MessagingException, java.io.UnsupportedEncodingException {
         AppConfig cfg = AppConfig.get();
 
         if (!cfg.isSmtpConfigured()) {
@@ -175,18 +206,24 @@ public class EmailService {
         }
 
         Properties props = new Properties();
-        props.put("mail.smtp.auth",            "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host",            cfg.getSmtpHost());
-        props.put("mail.smtp.port",            String.valueOf(cfg.getSmtpPort()));
-        props.put("mail.smtp.connectiontimeout", "5000");
-        props.put("mail.smtp.timeout",           "5000");
+        props.put("mail.smtp.auth",                "true");
+        props.put("mail.smtp.starttls.enable",     "true");
+        props.put("mail.smtp.starttls.required",   "true");   // FIX: enforce STARTTLS, don't allow plaintext fallback
+        props.put("mail.smtp.ssl.trust",           cfg.getSmtpHost()); // FIX: trust Gmail's SSL cert to prevent handshake failure
+        props.put("mail.smtp.host",                cfg.getSmtpHost());
+        props.put("mail.smtp.port",                String.valueOf(cfg.getSmtpPort()));
+        props.put("mail.smtp.connectiontimeout",   "15000");  // FIX: was 5000 — too short for Gmail
+        props.put("mail.smtp.timeout",             "15000");  // FIX: was 5000
+        props.put("mail.smtp.writetimeout",        "15000");  // FIX: was missing entirely
 
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(cfg.getSmtpUser(), cfg.getSmtpPassword());
             }
         });
+
+        // Uncomment the line below to see detailed SMTP handshake logs in Tomcat console (useful for debugging)
+        // session.setDebug(true);
 
         Message msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(cfg.getSmtpUser(), cfg.getSmtpFrom()));
@@ -198,7 +235,6 @@ public class EmailService {
         LOG.info("[EmailService] Sent '" + subject + "' to " + to);
     }
 
-    /** Single table row for email content */
     private static String tableRow(String label, String value) {
         return "<tr>"
             + "<td style='padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;"
@@ -207,7 +243,6 @@ public class EmailService {
             + "</tr>";
     }
 
-    /** Builds a full, branded HTML email */
     private static String buildHtml(
             String headline, String greeting, String message,
             String contentBlock, String footer, String accentColor) {
