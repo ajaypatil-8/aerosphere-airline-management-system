@@ -1,245 +1,651 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.text.DecimalFormat, java.util.*" %>
-<%@ page import="com.skyconnect.controller.InvoiceServlet.Passenger" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.flightapp.model.*, java.util.*" %>
 <%
-    String userName2 = (String) session.getAttribute("userName");
-    if (userName2 == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
-    DecimalFormat df = new DecimalFormat("0.00");
-    Integer bookingId   = (Integer) request.getAttribute("bookingId");
-    String  uName       = (String)  request.getAttribute("userName");
-    String  userEmail   = (String)  request.getAttribute("userEmail");
-    String  flightNo    = (String)  request.getAttribute("flightNo");
-    String  source      = (String)  request.getAttribute("source");
-    String  destination = (String)  request.getAttribute("destination");
-    String  departDate  = (String)  request.getAttribute("departDate");
-    String  departTime  = (String)  request.getAttribute("departTime");
-    String  arrivalTime = (String)  request.getAttribute("arrivalTime");
-    Integer seats       = (Integer) request.getAttribute("seats");
-    Double  amount      = (Double)  request.getAttribute("amount");
-    String  status      = (String)  request.getAttribute("status");
-    Double  paidAmount  = (Double)  request.getAttribute("paidAmount");
-    String  payMethod   = (String)  request.getAttribute("paymentMethod");
-    String  payStatus   = (String)  request.getAttribute("paymentStatus");
-    @SuppressWarnings("unchecked")
-    List<Passenger> passengers = (List<Passenger>) request.getAttribute("passengers");
-    if (amount == null) amount = 0.0;
-    String statusClass = "paid".equalsIgnoreCase(status) ? "badge-paid" : "cancelled".equalsIgnoreCase(status) ? "badge-cancelled" : "badge-booked";
-    // Only show download button if booking is paid/booked (not cancelled/pending)
-    boolean showDownload = !"CANCELLED".equalsIgnoreCase(status) && !"PENDING".equalsIgnoreCase(status);
+    HttpSession sess = request.getSession(false);
+    String userEmail = (sess != null) ? (String) sess.getAttribute("userEmail") : null;
+    if (userEmail == null) { response.sendRedirect("login.jsp"); return; }
+
+    // ── Preserve all existing attribute reads ──
+    String bookingId     = (String) request.getAttribute("bookingId");
+    String flightNo      = (String) request.getAttribute("flightNo");
+    String from          = (String) request.getAttribute("from");
+    String to            = (String) request.getAttribute("to");
+    String depTime       = (String) request.getAttribute("depTime");
+    String arrTime       = (String) request.getAttribute("arrTime");
+    String depDate       = (String) request.getAttribute("depDate");
+    String travelClass   = (String) request.getAttribute("travelClass");
+    String seatNumbers   = (String) request.getAttribute("seatNumbers");
+    String passengers    = (String) request.getAttribute("passengers");
+    String totalFare     = (String) request.getAttribute("totalFare");
+    String paymentId     = (String) request.getAttribute("paymentId");
+    String passengerName = (String) request.getAttribute("passengerName");
+    String bookingDate   = (String) request.getAttribute("bookingDate");
+    String airline       = (String) request.getAttribute("airline");
+    String duration      = (String) request.getAttribute("duration");
 %>
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Invoice #<%= bookingId %> – AeroSphere</title>
-<%-- FIX: Apply theme BEFORE any rendering to prevent flash --%>
-<script>
-(function(){
-  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  document.documentElement.setAttribute('data-theme',t);
-})();
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--primary:#10B981;--primary-dark:#059669;--primary-glow:rgba(16,185,129,.18);--bg:#FAFAF9;--card-bg:#FFFFFF;--text:#1C1917;--text-muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px}
-[data-theme="dark"]{--primary:#10B981;--primary-dark:#34D399;--primary-glow:rgba(16,185,129,.22);--bg:#0A0A0A;--card-bg:#141414;--text:#F5F5F4;--text-muted:#9CA3AF;--border:#262626;--shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.5)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-.navbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--card-bg);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.brand-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px var(--primary-glow)}
-.brand-name{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}.brand-name span{color:var(--primary)}
-.nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:8px;font-size:.86rem;font-weight:500;transition:all .2s}
-.nav-link:hover{color:var(--text);background:var(--border)}.nav-link.btn-danger{color:#DC2626;background:rgba(220,38,38,.08)}.nav-link.btn-danger:hover{background:rgba(220,38,38,.15)}
-.theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;background:var(--card-bg);color:var(--text)}
-.btn:hover{border-color:var(--primary);color:var(--primary)}
-.btn-primary{background:var(--primary);color:#fff!important;border-color:var(--primary);box-shadow:0 3px 10px var(--primary-glow)}
-.btn-primary:hover{background:var(--primary-dark);color:#fff}
-.btn-pdf{background:rgba(239,68,68,.08);color:#DC2626;border-color:rgba(239,68,68,.2)}
-.btn-pdf:hover{background:rgba(239,68,68,.14);color:#DC2626;border-color:rgba(239,68,68,.4)}
-/* PAGE */
-.page-wrapper{max-width:820px;margin:0 auto;padding:28px 24px}
-/* INVOICE CARD */
-.invoice-card{background:var(--card-bg);border:1px solid var(--border);border-top:3px solid var(--primary);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg);animation:fadeUp .5s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.invoice-header{text-align:center;padding:28px 24px 24px;border-bottom:1px solid var(--border)}
-.invoice-logo{font-size:1.5rem;font-weight:900;letter-spacing:-.5px;margin-top:6px}
-.invoice-logo span{color:var(--primary)}
-.invoice-id{font-size:.78rem;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:.76rem;font-weight:700;margin-top:10px}
-.badge-paid{background:rgba(16,185,129,.12);color:var(--primary);border:1px solid var(--primary)}
-.badge-booked{background:rgba(59,130,246,.1);color:#2563EB;border:1px solid rgba(59,130,246,.3)}
-[data-theme="dark"] .badge-booked{color:#93C5FD}
-.badge-cancelled{background:rgba(239,68,68,.1);color:#DC2626;border:1px solid rgba(239,68,68,.2)}
-[data-theme="dark"] .badge-cancelled{color:#FCA5A5}
-.route-banner{display:flex;align-items:center;justify-content:space-between;background:var(--primary-glow);border-bottom:1px solid var(--border);padding:20px 28px}
-.route-city{font-size:1.8rem;font-weight:900;letter-spacing:-1px}
-.route-lbl{font-size:.74rem;color:var(--text-muted);margin-top:3px}
-.route-mid{text-align:center}
-.route-fno{font-size:.72rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-.route-icon{font-size:1.5rem;color:var(--primary)}
-.route-date{font-size:.72rem;color:var(--text-muted);margin-top:4px}
-.invoice-body{padding:24px 28px}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px}
-.sec-title{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.info-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
-.info-row:last-child{border-bottom:none}
-.info-icon{width:30px;height:30px;background:var(--primary-glow);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.info-label{font-size:.72rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
-.info-value{font-size:.88rem;font-weight:600;margin-top:1px}
-.invoice-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem}
-.invoice-row:last-child{border-bottom:none}
-.invoice-row .label{color:var(--text-muted)}
-.invoice-total{display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid var(--primary);margin-top:4px}
-.invoice-total .label{font-weight:700;font-size:.95rem}
-.invoice-total .value{font-size:1.2rem;font-weight:900;color:var(--primary)}
-.table-section{padding:0 28px 20px}
-.table-title{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-table{width:100%;border-collapse:collapse}
-thead th{padding:9px 12px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border)}
-tbody td{padding:10px 12px;font-size:.86rem;border-bottom:1px solid var(--border)}
-tbody tr:last-child td{border-bottom:none}
-.thank-you{margin:16px 28px 24px;background:var(--primary-glow);border:1px solid var(--primary);border-radius:11px;padding:16px 20px;text-align:center}
-.thank-you strong{display:block;color:var(--primary);font-weight:700;margin-bottom:4px}
-.thank-you small{font-size:.78rem;color:var(--text-muted)}
-.actions{display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap;animation:fadeUp .5s ease both .1s}
-@media print{
-    .navbar,.no-print,.actions{display:none!important}
-    body{background:#fff;color:#000}
-    .invoice-card{box-shadow:none;border:1px solid #ddd}
-    :root{--bg:#fff;--card-bg:#fff;--text:#000;--text-muted:#555;--border:#ddd;--primary:#059669;--primary-glow:rgba(5,150,105,.1)}
-}
-@media(max-width:640px){.two-col{grid-template-columns:1fr}.route-banner{flex-direction:column;gap:12px;text-align:center}}
-</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>E-Ticket — Booking <%= bookingId %></title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" href="assests/css/style.css"/>
+    <link rel="stylesheet" href="assests/css/animations.css"/>
+
+    <style>
+        .inv-page {
+            min-height: 100vh;
+            background: var(--bg-0);
+            background-image:
+                radial-gradient(ellipse 60% 40% at 30% 5%, rgba(14,165,233,.1) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 30% at 80% 90%, rgba(16,185,129,.08) 0%, transparent 60%);
+        }
+
+        .inv-wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ── Page header ── */
+        .inv-page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            animation: fadeDown .5s ease both;
+        }
+        .inv-page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .inv-page-title span {
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .inv-actions { display: flex; gap: .75rem; }
+        .btn-inv {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .6rem 1.2rem;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .25s;
+            border: 1.5px solid var(--border);
+            background: var(--surface-1);
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .btn-inv:hover { border-color: var(--accent-blue); color: var(--accent-blue); transform: translateY(-1px); }
+        .btn-inv.primary {
+            background: var(--grad-brand);
+            border-color: transparent;
+            color: #fff;
+        }
+        .btn-inv.primary:hover { box-shadow: 0 6px 20px rgba(14,165,233,.35); }
+
+        /* ── BOARDING PASS CARD ── */
+        .boarding-pass {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            animation: fadeUp .6s .1s ease both;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Top gradient band */
+        .bp-header {
+            background: linear-gradient(135deg, #0a1628 0%, #0c1f3a 50%, #0d2040 100%);
+            padding: 2rem 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .bp-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 80% 50%, rgba(14,165,233,.15) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 20% 50%, rgba(16,185,129,.08) 0%, transparent 60%);
+        }
+        .bp-watermark {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 7rem;
+            opacity: .04;
+            color: #fff;
+            animation: floatAnim 4s ease-in-out infinite;
+        }
+
+        .bp-airline-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 2rem;
+        }
+        .bp-airline-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: .05em;
+        }
+        .bp-flight-no {
+            font-family: 'DM Mono', monospace;
+            font-size: .85rem;
+            color: rgba(255,255,255,.5);
+        }
+        .bp-status {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .35rem .9rem;
+            background: rgba(16,185,129,.15);
+            border: 1px solid rgba(16,185,129,.3);
+            border-radius: 20px;
+            color: #10B981;
+            font-size: .8rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+        }
+        .bp-status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #10B981;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        /* Route row */
+        .bp-route {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+        .bp-city {
+            flex: 1;
+        }
+        .bp-city.right { text-align: right; }
+        .bp-city-code {
+            font-family: 'Syne', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+        .bp-city-name {
+            font-size: .85rem;
+            color: rgba(255,255,255,.5);
+            font-family: 'DM Sans', sans-serif;
+            margin-top: .3rem;
+        }
+        .bp-city-time {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,.85);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            margin-top: .5rem;
+        }
+        .bp-route-mid {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+            padding: 0 2rem;
+        }
+        .bp-duration {
+            font-size: .75rem;
+            color: rgba(255,255,255,.4);
+            font-family: 'DM Sans', sans-serif;
+        }
+        .bp-route-line {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+        .bp-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.3);
+        }
+        .bp-line {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,.2), rgba(14,165,233,.6), rgba(255,255,255,.2));
+        }
+        .bp-plane-icon { color: var(--accent-blue); font-size: 1.2rem; }
+
+        /* ── Tear perforation ── */
+        .bp-perforation {
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin: 0;
+        }
+        .bp-perf-circle {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--bg-0);
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .bp-perf-line {
+            flex: 1;
+            border-top: 2px dashed var(--border);
+            margin: 0 .5rem;
+        }
+        .bp-perf-label {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface-1);
+            padding: .2rem .8rem;
+            font-size: .7rem;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            border-radius: 10px;
+        }
+
+        /* ── Info grid ── */
+        .bp-info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            padding: 1.5rem 2.5rem;
+        }
+        .bp-info-cell {
+            padding: .75rem 1rem .75rem 0;
+            border-right: 1px solid var(--border);
+        }
+        .bp-info-cell:last-child { border-right: none; padding-right: 0; }
+        .bp-info-cell:not(:first-child) { padding-left: 1rem; }
+        .bp-info-label {
+            font-size: .7rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: .3rem;
+        }
+        .bp-info-val {
+            font-family: 'Syne', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .bp-info-val.mono {
+            font-family: 'DM Mono', monospace;
+            font-size: .85rem;
+            color: var(--accent-blue);
+        }
+
+        /* ── Barcode section ── */
+        .bp-barcode-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--surface-2);
+        }
+        .bp-booking-id {
+            font-family: 'DM Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: .15em;
+        }
+        .bp-booking-id span {
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .bp-barcode {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            height: 50px;
+        }
+        .bp-bar {
+            background: var(--text-primary);
+            border-radius: 1px;
+        }
+
+        /* ── Payment details card ── */
+        .inv-detail-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            animation: fadeUp .6s .2s ease both;
+        }
+        .inv-detail-card::before {
+            content: '';
+            display: block;
+            height: 3px;
+            background: var(--grad-brand);
+        }
+        .inv-detail-header {
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Syne', sans-serif;
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .inv-detail-header i { color: var(--accent-blue); }
+
+        .inv-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .inv-table tr {
+            border-bottom: 1px solid var(--border);
+            transition: background .2s;
+        }
+        .inv-table tr:last-child { border-bottom: none; }
+        .inv-table tr:hover { background: var(--surface-2); }
+        .inv-table td {
+            padding: .9rem 2rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .875rem;
+        }
+        .inv-table td:first-child { color: var(--text-muted); }
+        .inv-table td:last-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+        }
+        .inv-table tr.total-row td {
+            padding: 1.1rem 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .inv-table tr.total-row td:last-child {
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.15rem;
+        }
+
+        /* ── Payment verified banner ── */
+        .inv-verified-banner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: rgba(16,185,129,.07);
+            border-top: 1px solid rgba(16,185,129,.15);
+        }
+        .ivb-icon {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(16,185,129,.15);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent-green);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .ivb-text { font-family: 'DM Sans', sans-serif; }
+        .ivb-title { font-size: .9rem; font-weight: 600; color: var(--accent-green); }
+        .ivb-sub { font-size: .78rem; color: var(--text-muted); margin-top: .1rem; }
+        .ivb-pid {
+            margin-left: auto;
+            font-family: 'DM Mono', monospace;
+            font-size: .8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Bottom CTA strip ── */
+        .inv-cta-strip {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            animation: fadeUp .6s .35s ease both;
+            flex-wrap: wrap;
+        }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes fadeDown {
+            from { opacity:0; transform:translateY(-15px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes floatAnim {
+            0%,100% { transform: translateY(-50%) rotate(-10deg); }
+            50%      { transform: translateY(calc(-50% - 8px)) rotate(-10deg); }
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; }
+            50%      { opacity:.4; }
+        }
+
+        @media print {
+            .inv-page-header .inv-actions,
+            .inv-cta-strip,
+            nav, footer { display: none !important; }
+            .boarding-pass, .inv-detail-card { box-shadow: none; border-color: #ddd; }
+            body { background: #fff; }
+            .bp-city-code, .bp-airline-name, .bp-info-val { color: #000 !important; }
+        }
+
+        @media (max-width: 600px) {
+            .bp-info-grid { grid-template-columns: repeat(2,1fr); }
+            .bp-city-code { font-size: 2.5rem; }
+            .bp-route-mid { padding: 0 1rem; }
+            .bp-line { width: 40px; }
+            .inv-table td { padding: .75rem 1.2rem; }
+            .bp-barcode-row { flex-direction: column; gap: 1rem; }
+        }
+    </style>
 </head>
 <body>
+<div class="inv-page">
+    <%@ include file="common/navbar.jsp" %>
 
-<nav class="navbar no-print">
-    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-        <div class="brand-icon">✈</div><span class="brand-name">Aero<span>Sphere</span></span>
-    </a>
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link ">🏠 Dashboard</a>
-        <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link ">🔍 Search</a>
-        <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link ">✈️ All Flights</a>
-        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link ">🎫 My Bookings</a>
-        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link ">💸 Refunds</a>
-        <a href="${pageContext.request.contextPath}/profile"           class="nav-link ">👤 Profile</a>
-        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
-    </div>
-</nav>
+    <div class="inv-wrapper">
 
-<div class="page-wrapper">
-    <div class="invoice-card">
-        <!-- HEADER -->
-        <div class="invoice-header">
-            <div style="font-size:2rem">✈</div>
-            <div class="invoice-logo">Aero<span>Sphere</span></div>
-            <div class="invoice-id">Booking Invoice · #<%= bookingId %></div>
-            <div><span class="badge <%= statusClass %>"><%= status != null ? status.toUpperCase() : "—" %></span></div>
-        </div>
-
-        <!-- ROUTE BANNER -->
-        <div class="route-banner">
+        <!-- Page header -->
+        <div class="inv-page-header">
             <div>
-                <div class="route-city"><%= source %></div>
-                <div class="route-lbl">Departure · <%= departTime != null ? departTime.substring(0,5) : "—" %></div>
+                <div class="inv-page-title">E-Ticket &amp; <span>Invoice</span></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text-muted); margin-top:.3rem;">
+                    Booking confirmed • <%= bookingDate != null ? bookingDate : "—" %>
+                </div>
             </div>
-            <div class="route-mid">
-                <div class="route-fno"><%= flightNo %></div>
-                <div class="route-icon">✈</div>
-                <div class="route-date"><%= departDate %></div>
-            </div>
-            <div style="text-align:right">
-                <div class="route-city"><%= destination %></div>
-                <div class="route-lbl">Arrival · <%= arrivalTime != null && !arrivalTime.isEmpty() ? arrivalTime.substring(0,5) : "—" %></div>
+            <div class="inv-actions">
+                <button class="btn-inv" onclick="window.print()">
+                    <i class="fa fa-print"></i> Print
+                </button>
+                <a href="DownloadInvoiceServlet?bookingId=<%= bookingId %>" class="btn-inv primary">
+                    <i class="fa fa-download"></i> Download PDF
+                </a>
             </div>
         </div>
 
-        <!-- BODY -->
-        <div class="invoice-body">
-            <div class="two-col">
-                <!-- PASSENGER INFO -->
-                <div>
-                    <div class="sec-title">Passenger Details</div>
-                    <div class="info-row"><div class="info-icon">👤</div><div><div class="info-label">Name</div><div class="info-value"><%= uName %></div></div></div>
-                    <div class="info-row"><div class="info-icon">✉</div><div><div class="info-label">Email</div><div class="info-value"><%= userEmail %></div></div></div>
-                    <div class="info-row"><div class="info-icon">💺</div><div><div class="info-label">Seats</div><div class="info-value"><%= seats %></div></div></div>
+        <!-- ══ BOARDING PASS ══ -->
+        <div class="boarding-pass">
+            <!-- Header: airline + status -->
+            <div class="bp-header">
+                <div class="bp-watermark">✈</div>
+                <div class="bp-airline-row">
+                    <div>
+                        <div class="bp-airline-name">✈ <%= airline != null ? airline : "SkyBook Airlines" %></div>
+                        <div class="bp-flight-no">Flight <%= flightNo != null ? flightNo : "—" %></div>
+                    </div>
+                    <div class="bp-status">
+                        <div class="bp-status-dot"></div>
+                        Confirmed
+                    </div>
                 </div>
-                <!-- PAYMENT INFO -->
-                <div>
-                    <div class="sec-title">Payment Details</div>
-                    <div class="invoice-row"><span class="label">Base Fare</span><span>₹<%= df.format(amount) %></span></div>
-                    <div class="invoice-row"><span class="label">GST (5%)</span><span>₹<%= df.format(amount * 0.05) %></span></div>
-                    <% if (payMethod != null) { %>
-                    <div class="invoice-row"><span class="label">Method</span><span><%= payMethod.replace("_"," ") %></span></div>
-                    <% } %>
-                    <div class="invoice-total">
-                        <span class="label">Total Paid</span>
-                        <span class="value">₹<%= paidAmount != null ? df.format(paidAmount) : df.format(amount * 1.05) %></span>
+                <!-- Route -->
+                <div class="bp-route">
+                    <div class="bp-city">
+                        <div class="bp-city-code"><%= from != null ? from.substring(0, Math.min(3, from.length())).toUpperCase() : "DEP" %></div>
+                        <div class="bp-city-name"><%= from != null ? from : "Departure" %></div>
+                        <div class="bp-city-time"><%= depTime != null ? depTime : "--:--" %></div>
+                    </div>
+                    <div class="bp-route-mid">
+                        <div class="bp-duration"><%= duration != null ? duration : "Direct" %></div>
+                        <div class="bp-route-line">
+                            <div class="bp-dot"></div>
+                            <div class="bp-line"></div>
+                            <i class="fa fa-plane bp-plane-icon"></i>
+                            <div class="bp-line"></div>
+                            <div class="bp-dot"></div>
+                        </div>
+                        <div class="bp-duration" style="color:rgba(255,255,255,.25); font-size:.7rem;">Direct Flight</div>
+                    </div>
+                    <div class="bp-city right">
+                        <div class="bp-city-code"><%= to != null ? to.substring(0, Math.min(3, to.length())).toUpperCase() : "ARR" %></div>
+                        <div class="bp-city-name"><%= to != null ? to : "Arrival" %></div>
+                        <div class="bp-city-time"><%= arrTime != null ? arrTime : "--:--" %></div>
                     </div>
                 </div>
             </div>
+
+            <!-- Perforation -->
+            <div class="bp-perforation">
+                <div class="bp-perf-circle" style="margin-left:-14px;"></div>
+                <div class="bp-perf-line"></div>
+                <div class="bp-perf-label">✂ TEAR HERE</div>
+                <div class="bp-perf-line"></div>
+                <div class="bp-perf-circle" style="margin-right:-14px;"></div>
+            </div>
+
+            <!-- Info grid -->
+            <div class="bp-info-grid">
+                <div class="bp-info-cell">
+                    <div class="bp-info-label">Passenger</div>
+                    <div class="bp-info-val"><%= passengerName != null ? passengerName : "—" %></div>
+                </div>
+                <div class="bp-info-cell">
+                    <div class="bp-info-label">Date</div>
+                    <div class="bp-info-val"><%= depDate != null ? depDate : "—" %></div>
+                </div>
+                <div class="bp-info-cell">
+                    <div class="bp-info-label">Class</div>
+                    <div class="bp-info-val"><%= travelClass != null ? travelClass : "Economy" %></div>
+                </div>
+                <div class="bp-info-cell">
+                    <div class="bp-info-label">Seat(s)</div>
+                    <div class="bp-info-val mono"><%= seatNumbers != null ? seatNumbers : "—" %></div>
+                </div>
+            </div>
+
+            <!-- Barcode row -->
+            <div class="bp-barcode-row">
+                <div>
+                    <div style="font-size:.7rem; color:var(--text-muted); font-family:'DM Sans',sans-serif; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem;">Booking Reference</div>
+                    <div class="bp-booking-id">
+                        <span>#<%= bookingId != null ? bookingId : "——" %></span>
+                    </div>
+                </div>
+                <!-- Decorative barcode (visual only) -->
+                <div class="bp-barcode" id="barcodeEl"></div>
+            </div>
         </div>
 
-        <!-- SEAT TABLE -->
-        <% if (passengers != null && !passengers.isEmpty()) { %>
-        <div class="table-section">
-            <div class="table-title">Seat Allocation</div>
-            <table>
-                <thead><tr><th>#</th><th>Passenger Name</th><th>Age</th><th>Gender</th><th>Seat No</th></tr></thead>
-                <tbody>
-                <% int p=0; for(Passenger pass : passengers) { p++; %>
+        <!-- ══ PAYMENT DETAILS ══ -->
+        <div class="inv-detail-card">
+            <div class="inv-detail-header">
+                <i class="fa fa-receipt"></i> Fare Breakdown &amp; Payment
+            </div>
+            <table class="inv-table">
                 <tr>
-                    <td style="color:var(--text-muted)"><%= p %></td>
-                    <td style="font-weight:600"><%= pass.name %></td>
-                    <td><%= pass.age %></td>
-                    <td><%= pass.gender %></td>
-                    <td><strong style="color:var(--primary)"><%= pass.seatNo != null ? pass.seatNo : "Auto" %></strong></td>
+                    <td>Base Fare (<%= passengers != null ? passengers : "1" %> passenger(s))</td>
+                    <td>₹<%= totalFare != null ? totalFare : "0" %></td>
                 </tr>
-                <% } %>
-                </tbody>
+                <tr>
+                    <td>Taxes &amp; Airport Charges</td>
+                    <td style="color:var(--text-muted);">Included</td>
+                </tr>
+                <tr>
+                    <td>Seat Selection</td>
+                    <td style="color:var(--accent-green);">Complimentary</td>
+                </tr>
+                <tr>
+                    <td>Convenience Fee</td>
+                    <td style="color:var(--text-muted);">₹0</td>
+                </tr>
+                <tr class="total-row">
+                    <td>Total Paid</td>
+                    <td>₹<%= totalFare != null ? totalFare : "0" %></td>
+                </tr>
             </table>
+            <div class="inv-verified-banner">
+                <div class="ivb-icon"><i class="fa fa-circle-check"></i></div>
+                <div class="ivb-text">
+                    <div class="ivb-title">Payment Verified</div>
+                    <div class="ivb-sub">Processed securely via Razorpay</div>
+                </div>
+                <div class="ivb-pid">TXN: <%= paymentId != null ? paymentId : "—" %></div>
+            </div>
         </div>
-        <% } %>
 
-        <!-- THANK YOU -->
-        <div class="thank-you">
-            <strong>✅ Thank you for flying with AeroSphere!</strong>
-            <small>Please carry a valid photo ID. Arrive at least 2 hours before departure.</small>
+        <!-- CTA strip -->
+        <div class="inv-cta-strip">
+            <a href="user_dashboard.jsp" class="btn-inv">
+                <i class="fa fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="seat_map.jsp?bookingId=<%= bookingId %>" class="btn-inv">
+                <i class="fa fa-chair"></i> View Seat Map
+            </a>
+            <a href="DownloadInvoiceServlet?bookingId=<%= bookingId %>" class="btn-inv primary">
+                <i class="fa fa-download"></i> Download E-Ticket
+            </a>
         </div>
-    </div>
 
-    <!-- ACTIONS — PDF download button added here -->
-    <div class="actions no-print">
-        <a href="${pageContext.request.contextPath}/userBookings" class="btn">← My Bookings</a>
-        <button onclick="window.print()" class="btn btn-primary">🖨 Print Invoice</button>
-        <% if (showDownload) { %>
-        <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= bookingId %>&download=true"
-           class="btn btn-pdf" title="Download PDF">
-            📄 Download PDF
-        </a>
-        <% } %>
     </div>
+    <%@ include file="common/footer.jsp" %>
 </div>
 
+<script src="assests/js/main.js"></script>
 <script>
-// FIX: Read localStorage theme and set toggle icon immediately (no flash, no wrong icon)
-(function(){
-  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  document.documentElement.setAttribute('data-theme',t);
-  var btn=document.getElementById('themeToggle');
-  if(btn) btn.textContent=t==='dark'?'☀️':'🌙';
-})();
-function toggleTheme(){
-  var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',n);
-  localStorage.setItem('aerosphere-theme',n);
-  document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';
-}
+    /* ── Decorative barcode generator ── */
+    (function() {
+        const el = document.getElementById('barcodeEl');
+        if (!el) return;
+        const counts = [1,3,1,2,3,1,2,1,3,2,1,2,3,1,2,1,3,1,2,3,1,1,3,2];
+        counts.forEach((w, i) => {
+            const bar = document.createElement('div');
+            bar.className = 'bp-bar';
+            bar.style.width = (w * 3) + 'px';
+            bar.style.height = (i % 3 === 0) ? '50px' : (i % 2 === 0 ? '40px' : '35px');
+            bar.style.opacity = i % 4 === 3 ? '.3' : '1';
+            el.appendChild(bar);
+        });
+    })();
 </script>
-</body></html>
+</body>
+</html>

@@ -5,207 +5,523 @@
     String userName = (String) session.getAttribute("userName");
     if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<Map<String,Object>> flights = (List<Map<String,Object>>) request.getAttribute("flights");
-    Boolean searched = (Boolean) request.getAttribute("searched");
-    String error     = (String)  request.getAttribute("error");
-    String srcParam  = request.getParameter("source")      != null ? request.getParameter("source") : "";
-    String dstParam  = request.getParameter("destination")  != null ? request.getParameter("destination") : "";
-    String datParam  = request.getParameter("departDate")   != null ? request.getParameter("departDate") : "";
-    String seatsParam= request.getParameter("numSeats")     != null ? request.getParameter("numSeats") : "1";
-    // FIX: safe parseInt — prevents NumberFormatException crash if URL is tampered
+    Boolean searched  = (Boolean) request.getAttribute("searched");
+    String error      = (String)  request.getAttribute("error");
+    String srcParam   = request.getParameter("source")      != null ? request.getParameter("source")      : "";
+    String dstParam   = request.getParameter("destination") != null ? request.getParameter("destination")  : "";
+    String datParam   = request.getParameter("departDate")  != null ? request.getParameter("departDate")   : "";
+    String seatsParam = request.getParameter("numSeats")    != null ? request.getParameter("numSeats")     : "1";
     int numSeatsInt = 1;
-    try { numSeatsInt = Integer.parseInt(seatsParam); if (numSeatsInt < 1) numSeatsInt = 1; } catch (Exception ignored) { numSeatsInt = 1; seatsParam = "1"; }
-    // FIX: HTML-escape user-controlled params to prevent XSS
-    String srcParamE = HtmlUtils.e(srcParam);
-    String dstParamE = HtmlUtils.e(dstParam);
-    String datParamE = HtmlUtils.e(datParam);
+    try { numSeatsInt = Integer.parseInt(seatsParam); if (numSeatsInt < 1) numSeatsInt = 1; }
+    catch (Exception ignored) { numSeatsInt = 1; seatsParam = "1"; }
+    String srcParamE  = HtmlUtils.e(srcParam);
+    String dstParamE  = HtmlUtils.e(dstParam);
+    String datParamE  = HtmlUtils.e(datParam);
+    String firstName  = userName.contains(" ") ? userName.split(" ")[0] : userName;
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Search Flights – AeroSphere</title>
+<script>(function(){var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
-:root{--primary:#10B981;--primary-dark:#059669;--primary-glow:rgba(16,185,129,.18);--accent:#A7F3D0;--bg:#FAFAF9;--card-bg:#FFFFFF;--text:#1C1917;--text-muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px}
-[data-theme="dark"]{--primary:#10B981;--primary-dark:#34D399;--primary-glow:rgba(16,185,129,.22);--bg:#0A0A0A;--card-bg:#141414;--text:#F5F5F4;--text-muted:#9CA3AF;--border:#262626;--shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.5)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-.navbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--card-bg);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.brand-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px var(--primary-glow)}
-.brand-name{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}.brand-name span{color:var(--primary)}
-.nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:8px;font-size:.86rem;font-weight:500;transition:all .2s}
-.nav-link:hover{color:var(--text);background:var(--border)}.nav-link.active{color:var(--primary);background:var(--primary-glow)}
-.nav-link.btn-danger{color:#DC2626;background:rgba(220,38,38,.08)}.nav-link.btn-danger:hover{background:rgba(220,38,38,.15)}
-.theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
-.page-wrapper{max-width:1000px;margin:0 auto;padding:32px 24px}
-.page-header{margin-bottom:24px}
-.page-title{font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
-.page-subtitle{color:var(--text-muted);font-size:.9rem}
-/* SEARCH BAR */
-.search-bar{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.search-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent),var(--primary))}
-.search-bar label{display:block;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:6px}
-.search-bar input,.search-bar select{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;outline:none;transition:border-color .2s}
-.search-bar input:focus,.search-bar select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-.search-bar input::placeholder{color:var(--text-muted);opacity:.6}
-.btn-search{padding:10px 20px;background:var(--primary);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:.86rem;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px var(--primary-glow);white-space:nowrap}
-.btn-search:hover{background:var(--primary-dark);transform:translateY(-1px)}
-/* ALERTS */
-.alert{padding:12px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px}
-.alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626}
-[data-theme="dark"] .alert-error{color:#FCA5A5}
-/* RESULTS COUNT */
-.results-count{font-size:.86rem;color:var(--text-muted);margin-bottom:16px}
-.results-count strong{color:var(--primary);font-weight:700}
-/* FLIGHT CARD */
-.flight-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;transition:all .25s;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
-.flight-card:hover{border-color:var(--primary);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.flight-card-body{padding:20px 24px;display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:center;gap:16px}
-.city-block{}
-.city-code{font-size:1.7rem;font-weight:900;letter-spacing:-1px}
-.city-name{font-size:.76rem;color:var(--text-muted);margin-top:2px}
-.flight-time{font-size:.82rem;color:var(--primary);font-weight:600;margin-top:4px}
-.flight-center{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 8px}
-.flight-no{font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px}
-.flight-line{display:flex;align-items:center;gap:6px;width:100%}
-.flight-line-bar{flex:1;height:1px;background:var(--border)}
-.flight-line-icon{color:var(--primary);font-size:1rem}
-.price-block{text-align:right}
-.price-big{font-size:1.5rem;font-weight:900;letter-spacing:-.5px}
-.price-sub{font-size:.74rem;color:var(--text-muted);margin-bottom:10px}
-.flight-footer{padding:10px 24px;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:center;gap:20px}
-.flight-meta-item{font-size:.76rem;color:var(--text-muted)}
-/* EMPTY */
-.empty-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:60px 24px;text-align:center;box-shadow:var(--shadow)}
-.empty-icon{font-size:3rem;margin-bottom:16px;opacity:.4}
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:.84rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:all .2s}
-.btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px var(--primary-glow)}
-.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
-.btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
-.btn-sm{padding:6px 12px;font-size:.8rem}
-/* FULL badge */
-.badge-full{background:rgba(239,68,68,.1);color:#DC2626;border:1px solid rgba(239,68,68,.2);padding:4px 12px;border-radius:99px;font-size:.76rem;font-weight:700}
-[data-theme="dark"] .badge-full{color:#FCA5A5}
-@media(max-width:800px){.search-bar{grid-template-columns:1fr 1fr}.search-bar .btn-col{grid-column:1/-1}.flight-card-body{grid-template-columns:1fr auto 1fr;gap:12px}.flight-center{display:none}}
-@media(max-width:500px){.search-bar{grid-template-columns:1fr}}
+/* ── SEARCH PAGE SPECIFIC ─────────────────────────────── */
+
+/* Hero search bar */
+.search-hero {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-md);
+  position: relative; overflow: hidden;
+}
+.search-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad-brand);
+}
+.search-hero-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+}
+.search-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.search-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  gap: 14px; align-items: end;
+}
+.sf-field label {
+  display: block; font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-muted); margin-bottom: 7px;
+}
+.sf-field input, .sf-field select {
+  width: 100%; padding: 10px 13px;
+  background: var(--bg); border: 1.5px solid var(--border-2);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: .875rem;
+  outline: none;
+  transition: border-color var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast);
+}
+.sf-field input:focus, .sf-field select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+  background: var(--surface-0);
+}
+.sf-field input::placeholder { color: var(--text-faint); }
+.btn-search-main {
+  padding: 11px 24px;
+  background: var(--grad-brand); color: #fff; border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: .9rem; cursor: pointer;
+  box-shadow: 0 4px 14px var(--primary-glow-lg);
+  white-space: nowrap;
+  transition: transform var(--trans-fast), box-shadow var(--trans-fast);
+  display: flex; align-items: center; gap: 8px;
+  position: relative; overflow: hidden;
+}
+.btn-search-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--primary-glow-lg);
+}
+.btn-search-main:active { transform: translateY(0); }
+
+/* Swap button */
+.swap-btn {
+  width: 32px; height: 32px;
+  background: var(--primary-glow);
+  border: 1px solid rgba(14,165,233,.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px;
+  transition: transform var(--trans-fast), background var(--trans-fast);
+  color: var(--primary); align-self: flex-end; margin-bottom: 0;
+}
+.swap-btn:hover { background: rgba(14,165,233,.25); transform: rotate(180deg); }
+
+/* Results header bar */
+.results-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+}
+.results-summary {
+  font-size: .9rem; color: var(--text-muted);
+}
+.results-summary strong { color: var(--primary); font-weight: 700; }
+.results-count-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--primary-glow);
+  border: 1px solid rgba(14,165,233,.3);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: .8rem; font-weight: 700; color: var(--primary);
+}
+
+/* Flight result card */
+.fc {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden; margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
+  animation: fadeUp .4s var(--ease) both;
+  position: relative;
+}
+.fc::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: var(--grad-brand);
+  transform: scaleY(0); transform-origin: top;
+  transition: transform var(--trans);
+}
+.fc:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-2);
+}
+.fc:hover::before { transform: scaleY(1); }
+
+/* Card body — route + price */
+.fc-body {
+  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+/* City block */
+.fc-city-code {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.7rem; font-weight: 800;
+  letter-spacing: -.04em; color: var(--text);
+  line-height: 1;
+}
+.fc-city-name { font-size: .75rem; color: var(--text-muted); margin-top: 3px; }
+.fc-city-time {
+  font-size: .85rem; color: var(--primary);
+  font-weight: 600; margin-top: 5px;
+}
+
+/* Flight centre — route line */
+.fc-route {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 5px; padding: 0 8px;
+}
+.fc-fno {
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-faint);
+}
+.fc-line {
+  display: flex; align-items: center; gap: 5px; width: 90px;
+}
+.fc-line-bar { flex: 1; height: 1px; background: var(--border-2); }
+.fc-plane { color: var(--primary); font-size: 1.05rem; }
+
+/* Seats badge */
+.fc-seats {
+  text-align: center;
+}
+.seats-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem; font-weight: 800;
+  color: var(--text); line-height: 1;
+}
+.seats-label { font-size: .7rem; color: var(--text-muted); margin-top: 3px; }
+.seats-low { color: var(--danger); }
+
+/* Price block */
+.fc-price { text-align: right; }
+.fc-price-big {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.55rem; font-weight: 800;
+  color: var(--primary); letter-spacing: -.03em; line-height: 1;
+}
+.fc-price-sub { font-size: .72rem; color: var(--text-faint); margin: 4px 0 12px; }
+.fc-total {
+  font-size: .8rem; font-weight: 700;
+  color: var(--text-2); margin-bottom: 10px;
+}
+.fc-total span { color: var(--primary); }
+
+/* Book button */
+.btn-book {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px;
+  background: var(--grad-brand); color: #fff; border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .84rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 3px 12px var(--primary-glow-lg);
+  transition: transform var(--trans-fast), box-shadow var(--trans-fast);
+  white-space: nowrap;
+}
+.btn-book:hover { transform: translateY(-2px); box-shadow: 0 6px 18px var(--primary-glow-lg); }
+.badge-full {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--danger-bg); color: var(--danger);
+  border: 1px solid var(--danger-border);
+  padding: 5px 14px; border-radius: var(--radius-full);
+  font-size: .76rem; font-weight: 700;
+}
+
+/* Footer meta bar */
+.fc-footer {
+  padding: 10px 26px;
+  background: var(--surface-1);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 20px;
+  flex-wrap: wrap;
+}
+.fc-meta {
+  font-size: .75rem; color: var(--text-muted);
+  display: flex; align-items: center; gap: 5px;
+}
+.fc-meta-total {
+  margin-left: auto;
+  font-size: .82rem; font-weight: 700; color: var(--primary);
+}
+
+/* Empty / no-results */
+.no-results {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 64px 24px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  animation: fadeUp .4s var(--ease) both;
+}
+.no-results-icon { font-size: 3.5rem; opacity: .35; margin-bottom: 16px; animation: floatAnim 3s ease-in-out infinite; }
+.no-results h3 { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; margin-bottom:10px; }
+.no-results p  { color: var(--text-muted); font-size:.9rem; margin-bottom: 20px; }
+
+/* Page header strip */
+.page-topbar {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; flex-wrap: wrap;
+  gap: 12px; margin-bottom: 24px;
+}
+.page-topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem; font-weight: 800;
+  letter-spacing: -.04em; margin-bottom: 4px;
+}
+.page-topbar-sub { color: var(--text-muted); font-size: .9rem; }
+
+@media(max-width:860px) {
+  .search-form-grid { grid-template-columns: 1fr 1fr; }
+  .search-form-grid .btn-col { grid-column: 1/-1; }
+  .fc-body { grid-template-columns: 1fr auto 1fr; }
+  .fc-route, .fc-seats { display: none; }
+}
+@media(max-width:560px) {
+  .search-form-grid { grid-template-columns: 1fr; }
+  .fc-body { grid-template-columns: 1fr; gap: 12px; }
+  .fc-price { text-align: left; }
+  .fc-footer { gap: 10px; }
+}
 </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-        <div class="brand-icon">✈</div><span class="brand-name">Aero<span>Sphere</span></span>
+<!-- NAVBAR -->
+<nav class="navbar" role="navigation">
+  <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
+    <div class="brand-icon">✈</div>
+    <span class="brand-name">Aero<span>Sphere</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link active">🔍 Search</a>
+    <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 Bookings</a>
+    <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refunds</a>
+    <a href="${pageContext.request.contextPath}/profile"           class="nav-link">👤 Profile</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()">🌙</button>
+    <a href="${pageContext.request.contextPath}/profile" class="user-pill">
+      <div class="user-avatar"><%= firstName.charAt(0) %></div>
+      <span><%= firstName %></span>
     </a>
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link ">🏠 Dashboard</a>
-        <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link active">🔍 Search</a>
-        <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link ">✈️ All Flights</a>
-        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link ">🎫 My Bookings</a>
-        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link ">💸 Refunds</a>
-        <a href="${pageContext.request.contextPath}/profile"           class="nav-link ">👤 Profile</a>
-        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
-    </div>
+    <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-danger">↩ Logout</a>
+    <button class="hamburger" id="as-hamburger"><span></span><span></span><span></span></button>
+  </div>
 </nav>
-
-<div class="page-wrapper">
-    <div class="page-header">
-        <div class="page-title">🔍 Search Flights</div>
-        <div class="page-subtitle">Find available flights for your journey</div>
-    </div>
-
-    <!-- SEARCH BAR -->
-    <form action="${pageContext.request.contextPath}/searchFlights" method="get" class="search-bar">
-        <div>
-            <label>From</label>
-            <input type="text" name="source" value="<%= srcParamE %>" placeholder="e.g. Mumbai" required>
-        </div>
-        <div>
-            <label>To</label>
-            <input type="text" name="destination" value="<%= dstParamE %>" placeholder="e.g. Delhi" required>
-        </div>
-        <div>
-            <label>Date</label>
-            <input type="date" name="departDate" value="<%= datParamE %>" required>
-        </div>
-        <div>
-            <label>Passengers</label>
-            <select name="numSeats">
-                <% for (int i=1;i<=9;i++){%><option value="<%= i %>" <%= seatsParam.equals(String.valueOf(i))?"selected":"" %>><%= i %> Passenger<%= i>1?"s":"" %></option><%}%>
-            </select>
-        </div>
-        <div class="btn-col"><button type="submit" class="btn-search">🔍 Search</button></div>
-    </form>
-
-    <% if (error != null) { %><div class="alert alert-error">⚠ <%= HtmlUtils.e(error) %></div><% } %>
-
-    <% if (Boolean.TRUE.equals(searched)) { %>
-        <% if (flights == null || flights.isEmpty()) { %>
-            <div class="empty-card">
-                <div class="empty-icon">✈</div>
-                <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">No flights found</h3>
-                <p style="color:var(--text-muted);font-size:.88rem">Try a different date or route</p>
-            </div>
-        <% } else { %>
-            <p class="results-count"><strong><%= flights.size() %></strong> flight<%= flights.size()!=1?"s":"" %> found for <strong><%= srcParamE %> → <%= dstParamE %></strong> on <%= datParamE %></p>
-            <% int fi=0; for (Map<String,Object> f : flights) { fi++;
-               int avail = (Integer)f.get("seats_available"); %>
-            <div class="flight-card" style="animation-delay:<%= fi*0.07 %>s">
-                <div class="flight-card-body">
-                    <div class="city-block">
-                        <div class="city-code"><%= ((String)f.get("source")).substring(0,Math.min(3,((String)f.get("source")).length())).toUpperCase() %></div>
-                        <div class="city-name"><%= f.get("source") %></div>
-                        <div class="flight-time"><%= f.get("depart_time") %></div>
-                    </div>
-                    <div class="flight-center">
-                        <div class="flight-no"><%= f.get("flight_no") %></div>
-                        <div class="flight-line">
-                            <div class="flight-line-bar"></div>
-                            <div class="flight-line-icon">✈</div>
-                            <div class="flight-line-bar"></div>
-                        </div>
-                    </div>
-                    <div class="city-block">
-                        <div class="city-code"><%= ((String)f.get("destination")).substring(0,Math.min(3,((String)f.get("destination")).length())).toUpperCase() %></div>
-                        <div class="city-name"><%= f.get("destination") %></div>
-                        <div class="flight-time"><%= f.get("arrival_time") != null ? f.get("arrival_time") : "—" %></div>
-                    </div>
-                    <div></div>
-                    <div class="price-block">
-                        <div class="price-big">₹<%= String.format("%,.0f",(Double)f.get("price")) %></div>
-                        <div class="price-sub">per seat · <%= avail %> left</div>
-                        <% if (avail >= numSeatsInt) { %>
-                        <form action="${pageContext.request.contextPath}/bookFlight" method="post" style="margin:0">
-                            <input type="hidden" name="flightId" value="<%= f.get("id") %>">
-                            <input type="hidden" name="numSeats" value="<%= seatsParam %>">
-                            <button type="submit" class="btn btn-primary btn-sm">Book Now →</button>
-                        </form>
-                        <% } else { %><span class="badge-full">Full</span><% } %>
-                    </div>
-                </div>
-                <div class="flight-footer">
-                    <span class="flight-meta-item">📅 <%= f.get("depart_date") %></span>
-                    <span class="flight-meta-item">💺 <%= avail %> seats available</span>
-                    <span class="flight-meta-item">👥 <%= seatsParam %> passenger<%= numSeatsInt>1?"s":"" %></span>
-                    <span class="flight-meta-item" style="margin-left:auto;font-weight:700;color:var(--primary)">Total: ₹<%= String.format("%,.0f",(Double)f.get("price")*numSeatsInt) %></span>
-                </div>
-            </div>
-            <% } %>
-        <% } %>
-    <% } %>
+<div class="mobile-nav" id="as-mobile-nav">
+  <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
+  <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link active">🔍 Search Flights</a>
+  <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
+  <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refund History</a>
+  <a href="${pageContext.request.contextPath}/profile"           class="nav-link">👤 Profile</a>
+  <hr style="border:none;border-top:1px solid var(--border);margin:6px 0">
+  <a href="${pageContext.request.contextPath}/logout" class="nav-link btn-danger">↩ Logout</a>
 </div>
 
+<!-- PAGE -->
+<div class="page-wrapper">
+
+  <!-- Page heading -->
+  <div class="page-topbar fade-up">
+    <div>
+      <div class="page-topbar-title">🔍 Search <span style="color:var(--primary)">Flights</span></div>
+      <div class="page-topbar-sub">Find and book the best flights for your journey</div>
+    </div>
+  </div>
+
+  <!-- SEARCH FORM (all name/action attrs preserved exactly) -->
+  <div class="search-hero fade-up d1">
+    <div class="search-hero-head">
+      <div class="search-hero-title">✈ Enter your travel details</div>
+      <% if (Boolean.TRUE.equals(searched) && flights != null) { %>
+        <div class="results-count-chip">
+          ✈ <%= flights.size() %> flight<%= flights.size() != 1 ? "s" : "" %> found
+        </div>
+      <% } %>
+    </div>
+    <form action="${pageContext.request.contextPath}/searchFlights" method="get" class="search-form-grid" id="searchForm">
+      <div class="sf-field">
+        <label>From</label>
+        <input type="text" name="source" value="<%= srcParamE %>" id="srcInput"
+               placeholder="e.g. Mumbai" required autocomplete="off">
+      </div>
+
+      <%-- Swap button sits between From and To (cosmetic only, handled by JS) --%>
+      <div style="display:flex;align-items:flex-end;padding-bottom:1px">
+        <button type="button" class="swap-btn" onclick="swapCities()" title="Swap cities">⇄</button>
+      </div>
+
+      <div class="sf-field">
+        <label>To</label>
+        <input type="text" name="destination" value="<%= dstParamE %>" id="dstInput"
+               placeholder="e.g. Delhi" required autocomplete="off">
+      </div>
+      <div class="sf-field">
+        <label>Departure Date</label>
+        <input type="date" name="departDate" value="<%= datParamE %>" id="datInput" required>
+      </div>
+      <div class="sf-field">
+        <label>Passengers</label>
+        <select name="numSeats" id="seatsSelect">
+          <% for (int i=1;i<=9;i++){ %>
+            <option value="<%= i %>" <%= seatsParam.equals(String.valueOf(i)) ? "selected" : "" %>>
+              <%= i %> Passenger<%= i>1 ? "s" : "" %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+      <div class="btn-col">
+        <button type="submit" class="btn-search-main">
+          <span>🔍</span><span>Search</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <%-- Alerts --%>
+  <% if (error != null) { %>
+    <div class="alert alert-error"><span>⚠</span><span><%= HtmlUtils.e(error) %></span></div>
+  <% } %>
+
+  <%-- RESULTS --%>
+  <% if (Boolean.TRUE.equals(searched)) { %>
+    <% if (flights == null || flights.isEmpty()) { %>
+
+      <!-- No results -->
+      <div class="no-results">
+        <div class="no-results-icon">🛫</div>
+        <h3>No flights found</h3>
+        <p>We couldn't find flights for <strong><%= srcParamE %> → <%= dstParamE %></strong> on <strong><%= datParamE %></strong>.<br>Try a different date, route, or fewer passengers.</p>
+        <button onclick="document.getElementById('srcInput').focus()" class="btn btn-primary">Modify Search</button>
+      </div>
+
+    <% } else { %>
+
+      <!-- Results meta -->
+      <div class="results-meta fade-up">
+        <div class="results-summary">
+          Showing <strong><%= flights.size() %></strong> flight<%= flights.size() != 1 ? "s" : "" %>
+          for <strong><%= srcParamE %> → <%= dstParamE %></strong>
+          on <strong><%= datParamE %></strong> · <%= numSeatsInt %> passenger<%= numSeatsInt > 1 ? "s" : "" %>
+        </div>
+      </div>
+
+      <%-- Flight cards (form actions/inputs preserved exactly) --%>
+      <% int fi=0; for (Map<String,Object> f : flights) { fi++;
+         int avail = (Integer) f.get("seats_available");
+         double pricePer = (Double) f.get("price");
+         double total    = pricePer * numSeatsInt;
+         String srcCode  = ((String)f.get("source")).substring(0, Math.min(3,((String)f.get("source")).length())).toUpperCase();
+         String dstCode  = ((String)f.get("destination")).substring(0, Math.min(3,((String)f.get("destination")).length())).toUpperCase();
+      %>
+      <div class="fc" style="animation-delay:<%= fi * 0.07 %>s">
+        <div class="fc-body">
+
+          <!-- Origin -->
+          <div>
+            <div class="fc-city-code"><%= srcCode %></div>
+            <div class="fc-city-name"><%= f.get("source") %></div>
+            <div class="fc-city-time">🛫 <%= f.get("depart_time") %></div>
+          </div>
+
+          <!-- Route line -->
+          <div class="fc-route">
+            <div class="fc-fno"><%= f.get("flight_no") %></div>
+            <div class="fc-line">
+              <div class="fc-line-bar"></div>
+              <div class="fc-plane">✈</div>
+              <div class="fc-line-bar"></div>
+            </div>
+          </div>
+
+          <!-- Destination -->
+          <div>
+            <div class="fc-city-code"><%= dstCode %></div>
+            <div class="fc-city-name"><%= f.get("destination") %></div>
+            <div class="fc-city-time">🛬 <%= f.get("arrival_time") != null ? f.get("arrival_time") : "—" %></div>
+          </div>
+
+          <!-- Seats -->
+          <div class="fc-seats">
+            <div class="seats-num <%= avail <= 5 ? "seats-low" : "" %>"><%= avail %></div>
+            <div class="seats-label">seats left<%= avail <= 5 ? " ⚠" : "" %></div>
+          </div>
+
+          <!-- Price + CTA -->
+          <div class="fc-price">
+            <div class="fc-price-big">₹<%= String.format("%,.0f", pricePer) %></div>
+            <div class="fc-price-sub">per seat</div>
+            <div class="fc-total">Total: <span>₹<%= String.format("%,.0f", total) %></span></div>
+            <% if (avail >= numSeatsInt) { %>
+              <form action="${pageContext.request.contextPath}/bookFlight" method="post" style="margin:0">
+                <input type="hidden" name="flightId" value="<%= f.get("id") %>">
+                <input type="hidden" name="numSeats" value="<%= seatsParam %>">
+                <button type="submit" class="btn-book">Book Now →</button>
+              </form>
+            <% } else { %>
+              <span class="badge-full">✗ Full</span>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Footer meta -->
+        <div class="fc-footer">
+          <span class="fc-meta">📅 <%= f.get("depart_date") %></span>
+          <span class="fc-meta">💺 <%= avail %> seat<%= avail != 1 ? "s" : "" %> available</span>
+          <span class="fc-meta">👥 <%= numSeatsInt %> passenger<%= numSeatsInt > 1 ? "s" : "" %></span>
+          <span class="fc-meta-total">Total for <%= numSeatsInt %> seat<%= numSeatsInt > 1 ? "s" : "" %>: ₹<%= String.format("%,.0f", total) %></span>
+        </div>
+      </div>
+      <% } %>
+
+    <% } %>
+  <% } %>
+
+</div>
+
+<script src="${pageContext.request.contextPath}/assests/js/main.js"></script>
 <script>
-const t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-document.documentElement.setAttribute('data-theme',t);
-document.getElementById('themeToggle').textContent=t==='dark'?'☀️':'🌙';
-function toggleTheme(){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('aerosphere-theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';}
-document.querySelector('input[name="departDate"]').min=new Date().toISOString().split('T')[0];
+  // Set minimum date
+  document.getElementById('datInput').min = new Date().toISOString().split('T')[0];
+
+  // Swap cities
+  function swapCities() {
+    var src = document.getElementById('srcInput');
+    var dst = document.getElementById('dstInput');
+    var tmp = src.value;
+    src.value = dst.value;
+    dst.value = tmp;
+    // brief flash animation
+    [src, dst].forEach(function(el) {
+      el.style.transition = 'background .2s';
+      el.style.background = 'var(--primary-glow)';
+      setTimeout(function() { el.style.background = ''; }, 300);
+    });
+  }
+
+  // Ripple on search button
+  document.querySelector('.btn-search-main').addEventListener('click', function(e) {
+    var r = document.createElement('span');
+    var rect = this.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height);
+    r.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,.28);width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px;transform:scale(0);animation:rippleAnim .6s linear;pointer-events:none';
+    this.appendChild(r);
+    r.addEventListener('animationend', function() { r.remove(); });
+  });
 </script>
-</body></html>
+</body>
+</html>

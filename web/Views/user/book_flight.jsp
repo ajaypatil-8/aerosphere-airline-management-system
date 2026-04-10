@@ -40,178 +40,372 @@
     } catch (Exception e) { e.printStackTrace(); }
 
     double totalAmount = price * numSeats;
+    String firstName = userName.contains(" ") ? userName.split(" ")[0] : userName;
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Confirm Booking – AeroSphere</title>
+<script>(function(){var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
-:root{--primary:#10B981;--primary-dark:#059669;--primary-glow:rgba(16,185,129,.18);--bg:#FAFAF9;--card-bg:#FFFFFF;--text:#1C1917;--text-muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px}
-[data-theme="dark"]{--primary:#10B981;--primary-dark:#34D399;--primary-glow:rgba(16,185,129,.22);--bg:#0A0A0A;--card-bg:#141414;--text:#F5F5F4;--text-muted:#9CA3AF;--border:#262626;--shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.5)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-/* NAVBAR */
-.navbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--card-bg);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.brand-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px var(--primary-glow)}
-.brand-name{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}.brand-name span{color:var(--primary)}
-.nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:8px;font-size:.86rem;font-weight:500;transition:all .2s}
-.nav-link:hover{color:var(--text);background:var(--border)}.nav-link.btn-danger{color:#DC2626;background:rgba(220,38,38,.08)}.nav-link.btn-danger:hover{background:rgba(220,38,38,.15)}
-.theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
-/* PAGE */
-.page-wrapper{max-width:680px;margin:0 auto;padding:32px 24px}
-/* STEPS */
-.steps{display:flex;align-items:center;margin-bottom:32px;animation:fadeUp .5s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.step{display:flex;flex-direction:column;align-items:center;gap:5px}
-.step-circle{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:var(--text-muted);background:var(--card-bg);transition:all .3s}
-.step.done .step-circle{background:var(--primary);border-color:var(--primary);color:#fff}
-.step.active .step-circle{border-color:var(--primary);color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-.step-label{font-size:.7rem;font-weight:600;color:var(--text-muted);white-space:nowrap}
-.step.done .step-label,.step.active .step-label{color:var(--primary)}
-.step-line{flex:1;height:2px;background:var(--border);margin:0 6px;margin-bottom:18px;transition:background .3s}
-.step-line.done{background:var(--primary)}
-/* CARD */
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s ease both .1s}
-.card-inner{padding:28px}
-/* ROUTE STRIP */
-.route-strip{display:flex;align-items:center;justify-content:space-between;background:var(--primary-glow);border:1px solid var(--primary);border-radius:12px;padding:18px 24px;margin-bottom:20px}
-.route-city-name{font-size:1.6rem;font-weight:900;letter-spacing:-1px}
-.route-city-lbl{font-size:.74rem;color:var(--text-muted);margin-top:3px}
-.route-icon{font-size:1.6rem;color:var(--primary)}
-/* INFO GRID */
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.info-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-.info-item label{display:block;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:4px}
-.info-item span{font-size:.9rem;font-weight:600}
-/* FARE BOX */
-.fare-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px}
-.fare-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:12px}
-.fare-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem}
-.fare-row:last-child{border-bottom:none}
-.fare-row.total{font-weight:800;font-size:1rem;color:var(--primary);border-top:2px solid var(--primary);padding-top:12px;margin-top:4px}
-.fare-row.total span:last-child{font-size:1.2rem}
-/* FORM */
-.field{margin-bottom:16px}
-.field label{display:block;font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:7px}
-.field-wrap{position:relative}
-.field-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
-.field-wrap input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px 11px 38px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:all .2s}
-.field-wrap input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-/* BUTTONS */
-.btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:var(--primary);border:none;border-radius:11px;color:#fff;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 5px 18px var(--primary-glow)}
-.btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 8px 24px var(--primary-glow)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.back-link{display:block;text-align:center;margin-top:14px;font-size:.84rem;color:var(--text-muted);text-decoration:none;transition:color .2s}
-.back-link:hover{color:var(--primary)}
-/* ALERT */
-.alert-warn{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#D97706}
-[data-theme="dark"] .alert-warn{color:#FCD34D}
-hr.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+/* ── BOOK FLIGHT PAGE ────────────────────────────────── */
+.booking-wrapper { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+
+/* Route strip */
+.route-strip {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  animation: fadeUp .5s var(--ease) .1s both;
+}
+.route-strip::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad-brand);
+}
+.route-strip-bg {
+  position: absolute; right: 16px; top: 50%;
+  transform: translateY(-50%); font-size: 5rem;
+  opacity: .04; pointer-events: none;
+  animation: floatAnim 5s ease-in-out infinite;
+}
+.rs-city {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.75rem; font-weight: 800;
+  letter-spacing: -.04em; color: var(--text); line-height: 1;
+}
+.rs-label { font-size: .72rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.rs-time  { font-size: .85rem; color: var(--primary); font-weight: 600; margin-top: 5px; }
+.rs-icon  { font-size: 1.8rem; color: var(--primary); flex-shrink: 0; animation: floatAnim 3s ease-in-out infinite; }
+
+/* Flight info grid */
+.info-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 20px;
+  animation: fadeUp .5s var(--ease) .15s both;
+}
+.info-tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 13px 16px;
+  transition: border-color var(--trans-fast);
+}
+.info-tile:hover { border-color: var(--primary); }
+.info-tile-label {
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-faint); margin-bottom: 5px;
+}
+.info-tile-val { font-size: .9rem; font-weight: 600; color: var(--text); }
+.info-tile-val.highlight { color: var(--primary); }
+
+/* Warning */
+.alert-warn {
+  background: var(--warning-bg); border: 1px solid var(--warning-border);
+  color: #92400E; border-radius: var(--radius); padding: 12px 16px;
+  font-size: .875rem; font-weight: 500;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+}
+[data-theme="dark"] .alert-warn { color: #FCD34D; }
+
+/* Fare summary */
+.fare-card {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden; margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  animation: fadeUp .5s var(--ease) .2s both;
+}
+.fare-head {
+  padding: 14px 20px;
+  background: var(--surface-1); border-bottom: 1px solid var(--border);
+  font-family: 'Syne', sans-serif;
+  font-size: .85rem; font-weight: 700; letter-spacing: -.01em;
+  display: flex; align-items: center; gap: 8px;
+}
+.fare-body { padding: 4px 0; }
+.fare-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 13px 20px; font-size: .9rem;
+  border-bottom: 1px solid var(--border);
+}
+.fare-row:last-child { border-bottom: none; }
+.fare-row-label { color: var(--text-muted); }
+.fare-row-val   { font-weight: 600; color: var(--text); }
+.fare-total-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px;
+  border-top: 2px solid var(--primary);
+  background: var(--primary-glow);
+}
+.fare-total-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 800; color: var(--text);
+}
+.fare-total-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem; font-weight: 800;
+  color: var(--primary); letter-spacing: -.03em;
+}
+
+/* Form section */
+.form-section {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow);
+  animation: fadeUp .5s var(--ease) .25s both;
+}
+.form-section-head {
+  padding: 14px 20px; background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Syne', sans-serif;
+  font-size: .85rem; font-weight: 700;
+}
+.form-section-body { padding: 20px; }
+.seat-field { margin-bottom: 0; }
+.seat-field label {
+  display: block; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.seat-input-wrap { position: relative; }
+.seat-input-icon {
+  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; color: var(--text-faint); pointer-events: none;
+  transition: color var(--trans-fast);
+}
+.seat-field:focus-within .seat-input-icon { color: var(--primary); }
+.seat-input-wrap input {
+  width: 100%; padding: 12px 14px 12px 40px;
+  background: var(--surface-1); border: 1.5px solid var(--border-2);
+  border-radius: var(--radius); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: .95rem;
+  outline: none;
+  transition: border-color var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast);
+}
+.seat-input-wrap input:focus {
+  border-color: var(--primary);
+  background: var(--surface-0);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Confirm button */
+.btn-confirm {
+  width: 100%; padding: 15px; margin-top: 16px;
+  background: var(--grad-brand); border: none;
+  border-radius: var(--radius); color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 6px 20px var(--primary-glow-lg);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform var(--trans-fast), box-shadow var(--trans-fast);
+  position: relative; overflow: hidden;
+}
+.btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 10px 28px var(--primary-glow-lg); }
+.btn-confirm:active { transform: translateY(0); }
+.btn-confirm:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.back-link {
+  display: block; text-align: center; margin-top: 14px;
+  font-size: .85rem; color: var(--text-muted); text-decoration: none;
+  transition: color var(--trans-fast);
+}
+.back-link:hover { color: var(--primary); }
+
+@media(max-width:560px){
+  .route-strip { flex-direction: column; align-items: flex-start; }
+  .info-grid   { grid-template-columns: 1fr; }
+  .booking-wrapper { padding: 20px 16px; }
+}
 </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-        <div class="brand-icon">✈</div><span class="brand-name">Aero<span>Sphere</span></span>
+<!-- NAVBAR -->
+<nav class="navbar" role="navigation">
+  <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
+    <div class="brand-icon">✈</div>
+    <span class="brand-name">Aero<span>Sphere</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-link">🏠 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/searchFlights" class="nav-link">🔍 Search</a>
+    <a href="${pageContext.request.contextPath}/userBookings"  class="nav-link">🎫 Bookings</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()">🌙</button>
+    <a href="${pageContext.request.contextPath}/profile" class="user-pill">
+      <div class="user-avatar"><%= firstName.charAt(0) %></div>
+      <span><%= firstName %></span>
     </a>
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link ">🏠 Dashboard</a>
-        <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link ">🔍 Search</a>
-        <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link ">✈️ All Flights</a>
-        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link ">🎫 My Bookings</a>
-        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link ">💸 Refunds</a>
-        <a href="${pageContext.request.contextPath}/profile"           class="nav-link ">👤 Profile</a>
-        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
-    </div>
+    <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-danger">↩ Logout</a>
+  </div>
 </nav>
 
-<div class="page-wrapper">
-    <!-- STEPS -->
-    <div class="steps">
-        <div class="step done"><div class="step-circle">✓</div><div class="step-label">Search</div></div>
-        <div class="step-line done"></div>
-        <div class="step active"><div class="step-circle">2</div><div class="step-label">Confirm</div></div>
-        <div class="step-line"></div>
-        <div class="step"><div class="step-circle">3</div><div class="step-label">Passengers</div></div>
-        <div class="step-line"></div>
-        <div class="step"><div class="step-circle">4</div><div class="step-label">Payment</div></div>
-        <div class="step-line"></div>
-        <div class="step"><div class="step-circle">5</div><div class="step-label">Ticket</div></div>
+<div class="booking-wrapper">
+
+  <!-- STEP PROGRESS -->
+  <div class="steps fade-up">
+    <div class="step done">
+      <div class="step-circle">✓</div>
+      <div class="step-label">Search</div>
     </div>
+    <div class="step-line done"></div>
+    <div class="step active">
+      <div class="step-circle">2</div>
+      <div class="step-label">Confirm</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">3</div>
+      <div class="step-label">Passengers</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">4</div>
+      <div class="step-label">Payment</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">5</div>
+      <div class="step-label">Ticket</div>
+    </div>
+  </div>
 
-    <div class="card">
-        <div class="card-inner">
-            <h2 style="font-weight:800;font-size:1.3rem;margin-bottom:22px">✈ Confirm Your Booking</h2>
+  <!-- ROUTE CARD -->
+  <div class="route-strip">
+    <div class="route-strip-bg">✈</div>
+    <div>
+      <div class="rs-city"><%= source %></div>
+      <div class="rs-label">Origin</div>
+      <div class="rs-time">🛫 <%= departTime %></div>
+    </div>
+    <div class="rs-icon">✈</div>
+    <div style="text-align:right">
+      <div class="rs-city"><%= destination %></div>
+      <div class="rs-label">Destination</div>
+      <div class="rs-time">🛬 <%= (arrivalTime != null && !arrivalTime.isEmpty()) ? arrivalTime : "—" %></div>
+    </div>
+  </div>
 
-            <!-- ROUTE -->
-            <div class="route-strip">
-                <div><div class="route-city-name"><%= source %></div><div class="route-city-lbl">Origin</div></div>
-                <div class="route-icon">✈</div>
-                <div style="text-align:right"><div class="route-city-name"><%= destination %></div><div class="route-city-lbl">Destination</div></div>
-            </div>
+  <!-- FLIGHT INFO GRID -->
+  <div class="info-grid">
+    <div class="info-tile">
+      <div class="info-tile-label">Flight No.</div>
+      <div class="info-tile-val highlight"><%= flightNo %></div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-label">Departure Date</div>
+      <div class="info-tile-val"><%= departDate %></div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-label">Departure Time</div>
+      <div class="info-tile-val"><%= departTime %></div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-label">Arrival Time</div>
+      <div class="info-tile-val"><%= (arrivalTime != null && !arrivalTime.isEmpty()) ? arrivalTime : "—" %></div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-label">Available Seats</div>
+      <div class="info-tile-val <%= seatsAvailable <= 5 ? "highlight" : "" %>"><%= seatsAvailable %><%= seatsAvailable <= 5 ? " ⚠" : "" %></div>
+    </div>
+    <div class="info-tile">
+      <div class="info-tile-label">Price per Seat</div>
+      <div class="info-tile-val highlight">₹ <%= String.format("%.2f", price) %></div>
+    </div>
+  </div>
 
-            <!-- INFO -->
-            <div class="info-grid">
-                <div class="info-item"><label>Flight No.</label><span style="color:var(--primary)"><%= flightNo %></span></div>
-                <div class="info-item"><label>Date</label><span><%= departDate %></span></div>
-                <div class="info-item"><label>Departure</label><span><%= departTime %></span></div>
-                <div class="info-item"><label>Arrival</label><span><%= (arrivalTime != null && !arrivalTime.isEmpty()) ? arrivalTime : "—" %></span></div>
-                <div class="info-item"><label>Seats Available</label><span><%= seatsAvailable %></span></div>
-                <div class="info-item"><label>Price per Seat</label><span>₹ <%= String.format("%.2f", price) %></span></div>
-            </div>
+  <% if (seatsAvailable < numSeats) { %>
+    <div class="alert-warn">
+      <span>⚠</span>
+      <span>Only <strong><%= seatsAvailable %></strong> seat(s) available. Please reduce your seat count below.</span>
+    </div>
+  <% } %>
 
-            <% if (seatsAvailable < numSeats) { %>
-            <div class="alert-warn">⚠ Only <%= seatsAvailable %> seat(s) available. Please reduce seat count.</div>
-            <% } %>
+  <!-- FARE SUMMARY -->
+  <div class="fare-card">
+    <div class="fare-head">💰 Fare Summary</div>
+    <div class="fare-body">
+      <div class="fare-row">
+        <span class="fare-row-label">Price per Seat</span>
+        <span class="fare-row-val">₹ <%= String.format("%.2f", price) %></span>
+      </div>
+      <div class="fare-row">
+        <span class="fare-row-label">Number of Seats</span>
+        <span class="fare-row-val" id="seatsDisplay"><%= numSeats %></span>
+      </div>
+    </div>
+    <div class="fare-total-row">
+      <span class="fare-total-label">Total Amount</span>
+      <span class="fare-total-val" id="totalDisplay">₹ <%= String.format("%.2f", totalAmount) %></span>
+    </div>
+  </div>
 
-            <!-- FARE SUMMARY -->
-            <div class="fare-box">
-                <div class="fare-title">💰 Fare Summary</div>
-                <div class="fare-row"><span>Price per Seat</span><span>₹ <%= String.format("%.2f", price) %></span></div>
-                <div class="fare-row"><span>Number of Seats</span><span id="seatsDisplay"><%= numSeats %></span></div>
-                <div class="fare-row total"><span>Total Amount</span><span id="totalDisplay">₹ <%= String.format("%.2f", totalAmount) %></span></div>
-            </div>
+  <!-- BOOKING FORM (action, method, all name attrs preserved exactly) -->
+  <div class="form-section">
+    <div class="form-section-head">✈ Confirm Your Booking</div>
+    <div class="form-section-body">
+      <form action="${pageContext.request.contextPath}/bookFlight" method="post" id="bookForm">
+        <input type="hidden" name="_csrf"     value="<%= HtmlUtils.e(csrfToken) %>">
+        <input type="hidden" name="flightId"  value="<%= flightId %>">
 
-            <hr class="divider">
-
-            <form action="${pageContext.request.contextPath}/bookFlight" method="post">
-                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
-                <input type="hidden" name="flightId" value="<%= flightId %>">
-                <div class="field">
-                    <label>Number of Seats</label>
-                    <div class="field-wrap">
-                        <span class="field-icon">💺</span>
-                        <input type="number" name="numSeats" min="1" max="<%= seatsAvailable %>"
-                               value="<%= numSeats %>" required oninput="updateTotal(this.value)">
-                    </div>
-                </div>
-                <button type="submit" class="btn-primary" <%= seatsAvailable == 0 ? "disabled" : "" %>>
-                    ✅ Confirm Booking →
-                </button>
-            </form>
-
-            <a href="javascript:history.back()" class="back-link">← Back to Results</a>
+        <div class="seat-field">
+          <label>Number of Seats</label>
+          <div class="seat-input-wrap">
+            <span class="seat-input-icon">💺</span>
+            <input type="number" name="numSeats"
+                   min="1" max="<%= seatsAvailable %>"
+                   value="<%= numSeats %>" required
+                   oninput="updateTotal(this.value)">
+          </div>
         </div>
+
+        <button type="submit" class="btn-confirm" id="btnConfirm"
+                <%= seatsAvailable == 0 ? "disabled" : "" %>>
+          <span>✅ Confirm Booking</span><span>→</span>
+        </button>
+      </form>
     </div>
+  </div>
+
+  <a href="javascript:history.back()" class="back-link">← Back to Results</a>
+
 </div>
 
+<script src="${pageContext.request.contextPath}/assests/js/main.js"></script>
 <script>
-const savedTheme=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-document.documentElement.setAttribute('data-theme',savedTheme);
-document.getElementById('themeToggle').textContent=savedTheme==='dark'?'☀️':'🌙';
-function toggleTheme(){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('aerosphere-theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';}
-const pricePerSeat = <%= price %>;
-function updateTotal(seats) {
-    const n = Math.max(1, parseInt(seats)||1);
+  var pricePerSeat = <%= price %>;
+
+  function updateTotal(seats) {
+    var n = Math.max(1, parseInt(seats) || 1);
     document.getElementById('seatsDisplay').textContent = n;
     document.getElementById('totalDisplay').textContent = '₹ ' + (pricePerSeat * n).toFixed(2);
-}
+  }
+
+  // Ripple on confirm button
+  document.getElementById('btnConfirm').addEventListener('click', function(e) {
+    var r = document.createElement('span');
+    var rect = this.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height);
+    r.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,.28);width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px;transform:scale(0);animation:rippleAnim .6s linear;pointer-events:none';
+    this.appendChild(r);
+    r.addEventListener('animationend', function() { r.remove(); });
+  });
 </script>
-</body></html>
+</body>
+</html>

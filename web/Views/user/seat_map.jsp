@@ -1,254 +1,738 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.flightapp.model.*, com.flightapp.dao.*, java.util.*" %>
 <%
-    String userName = (String) session.getAttribute("userName");
-    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
-    String flightId  = request.getParameter("flightId")     != null ? request.getParameter("flightId")     : "";
-    String numSeats  = request.getParameter("numSeats")     != null ? request.getParameter("numSeats")     : "1";
-    String flightNo  = request.getParameter("flightNo")     != null ? request.getParameter("flightNo")     : "";
-    String source    = request.getParameter("source")       != null ? request.getParameter("source")       : "";
-    String dest      = request.getParameter("destination")  != null ? request.getParameter("destination")  : "";
-    int numSeatsInt = 1;
-    try { numSeatsInt = Integer.parseInt(numSeats); if (numSeatsInt < 1) numSeatsInt = 1; } catch (NumberFormatException ignored) { numSeatsInt = 1; numSeats = "1"; }
-    String csrfToken = CsrfUtil.getToken(request);
+    HttpSession sess = request.getSession(false);
+    String userEmail = (sess != null) ? (String) sess.getAttribute("userEmail") : null;
+    if (userEmail == null) { response.sendRedirect("login.jsp"); return; }
+
+    // ── Preserve all existing attribute/param reads ──
+    String bookingId    = request.getParameter("bookingId");
+    if (bookingId == null) bookingId = (String) request.getAttribute("bookingId");
+
+    String flightNo     = (String) request.getAttribute("flightNo");
+    String from         = (String) request.getAttribute("from");
+    String to           = (String) request.getAttribute("to");
+    String travelClass  = (String) request.getAttribute("travelClass");
+    int    passCount    = 1;
+    try {
+        String pc = (String) request.getAttribute("passengers");
+        if (pc != null) passCount = Integer.parseInt(pc.trim());
+    } catch(Exception e) { /* default 1 */ }
+
+    // Occupied seats — comma-separated string from servlet/DAO
+    String occupiedSeatsStr = (String) request.getAttribute("occupiedSeats");
+    if (occupiedSeatsStr == null) occupiedSeatsStr = "";
+
+    // Pre-selected seats (if re-visiting) — comma-separated
+    String selectedSeatsStr = (String) request.getAttribute("selectedSeats");
+    if (selectedSeatsStr == null) selectedSeatsStr = "";
 %>
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Select Seats – AeroSphere</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--primary:#10B981;--primary-dark:#059669;--primary-glow:rgba(16,185,129,.18);--bg:#FAFAF9;--card-bg:#FFFFFF;--text:#1C1917;--text-muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px}
-[data-theme="dark"]{--primary:#10B981;--primary-dark:#34D399;--primary-glow:rgba(16,185,129,.22);--bg:#0A0A0A;--card-bg:#141414;--text:#F5F5F4;--text-muted:#9CA3AF;--border:#262626;--shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.5)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-.navbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--card-bg);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.brand-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px var(--primary-glow)}
-.brand-name{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}.brand-name span{color:var(--primary)}
-.nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:8px;font-size:.86rem;font-weight:500;transition:all .2s}
-.nav-link:hover{color:var(--text);background:var(--border)}.nav-link.active{color:var(--primary);background:var(--primary-glow)}.nav-link.btn-danger{color:#DC2626;background:rgba(220,38,38,.08)}
-.theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
-/* PAGE */
-.page-wrapper{max-width:1100px;margin:0 auto;padding:28px 24px}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;animation:fadeUp .5s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.page-title{font-size:1.4rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
-.page-subtitle{color:var(--text-muted);font-size:.9rem}
-/* FLIGHT INFO CARD */
-.flight-info{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;box-shadow:var(--shadow);flex-wrap:wrap;animation:fadeUp .5s ease both .05s;position:relative;overflow:hidden}
-.flight-info::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),#34D399,var(--primary))}
-.fi-route{display:flex;align-items:center;gap:14px}
-.fi-code{font-size:1.6rem;font-weight:900;letter-spacing:-1px}
-.fi-city{font-size:.76rem;color:var(--text-muted);margin-top:2px;text-align:center}
-.fi-arrow{color:var(--primary);font-size:1.2rem;padding:0 4px}
-.fi-meta{display:flex;gap:20px;flex-wrap:wrap}
-.fi-item{text-align:center}
-.fi-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
-.fi-value{font-weight:700;font-size:.9rem;margin-top:2px;color:var(--primary)}
-/* LEGEND */
-.legend{display:flex;gap:18px;align-items:center;margin-bottom:18px;flex-wrap:wrap;animation:fadeUp .5s ease both .1s}
-.legend-item{display:flex;align-items:center;gap:7px;font-size:.82rem;color:var(--text-muted)}
-.legend-dot{width:22px;height:22px;border-radius:6px}
-.ld-available{background:var(--primary-glow);border:1.5px solid var(--primary)}
-.ld-selected{background:var(--primary);border:1.5px solid var(--primary-dark)}
-.ld-booked{background:rgba(239,68,68,.12);border:1.5px solid rgba(239,68,68,.3)}
-/* TWO COL */
-.two-col{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
-/* PLANE CARD */
-.plane-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);animation:fadeUp .5s ease both .15s}
-.plane-nose{text-align:center;margin-bottom:18px;font-size:2.2rem;opacity:.3}
-.col-labels{display:grid;grid-template-columns:repeat(3,50px) 36px repeat(3,50px);gap:5px;justify-content:center;margin-bottom:8px}
-.col-labels span{text-align:center;font-size:.68rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
-.seat-row{display:grid;grid-template-columns:repeat(3,50px) 36px repeat(3,50px);gap:5px;justify-content:center;margin-bottom:5px;align-items:center}
-.row-no{text-align:center;font-size:.74rem;color:var(--text-muted);line-height:50px}
-.seat{width:50px;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700;cursor:pointer;background:var(--primary-glow);border:1.5px solid var(--primary);color:var(--primary);transition:all .15s;user-select:none}
-.seat:hover{background:rgba(16,185,129,.35);transform:scale(1.07)}
-.seat.selected{background:var(--primary);border-color:var(--primary-dark);color:#fff;transform:scale(1.1);box-shadow:0 3px 10px var(--primary-glow)}
-.seat.booked{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:rgba(239,68,68,.5);cursor:not-allowed}
-.seat.booked:hover{transform:none}
-/* SUMMARY PANEL */
-.summary-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px;position:sticky;top:74px;box-shadow:var(--shadow);animation:fadeUp .5s ease both .2s}
-.sp-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.sp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.87rem}
-.sp-row:last-of-type{border-bottom:none}
-.sp-key{color:var(--text-muted)}
-.sp-val{font-weight:600}
-.selected-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.seat-tag{background:var(--primary-glow);border:1px solid var(--primary);border-radius:6px;padding:4px 10px;font-size:.76rem;font-weight:700;color:var(--primary)}
-.btn-proceed{width:100%;padding:13px;margin-top:16px;background:var(--primary);border:none;border-radius:10px;color:#fff;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;opacity:.45;pointer-events:none;box-shadow:0 3px 10px var(--primary-glow)}
-.btn-proceed.ready{opacity:1;pointer-events:all}.btn-proceed.ready:hover{background:var(--primary-dark);transform:translateY(-1px)}
-.btn-back{display:block;text-decoration:none;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:9px 16px;text-align:center;font-size:.84rem;font-weight:600;margin-top:10px;transition:all .2s}
-.btn-back:hover{border-color:var(--primary);color:var(--primary)}
-@media(max-width:800px){.two-col{grid-template-columns:1fr}.summary-panel{position:static}}
-@media(max-width:480px){.col-labels,.seat-row{grid-template-columns:repeat(3,42px) 28px repeat(3,42px)}.seat{width:42px;height:42px;font-size:.7rem}}
-</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Seat Selection — <%= flightNo != null ? flightNo : "Flight" %></title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" href="assests/css/style.css"/>
+    <link rel="stylesheet" href="assests/css/animations.css"/>
+
+    <style>
+        .sm-page {
+            min-height: 100vh;
+            background: var(--bg-0);
+            background-image:
+                radial-gradient(ellipse 50% 40% at 80% 10%, rgba(14,165,233,.1) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 30% at 20% 80%, rgba(16,185,129,.07) 0%, transparent 60%);
+        }
+        .sm-wrapper {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ── Header ── */
+        .sm-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            animation: fadeDown .5s ease both;
+        }
+        .sm-back-btn {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--surface-1);
+            color: var(--text-secondary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            font-size: .9rem;
+        }
+        .sm-back-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .sm-title-block { flex: 1; }
+        .sm-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .sm-subtitle {
+            font-size: .85rem;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            margin-top: .2rem;
+        }
+        .sm-pass-pill {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .5rem 1rem;
+            border-radius: 20px;
+            background: rgba(14,165,233,.1);
+            border: 1px solid rgba(14,165,233,.2);
+            color: var(--accent-blue);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        /* ── Layout: cabin + sidebar ── */
+        .sm-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* ── Cabin card ── */
+        .cabin-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            animation: fadeUp .5s .1s ease both;
+        }
+        .cabin-card-header {
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cabin-card-header .cht {
+            font-family: 'Syne', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Legend */
+        .seat-legend {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .75rem;
+            color: var(--text-muted);
+        }
+        .leg-box {
+            width: 18px; height: 18px;
+            border-radius: 5px;
+            flex-shrink: 0;
+        }
+        .leg-box.available { background: var(--surface-2); border: 1.5px solid var(--border); }
+        .leg-box.occupied  { background: rgba(239,68,68,.25); border: 1.5px solid rgba(239,68,68,.4); }
+        .leg-box.selected  { background: var(--grad-brand); }
+        .leg-box.business  { background: rgba(14,165,233,.2); border: 1.5px solid rgba(14,165,233,.35); }
+
+        /* ── Airplane body ── */
+        .airplane-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+
+        /* Nose */
+        .plane-nose {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .plane-nose-inner {
+            width: 120px;
+            height: 50px;
+            background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
+            border: 1px solid var(--border);
+            border-radius: 60px 60px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            opacity: .5;
+        }
+
+        /* Class label */
+        .class-label {
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin: .8rem 0 .5rem;
+            padding: .3rem 0;
+            border-top: 1px dashed var(--border);
+            border-bottom: 1px dashed var(--border);
+        }
+        .class-label.business { color: var(--accent-blue); }
+        .class-label.economy  { color: var(--text-muted); }
+
+        /* Seat row container */
+        .seat-rows {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+        }
+        .seat-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .25rem;
+        }
+        .row-num {
+            width: 28px;
+            text-align: center;
+            font-family: 'DM Mono', monospace;
+            font-size: .7rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .seat-aisle {
+            width: 24px;
+            flex-shrink: 0;
+        }
+
+        /* The seat itself */
+        .seat {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px 8px 5px 5px;
+            border: 1.5px solid var(--border);
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .65rem;
+            font-family: 'DM Mono', monospace;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .seat::before {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 4px; right: 4px;
+            height: 4px;
+            background: inherit;
+            border-radius: 0 0 4px 4px;
+            opacity: .6;
+        }
+        .seat:hover:not(.occupied):not(.selected) {
+            border-color: var(--accent-blue);
+            background: rgba(14,165,233,.12);
+            color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14,165,233,.2);
+        }
+        .seat.occupied {
+            background: rgba(239,68,68,.1);
+            border-color: rgba(239,68,68,.3);
+            cursor: not-allowed;
+            color: rgba(239,68,68,.5);
+        }
+        .seat.occupied::after {
+            content: '✕';
+            font-size: .6rem;
+            position: absolute;
+        }
+        .seat.selected {
+            background: var(--grad-brand);
+            border-color: transparent;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(14,165,233,.35);
+            animation: seatPop .25s ease;
+        }
+        .seat.business-class {
+            background: rgba(14,165,233,.08);
+            border-color: rgba(14,165,233,.2);
+            width: 42px; height: 42px;
+            border-radius: 10px 10px 6px 6px;
+        }
+        .seat.business-class:hover:not(.occupied):not(.selected) {
+            border-color: var(--accent-blue);
+            background: rgba(14,165,233,.2);
+        }
+
+        @keyframes seatPop {
+            0%   { transform: translateY(-2px) scale(1.2); }
+            100% { transform: translateY(-2px) scale(1); }
+        }
+
+        /* ── Sidebar ── */
+        .sm-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .sm-sidebar-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            animation: fadeUp .5s .2s ease both;
+            position: relative;
+        }
+        .sm-sidebar-card::before {
+            content: '';
+            display: block;
+            height: 3px;
+            background: var(--grad-brand);
+        }
+        .sm-sc-header {
+            padding: 1rem 1.4rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Syne', sans-serif;
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Route mini-display */
+        .sm-route {
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .sm-route-city { text-align: center; }
+        .sm-route-code {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .sm-route-name {
+            font-size: .7rem;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+        }
+        .sm-route-arrow { color: var(--accent-blue); font-size: 1rem; }
+
+        /* Selected seat display */
+        .selected-seats-list {
+            padding: 1rem 1.4rem;
+            min-height: 80px;
+        }
+        .ssl-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            padding: 1rem 0;
+        }
+        .ssl-seat-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+        .ssl-chip {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            padding: .35rem .75rem;
+            border-radius: 20px;
+            background: rgba(14,165,233,.12);
+            border: 1px solid rgba(14,165,233,.25);
+            font-family: 'DM Mono', monospace;
+            font-size: .8rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+            animation: chipIn .2s ease both;
+        }
+        .ssl-chip button {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            padding: 0;
+            font-size: .7rem;
+            opacity: .6;
+            transition: opacity .2s;
+            line-height: 1;
+        }
+        .ssl-chip button:hover { opacity: 1; }
+        @keyframes chipIn {
+            from { opacity:0; transform:scale(.8); }
+            to   { opacity:1; transform:scale(1); }
+        }
+
+        /* Progress indicator */
+        .sm-progress-bar {
+            padding: .75rem 1.4rem;
+            border-top: 1px solid var(--border);
+        }
+        .sm-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .75rem;
+            color: var(--text-muted);
+            margin-bottom: .4rem;
+        }
+        .sm-progress-track {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--surface-2);
+            overflow: hidden;
+        }
+        .sm-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--grad-brand);
+            transition: width .4s ease;
+        }
+
+        /* Confirm button */
+        .btn-confirm-seats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            width: 100%;
+            padding: .9rem;
+            background: var(--grad-brand);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .3s;
+            margin: 1rem 1.4rem;
+            width: calc(100% - 2.8rem);
+        }
+        .btn-confirm-seats:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(14,165,233,.35);
+        }
+        .btn-confirm-seats:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        /* ── Seat info tip ── */
+        .seat-tip {
+            padding: .8rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .78rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+        .seat-tip i { color: var(--accent-blue); flex-shrink: 0; }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(18px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes fadeDown {
+            from { opacity:0; transform:translateY(-12px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        @media (max-width: 860px) {
+            .sm-layout { grid-template-columns: 1fr; }
+            .sm-sidebar { order: -1; }
+            .seat { width: 30px; height: 30px; font-size: .6rem; }
+            .seat.business-class { width: 34px; height: 34px; }
+        }
+        @media (max-width: 480px) {
+            .airplane-body { padding: 1rem; }
+            .seat { width: 26px; height: 26px; border-radius: 5px 5px 3px 3px; }
+            .seat.business-class { width: 30px; height: 30px; }
+            .row-num { width: 20px; font-size: .6rem; }
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-        <div class="brand-icon">✈</div><span class="brand-name">Aero<span>Sphere</span></span>
-    </a>
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link ">🏠 Dashboard</a>
-        <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link ">🔍 Search</a>
-        <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link ">✈️ All Flights</a>
-        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link ">🎫 My Bookings</a>
-        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link ">💸 Refunds</a>
-        <a href="${pageContext.request.contextPath}/profile"           class="nav-link ">👤 Profile</a>
-        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
-    </div>
-</nav>
+<div class="sm-page">
+    <%@ include file="common/navbar.jsp" %>
 
-<div class="page-wrapper">
-    <div class="page-header">
-        <div>
-            <div class="page-title">💺 Select Your Seats</div>
-            <div class="page-subtitle">Choose <%= numSeatsInt %> seat<%= numSeatsInt > 1 ? "s" : "" %> for your journey</div>
-        </div>
-        <a href="${pageContext.request.contextPath}/searchFlights" class="nav-link" style="border:1px solid var(--border);border-radius:8px">← Change Flight</a>
-    </div>
+    <div class="sm-wrapper">
 
-    <!-- FLIGHT INFO -->
-    <div class="flight-info">
-        <div class="fi-route">
-            <div>
-                <div class="fi-code"><%= source.length()>=3?source.substring(0,3).toUpperCase():source.toUpperCase() %></div>
-                <div class="fi-city"><%= source %></div>
-            </div>
-            <div class="fi-arrow">✈ ──</div>
-            <div>
-                <div class="fi-code"><%= dest.length()>=3?dest.substring(0,3).toUpperCase():dest.toUpperCase() %></div>
-                <div class="fi-city"><%= dest %></div>
-            </div>
-        </div>
-        <div class="fi-meta">
-            <div class="fi-item"><div class="fi-label">Flight</div><div class="fi-value"><%= flightNo %></div></div>
-            <div class="fi-item"><div class="fi-label">Passengers</div><div class="fi-value"><%= numSeats %></div></div>
-        </div>
-    </div>
-
-    <!-- LEGEND -->
-    <div class="legend">
-        <div class="legend-item"><div class="legend-dot ld-available"></div> Available</div>
-        <div class="legend-item"><div class="legend-dot ld-selected"></div> Selected</div>
-        <div class="legend-item"><div class="legend-dot ld-booked"></div> Booked</div>
-    </div>
-
-    <div class="two-col">
-        <!-- SEAT MAP -->
-        <div>
-            <div class="plane-card">
-                <div class="plane-nose">✈</div>
-                <div class="col-labels">
-                    <span>A</span><span>B</span><span>C</span><span></span><span>D</span><span>E</span><span>F</span>
+        <!-- Header -->
+        <div class="sm-header">
+            <a href="javascript:history.back()" class="sm-back-btn"><i class="fa fa-arrow-left"></i></a>
+            <div class="sm-title-block">
+                <div class="sm-title">Select Your Seat<%= passCount > 1 ? "s" : "" %></div>
+                <div class="sm-subtitle">
+                    Flight <%= flightNo != null ? flightNo : "—" %>
+                    <% if (from != null && to != null) { %>
+                        &nbsp;·&nbsp; <%= from %> → <%= to %>
+                    <% } %>
                 </div>
-                <div id="seatMap"></div>
+            </div>
+            <div class="sm-pass-pill">
+                <i class="fa fa-user-group"></i>
+                <%= passCount %> passenger<%= passCount > 1 ? "s" : "" %>
             </div>
         </div>
 
-        <!-- SUMMARY -->
-        <div class="summary-panel">
-            <div class="sp-title">🎫 Booking Summary</div>
-            <div class="sp-row"><span class="sp-key">Route</span><span class="sp-val" style="color:var(--primary)"><%= source.length()>=3?source.substring(0,3).toUpperCase():source %> → <%= dest.length()>=3?dest.substring(0,3).toUpperCase():dest %></span></div>
-            <div class="sp-row"><span class="sp-key">Flight</span><span class="sp-val"><%= flightNo %></span></div>
-            <div class="sp-row"><span class="sp-key">Passengers</span><span class="sp-val"><%= numSeats %></span></div>
-            <div class="sp-row"><span class="sp-key">Selected</span><span class="sp-val" id="selectedCount" style="color:var(--primary)">0 / <%= numSeats %></span></div>
-            <div class="selected-tags" id="selectedList"></div>
-            <form action="${pageContext.request.contextPath}/bookFlight" method="post" id="proceedForm">
-                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
-                <input type="hidden" name="flightId" value="<%= flightId %>">
-                <input type="hidden" name="numSeats" value="<%= numSeats %>">
-                <input type="hidden" name="selectedSeats" id="selectedSeatsInput" value="">
-                <button type="submit" class="btn-proceed" id="proceedBtn">Proceed to Book →</button>
-            </form>
-            <a href="${pageContext.request.contextPath}/searchFlights" class="btn-back">← Back to Search</a>
+        <div class="sm-layout">
+            <!-- ═══ CABIN ═══ -->
+            <div class="cabin-card">
+                <div class="cabin-card-header">
+                    <span class="cht">✈ Cabin View</span>
+                    <div class="seat-legend">
+                        <div class="leg-item"><div class="leg-box available"></div> Available</div>
+                        <div class="leg-item"><div class="leg-box occupied"></div> Taken</div>
+                        <div class="leg-item"><div class="leg-box selected"></div> Selected</div>
+                        <div class="leg-item"><div class="leg-box business"></div> Business</div>
+                    </div>
+                </div>
+
+                <div class="airplane-body">
+                    <div class="plane-nose">
+                        <div class="plane-nose-inner">✈</div>
+                    </div>
+
+                    <!-- Business class: rows 1–4, seats A–D (4-wide) -->
+                    <div class="class-label business">✦ Business Class ✦</div>
+                    <div class="seat-rows" id="businessRows"></div>
+
+                    <!-- Economy class: rows 5–30, seats A–F (6-wide) -->
+                    <div class="class-label economy">— Economy Class —</div>
+                    <div class="seat-rows" id="economyRows"></div>
+                </div>
+            </div>
+
+            <!-- ═══ SIDEBAR ═══ -->
+            <div class="sm-sidebar">
+                <div class="sm-sidebar-card">
+                    <div class="sm-sc-header"><i class="fa fa-plane" style="color:var(--accent-blue);margin-right:.4rem;"></i> Flight Details</div>
+                    <div class="sm-route">
+                        <div class="sm-route-city">
+                            <div class="sm-route-code"><%= from != null ? from.substring(0, Math.min(3, from.length())).toUpperCase() : "DEP" %></div>
+                            <div class="sm-route-name"><%= from != null ? from : "—" %></div>
+                        </div>
+                        <i class="fa fa-arrow-right sm-route-arrow"></i>
+                        <div class="sm-route-city">
+                            <div class="sm-route-code"><%= to != null ? to.substring(0, Math.min(3, to.length())).toUpperCase() : "ARR" %></div>
+                            <div class="sm-route-name"><%= to != null ? to : "—" %></div>
+                        </div>
+                    </div>
+
+                    <div class="sm-sc-header" style="border-top:1px solid var(--border);">Selected Seats</div>
+                    <div class="selected-seats-list" id="selectedSeatsList">
+                        <div class="ssl-empty" id="sslEmpty">
+                            <i class="fa fa-chair" style="display:block;font-size:1.5rem;margin-bottom:.5rem;opacity:.3;"></i>
+                            Tap a seat to select
+                        </div>
+                        <div class="ssl-seat-chips" id="sslChips"></div>
+                    </div>
+
+                    <div class="sm-progress-bar">
+                        <div class="sm-progress-label">
+                            <span id="selCount">0</span> of <%= passCount %> selected
+                            <span id="selStatus"></span>
+                        </div>
+                        <div class="sm-progress-track">
+                            <div class="sm-progress-fill" id="selProgressFill" style="width:0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="seat-tip">
+                        <i class="fa fa-circle-info"></i>
+                        Select exactly <%= passCount %> seat<%= passCount > 1 ? "s" : "" %> to continue
+                    </div>
+
+                    <!-- FORM — business logic preserved -->
+                    <form action="SeatSelectionServlet" method="POST">
+                        <input type="hidden" name="bookingId" value="<%= bookingId %>"/>
+                        <input type="hidden" name="selectedSeats" id="selectedSeatsInput"/>
+                        <button type="submit" class="btn-confirm-seats" id="confirmBtn" disabled>
+                            <i class="fa fa-check-circle"></i> Confirm Seats
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
+
     </div>
+    <%@ include file="common/footer.jsp" %>
 </div>
 
+<script src="assests/js/main.js"></script>
 <script>
-// Theme
-const t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-document.documentElement.setAttribute('data-theme',t);
-document.getElementById('themeToggle').textContent=t==='dark'?'☀️':'🌙';
-function toggleTheme(){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('aerosphere-theme',n);document.getElementById('themeToggle').textContent=n==='dark'?'☀️':'🌙';}
+    /* ── Config from JSP ── */
+    const MAX_SEATS      = <%= passCount %>;
+    const TRAVEL_CLASS   = '<%= travelClass != null ? travelClass.toLowerCase() : "economy" %>';
+    const OCCUPIED_SEATS = '<%= occupiedSeatsStr %>'.split(',').filter(Boolean);
+    const PRE_SELECTED   = '<%= selectedSeatsStr %>'.split(',').filter(Boolean);
 
-// Seat Map Logic
-const ROWS = 30, COLS = ['A','B','C','D','E','F'];
-const MAX_SEATS = parseInt('<%= numSeats %>');
-let selected = [];
-let bookedSeats = [];
+    let selectedSeats = [...PRE_SELECTED];
 
-// Fetch booked seats then render
-fetch('${pageContext.request.contextPath}/getBookedSeats?flightId=<%= flightId %>')
-    .then(r => r.json())
-    .then(data => { bookedSeats = data || []; renderMap(); })
-    .catch(() => renderMap());
+    /* ── Build seat map ── */
+    const BUSINESS_ROWS = [1,2,3,4];
+    const ECONOMY_ROWS  = Array.from({length:26}, (_,i) => i + 5);
+    const BUS_COLS      = ['A','B','C','D'];
+    const ECO_COLS      = ['A','B','C','D','E','F'];
 
-function renderMap() {
-    const map = document.getElementById('seatMap');
-    map.innerHTML = '';
-    for (let row = 1; row <= ROWS; row++) {
-        const rowEl = document.createElement('div');
-        rowEl.className = 'seat-row';
-        COLS.forEach((col, ci) => {
-            if (ci === 3) {
-                const aisle = document.createElement('div');
-                aisle.className = 'row-no';
-                aisle.textContent = row;
-                rowEl.appendChild(aisle);
-            }
-            const seatId = row + col;
-            const seat = document.createElement('div');
-            seat.className = 'seat';
-            seat.textContent = seatId;
-            seat.dataset.seat = seatId;
-            if (bookedSeats.includes(seatId)) {
-                seat.classList.add('booked');
-            } else {
-                seat.addEventListener('click', () => toggleSeat(seat, seatId));
-            }
-            rowEl.appendChild(seat);
+    function buildRows(rows, cols, containerId, isBusinessClass) {
+        const container = document.getElementById(containerId);
+        rows.forEach(rowNum => {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'seat-row';
+
+            // Row number
+            const rn = document.createElement('div');
+            rn.className = 'row-num';
+            rn.textContent = rowNum;
+            rowEl.appendChild(rn);
+
+            cols.forEach((col, colIdx) => {
+                // Aisle gap (middle)
+                if (cols.length === 6 && colIdx === 3) {
+                    const aisle = document.createElement('div');
+                    aisle.className = 'seat-aisle';
+                    rowEl.appendChild(aisle);
+                }
+                if (cols.length === 4 && colIdx === 2) {
+                    const aisle = document.createElement('div');
+                    aisle.className = 'seat-aisle';
+                    rowEl.appendChild(aisle);
+                }
+
+                const seatId = rowNum + col;
+                const btn = document.createElement('div');
+                btn.className = 'seat' + (isBusinessClass ? ' business-class' : '');
+                btn.dataset.seatId = seatId;
+                btn.textContent = col;
+                btn.title = 'Seat ' + seatId;
+
+                if (OCCUPIED_SEATS.includes(seatId)) {
+                    btn.classList.add('occupied');
+                } else if (selectedSeats.includes(seatId)) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.addEventListener('click', () => toggleSeat(seatId, btn));
+                }
+                rowEl.appendChild(btn);
+            });
+            container.appendChild(rowEl);
         });
-        map.appendChild(rowEl);
     }
-    updateSummary();
-}
 
-function toggleSeat(el, seatId) {
-    if (el.classList.contains('booked')) return;
-    if (el.classList.contains('selected')) {
-        el.classList.remove('selected');
-        selected = selected.filter(s => s !== seatId);
-    } else {
-        if (selected.length >= MAX_SEATS) {
-            const first = selected[0];
-            const firstEl = document.querySelector(`[data-seat="${first}"]`);
-            if (firstEl) firstEl.classList.remove('selected');
-            selected.shift();
+    buildRows(BUSINESS_ROWS, BUS_COLS, 'businessRows', true);
+    buildRows(ECONOMY_ROWS,  ECO_COLS, 'economyRows',  false);
+
+    /* ── Toggle seat selection ── */
+    function toggleSeat(seatId, btn) {
+        const idx = selectedSeats.indexOf(seatId);
+        if (idx > -1) {
+            // Deselect
+            selectedSeats.splice(idx, 1);
+            btn.classList.remove('selected');
+        } else {
+            if (selectedSeats.length >= MAX_SEATS) {
+                // Shake existing selection indicator
+                document.getElementById('selectedSeatsList').style.animation = 'shake .3s ease';
+                setTimeout(() => document.getElementById('selectedSeatsList').style.animation = '', 400);
+                return;
+            }
+            selectedSeats.push(seatId);
+            btn.classList.add('selected');
         }
-        el.classList.add('selected');
-        selected.push(seatId);
+        updateUI();
     }
-    updateSummary();
-}
 
-function updateSummary() {
-    document.getElementById('selectedCount').textContent = selected.length + ' / ' + MAX_SEATS;
-    document.getElementById('selectedSeatsInput').value = selected.join(',');
-    const listEl = document.getElementById('selectedList');
-    listEl.innerHTML = selected.map(s => `<span class="seat-tag">${s}</span>`).join('');
-    const btn = document.getElementById('proceedBtn');
-    if (selected.length === MAX_SEATS) {
-        btn.classList.add('ready');
-    } else {
-        btn.classList.remove('ready');
+    /* ── Update sidebar UI ── */
+    function updateUI() {
+        const count   = selectedSeats.length;
+        const percent = (count / MAX_SEATS) * 100;
+
+        document.getElementById('selCount').textContent = count;
+        document.getElementById('selProgressFill').style.width = percent + '%';
+        document.getElementById('selectedSeatsInput').value = selectedSeats.join(',');
+
+        const confirmBtn = document.getElementById('confirmBtn');
+        confirmBtn.disabled = count !== MAX_SEATS;
+
+        const statusEl = document.getElementById('selStatus');
+        if (count === MAX_SEATS) {
+            statusEl.textContent = '✓ Ready';
+            statusEl.style.color = 'var(--accent-green)';
+        } else {
+            statusEl.textContent = (MAX_SEATS - count) + ' more needed';
+            statusEl.style.color = 'var(--text-muted)';
+        }
+
+        // Chips
+        const chips = document.getElementById('sslChips');
+        const empty = document.getElementById('sslEmpty');
+        chips.innerHTML = '';
+        if (count === 0) {
+            empty.style.display = 'block';
+        } else {
+            empty.style.display = 'none';
+            selectedSeats.forEach(sId => {
+                const chip = document.createElement('div');
+                chip.className = 'ssl-chip';
+                chip.innerHTML = `<i class="fa fa-chair"></i> ${sId}
+                    <button onclick="deselect('${sId}')" title="Remove">✕</button>`;
+                chips.appendChild(chip);
+            });
+        }
     }
-}
+
+    /* ── Deselect from chip ── */
+    function deselect(seatId) {
+        const idx = selectedSeats.indexOf(seatId);
+        if (idx > -1) selectedSeats.splice(idx, 1);
+        const btn = document.querySelector('[data-seat-id="' + seatId + '"]');
+        if (btn) btn.classList.remove('selected');
+        updateUI();
+    }
+
+    // Initial render
+    updateUI();
+
+    /* ── Shake keyframe (inline) ── */
+    const shakeStyle = document.createElement('style');
+    shakeStyle.textContent = `
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25%      { transform: translateX(-5px); }
+            75%      { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(shakeStyle);
 </script>
-</body></html>
+</body>
+</html>
