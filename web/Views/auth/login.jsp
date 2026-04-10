@@ -10,297 +10,368 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In – AeroSphere</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In – AeroSphere</title>
+  <script>(function(){var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
+  <style>
+    /* ── LOGIN PAGE SPECIFIC ──────────────────────────────────── */
+    body { min-height:100vh; display:flex; flex-direction:column; }
 
-    <%-- ══ THEME: apply BEFORE body renders to kill the white flash ══ --%>
-    <script>
-        (function(){
-            var t = localStorage.getItem('aerosphere-theme') ||
-                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-theme', t);
-        })();
-    </script>
+    /* Navbar override for auth pages */
+    .auth-nav {
+      position:sticky; top:0; z-index:500;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 40px; height:64px;
+      background:var(--glass-bg);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:var(--glass-blur);
+      -webkit-backdrop-filter:var(--glass-blur);
+      animation:navbarDrop .5s var(--ease) both;
+    }
 
-    <style>
-        :root {
-            --primary: #10B981; --primary-dark: #059669; --primary-glow: rgba(16,185,129,0.2);
-            --accent: #A7F3D0; --bg: #FAFAF9; --card-bg: #FFFFFF; --text: #1C1917;
-            --text-muted: #6B7280; --border: #E5E7EB; --shadow: 0 4px 24px rgba(0,0,0,0.07);
-            --shadow-lg: 0 20px 60px rgba(0,0,0,0.12); --input-bg: #F9FAFB;
-        }
-        [data-theme="dark"] {
-            --primary: #10B981; --primary-dark: #34D399; --primary-glow: rgba(16,185,129,0.25);
-            --accent: #34D399; --bg: #0A0A0A; --card-bg: #141414; --text: #F5F5F4;
-            --text-muted: #9CA3AF; --border: #262626; --shadow: 0 4px 24px rgba(0,0,0,0.5);
-            --shadow-lg: 0 20px 60px rgba(0,0,0,0.6); --input-bg: #1A1A1A;
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; transition: background 0.3s, color 0.3s; }
+    /* Split layout */
+    .auth-layout {
+      flex:1;
+      display:grid;
+      grid-template-columns: 1fr 480px;
+      min-height: calc(100vh - 64px);
+    }
 
-        /* NAVBAR */
-        .navbar {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 48px; border-bottom: 1px solid var(--border);
-            background: var(--card-bg); animation: slideDown 0.5s ease both;
-        }
-        @keyframes slideDown { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
-        .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
-        .brand-icon { width:36px; height:36px; background:var(--primary); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 4px 12px var(--primary-glow); }
-        .brand-name { font-weight:800; font-size:1.15rem; letter-spacing:-0.5px; }
-        .brand-name span { color:var(--primary); }
-        .nav-right { display:flex; align-items:center; gap:8px; }
-        .nav-link { text-decoration:none; color:var(--text-muted); padding:8px 14px; border-radius:8px; font-size:0.88rem; font-weight:500; transition:all 0.2s; }
-        .nav-link:hover { color:var(--text); background:var(--border); }
-        .nav-link.outline { border:1px solid var(--border); color:var(--text); }
-        .nav-link.outline:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-glow); }
-        .theme-toggle { width:34px; height:34px; border:1px solid var(--border); border-radius:8px; background:var(--card-bg); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:all 0.2s; color:var(--text); }
-        .theme-toggle:hover { border-color:var(--primary); }
+    /* Left visual panel */
+    .auth-visual {
+      position:relative;
+      display:flex; flex-direction:column;
+      justify-content:center; padding:64px 56px;
+      background:var(--surface-0);
+      border-right:1px solid var(--border);
+      overflow:hidden;
+      animation:fadeRight .7s var(--ease) both;
+    }
+    .auth-visual-bg {
+      position:absolute; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 50% at 10% 20%, var(--primary-glow) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 80%, var(--secondary-glow) 0%, transparent 60%);
+    }
+    .auth-visual-plane {
+      position:absolute; right:-10px; bottom:40px;
+      font-size:220px; opacity:.035; transform:rotate(-12deg);
+      pointer-events:none; user-select:none; z-index:0;
+      animation:floatAnim 6s ease-in-out infinite;
+    }
+    .auth-visual > * { position:relative; z-index:1; }
 
-        /* LAYOUT */
-        .page-wrapper { flex:1; display:grid; grid-template-columns:1fr 480px; min-height:calc(100vh - 69px); }
+    .auth-tag {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--primary-glow); border:1px solid rgba(14,165,233,.35);
+      border-radius:var(--radius-full); padding:6px 16px;
+      font-size:.76rem; font-weight:700; letter-spacing:.09em;
+      text-transform:uppercase; color:var(--primary); margin-bottom:28px; width:fit-content;
+    }
+    .auth-tag::before {
+      content:''; width:6px; height:6px; background:var(--primary);
+      border-radius:50%; animation:pulseDot 2s infinite;
+    }
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
 
-        /* LEFT PANEL */
-        .visual-panel {
-            display:flex; flex-direction:column; justify-content:center; padding:60px;
-            background: linear-gradient(135deg, var(--primary-glow) 0%, transparent 60%);
-            border-right:1px solid var(--border); position:relative; overflow:hidden;
-            animation: panelIn 0.7s ease both;
-        }
-        @keyframes panelIn { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:translateX(0)} }
-        .visual-panel::after { content:'✈'; position:absolute; right:-20px; bottom:40px; font-size:220px; opacity:0.04; transform:rotate(-15deg); user-select:none; pointer-events:none; }
-        .tag-line {
-            display:inline-flex; align-items:center; gap:8px;
-            background:var(--primary-glow); border:1px solid var(--primary);
-            border-radius:99px; padding:6px 16px; font-size:0.76rem;
-            color:var(--primary); font-weight:600; letter-spacing:0.8px;
-            text-transform:uppercase; margin-bottom:28px; width:fit-content;
-        }
-        .visual-heading { font-size:3rem; font-weight:900; line-height:1.1; letter-spacing:-1.5px; margin-bottom:18px; }
-        .visual-heading .g { color:var(--primary); }
-        .visual-desc { color:var(--text-muted); font-size:0.95rem; line-height:1.7; max-width:380px; margin-bottom:36px; }
-        .feature-pills { display:flex; flex-direction:column; gap:10px; }
-        .pill {
-            display:flex; align-items:center; gap:12px;
-            background:var(--card-bg); border:1px solid var(--border);
-            border-radius:12px; padding:14px 16px; max-width:340px;
-            box-shadow:var(--shadow); transition:all 0.3s;
-        }
-        .pill:hover { border-color:var(--primary); transform:translateX(4px); }
-        .pill-icon { width:34px; height:34px; background:var(--primary-glow); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-        .pill-text strong { display:block; font-size:0.88rem; font-weight:600; }
-        .pill-text span { font-size:0.78rem; color:var(--text-muted); }
+    .auth-heading {
+      font-family:'Syne',sans-serif;
+      font-size:clamp(2.2rem,4vw,3rem);
+      font-weight:800; letter-spacing:-.05em; line-height:1.08;
+      margin-bottom:18px; color:var(--text);
+    }
+    .auth-heading .g {
+      background:var(--grad-brand);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .auth-desc {
+      color:var(--text-muted); font-size:.95rem; line-height:1.7;
+      max-width:380px; margin-bottom:36px;
+    }
 
-        /* LOGIN PANEL */
-        .login-panel {
-            display:flex; align-items:center; justify-content:center; padding:40px 48px;
-            background:var(--bg); animation: panelInR 0.7s cubic-bezier(0.16,1,0.3,1) both 0.1s;
-        }
-        @keyframes panelInR { from{opacity:0;transform:translateX(24px)} to{opacity:1;transform:translateX(0)} }
-        .login-box { width:100%; max-width:340px; }
-        .login-header { margin-bottom:28px; }
-        .login-header h2 { font-size:1.8rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:6px; }
-        .login-header p { color:var(--text-muted); font-size:0.9rem; }
+    /* Feature pills */
+    .feature-pills { display:flex; flex-direction:column; gap:10px; }
+    .fp {
+      display:flex; align-items:center; gap:12px;
+      background:var(--surface-0); border:1px solid var(--border);
+      border-radius:var(--radius); padding:14px 16px; max-width:360px;
+      box-shadow:var(--shadow-sm);
+      transition:border-color var(--trans), transform var(--trans);
+    }
+    .fp:hover { border-color:var(--primary); transform:translateX(5px); }
+    .fp-icon {
+      width:36px; height:36px; background:var(--primary-glow);
+      border-radius:var(--radius-sm); display:flex;
+      align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+    }
+    .fp-title { font-size:.875rem; font-weight:600; margin-bottom:2px; }
+    .fp-sub   { font-size:.76rem; color:var(--text-muted); }
 
-        /* Tabs */
-        .login-tabs {
-            display:flex; background:var(--input-bg); border:1px solid var(--border);
-            border-radius:10px; padding:3px; margin-bottom:24px;
-        }
-        .tab-btn {
-            flex:1; padding:9px; background:none; border:none; border-radius:8px;
-            color:var(--text-muted); font-family:'Inter',sans-serif; font-size:0.85rem;
-            font-weight:600; cursor:pointer; transition:all 0.2s;
-        }
-        .tab-btn.active { background:var(--primary); color:#fff; box-shadow:0 3px 10px var(--primary-glow); }
+    /* Right form panel */
+    .auth-form-panel {
+      display:flex; align-items:center; justify-content:center;
+      padding:40px 48px; background:var(--bg);
+      animation:fadeLeft .7s var(--ease) .1s both;
+    }
+    .auth-form-box { width:100%; max-width:360px; }
 
-        /* Alert */
-        .alert {
-            padding:11px 14px; border-radius:10px; margin-bottom:18px;
-            font-size:0.86rem; font-weight:500; display:flex; align-items:center; gap:8px;
-            background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2);
-            color:#DC2626; animation:shake 0.4s ease;
-        }
-        [data-theme="dark"] .alert { color:#FCA5A5; }
-        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    .auth-form-header { margin-bottom:28px; }
+    .auth-form-header h2 {
+      font-family:'Syne',sans-serif;
+      font-size:1.75rem; font-weight:800; letter-spacing:-.05em; margin-bottom:6px;
+    }
+    .auth-form-header p { color:var(--text-muted); font-size:.9rem; }
 
-        /* Fields */
-        .field { margin-bottom:16px; }
-        .field label { display:block; font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:7px; }
-        .input-wrap { position:relative; }
-        .input-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; pointer-events:none; transition:0.2s; }
-        .input-wrap input {
-            width:100%; background:var(--input-bg); border:1.5px solid var(--border);
-            border-radius:10px; padding:12px 14px 12px 38px; color:var(--text);
-            font-family:'Inter',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s;
-        }
-        .input-wrap input::placeholder { color:var(--text-muted); opacity:0.6; }
-        .input-wrap input:focus { border-color:var(--primary); background:var(--card-bg); box-shadow:0 0 0 3px var(--primary-glow); }
-        .pw-toggle {
-            position:absolute; right:10px; top:50%; transform:translateY(-50%);
-            background:none; border:none; color:var(--text-muted); cursor:pointer;
-            font-size:14px; padding:4px; transition:color 0.2s;
-        }
-        .pw-toggle:hover { color:var(--primary); }
+    /* Tab switcher */
+    .auth-tabs {
+      display:flex; background:var(--surface-1);
+      border:1px solid var(--border-2); border-radius:var(--radius);
+      padding:3px; margin-bottom:24px;
+      position:relative;
+    }
+    .auth-tab-btn {
+      flex:1; padding:9px; background:none; border:none;
+      border-radius:9px; color:var(--text-muted);
+      font-family:'DM Sans',sans-serif; font-size:.875rem; font-weight:600;
+      cursor:pointer; transition:color var(--trans-fast), background var(--trans-fast);
+      position:relative; z-index:1;
+    }
+    .auth-tab-btn.active {
+      background:var(--grad-brand); color:#fff;
+      box-shadow:0 3px 12px var(--primary-glow-lg);
+    }
 
-        /* Submit */
-        .btn-login {
-            width:100%; padding:14px; background:var(--primary); border:none;
-            border-radius:11px; color:#fff; font-family:'Inter',sans-serif;
-            font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.25s;
-            box-shadow:0 6px 20px var(--primary-glow); margin-top:4px;
-            display:flex; align-items:center; justify-content:center; gap:8px;
-        }
-        .btn-login:hover { background:var(--primary-dark); transform:translateY(-2px); box-shadow:0 10px 28px var(--primary-glow); }
-        .btn-login:active { transform:translateY(0); }
+    /* Field */
+    .login-field { margin-bottom:18px; }
+    .login-field label {
+      display:block; font-size:.72rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:.07em;
+      color:var(--text-muted); margin-bottom:7px;
+      transition:color var(--trans-fast);
+    }
+    .login-field:focus-within label { color:var(--primary); }
 
-        .divider { display:flex; align-items:center; gap:10px; margin:20px 0; }
-        .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
-        .divider span { font-size:0.76rem; color:var(--text-muted); }
+    /* Submit btn */
+    .btn-login-submit {
+      width:100%; padding:14px; margin-top:6px;
+      background:var(--grad-brand); border:none;
+      border-radius:var(--radius); color:#fff;
+      font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:700;
+      cursor:pointer; box-shadow:0 6px 20px var(--primary-glow-lg);
+      transition:transform var(--trans-fast), box-shadow var(--trans-fast);
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      position:relative; overflow:hidden;
+    }
+    .btn-login-submit:hover {
+      transform:translateY(-2px);
+      box-shadow:0 10px 28px var(--primary-glow-lg);
+    }
+    .btn-login-submit:active { transform:translateY(0); }
 
-        .register-link { text-align:center; font-size:0.86rem; color:var(--text-muted); }
-        .register-link a { color:var(--primary); text-decoration:none; font-weight:600; }
-        .register-link a:hover { color:var(--primary-dark); }
+    /* Register link */
+    .auth-bottom { text-align:center; font-size:.875rem; color:var(--text-muted); margin-top:20px; }
+    .auth-bottom a { color:var(--primary); font-weight:600; }
+    .auth-bottom a:hover { color:var(--primary-dark); text-decoration:underline; }
 
-        #adminForm { display:none; }
+    #adminForm { display:none; }
 
-        @media(max-width:860px) { .page-wrapper{grid-template-columns:1fr} .visual-panel{display:none} .login-panel{padding:40px 24px} }
-        @media(max-width:480px) { .navbar{padding:14px 20px} }
-    </style>
+    @media(max-width:860px) {
+      .auth-layout { grid-template-columns:1fr }
+      .auth-visual  { display:none }
+      .auth-form-panel { padding:40px 24px }
+    }
+    @media(max-width:480px) {
+      .auth-nav { padding:0 20px }
+      .auth-form-panel { padding:32px 16px }
+    }
+  </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/" class="nav-brand">
-        <div class="brand-icon">✈</div>
-        <span class="brand-name">Aero<span>Sphere</span></span>
-    </a>
-    <div class="nav-right">
-        <a href="${pageContext.request.contextPath}/" class="nav-link">Home</a>
-        <a href="${pageContext.request.contextPath}/register" class="nav-link outline">Create Account</a>
-        <%-- Icon set by inline script below after theme is known --%>
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeToggle">🌙</button>
-    </div>
+<nav class="auth-nav">
+  <a href="${pageContext.request.contextPath}/" class="nav-brand">
+    <div class="brand-icon">✈</div>
+    <span class="brand-name">Aero<span>Sphere</span></span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="${pageContext.request.contextPath}/" class="btn btn-ghost btn-sm">Home</a>
+    <a href="${pageContext.request.contextPath}/register" class="btn btn-ghost btn-sm">Create Account</a>
+    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()" aria-label="Toggle theme">🌙</button>
+  </div>
 </nav>
 
-<!-- MAIN -->
-<div class="page-wrapper">
+<!-- LAYOUT -->
+<div class="auth-layout">
 
-    <!-- LEFT VISUAL -->
-    <div class="visual-panel">
-        <div class="tag-line">✦ AeroSphere Airlines</div>
-        <h1 class="visual-heading">Your Next<br><span class="g">Adventure</span><br>Awaits.</h1>
-        <p class="visual-desc">Book flights, manage reservations and track your journeys — all in one place. Built for the modern traveller.</p>
-        <div class="feature-pills">
-            <div class="pill"><div class="pill-icon">✈</div><div class="pill-text"><strong>Instant Booking</strong><span>Reserve seats in under 2 minutes</span></div></div>
-            <div class="pill"><div class="pill-icon">📋</div><div class="pill-text"><strong>Manage Trips</strong><span>View, modify or cancel any booking</span></div></div>
-            <div class="pill"><div class="pill-icon">🔒</div><div class="pill-text"><strong>Secure Payments</strong><span>Safe checkout &amp; instant invoices</span></div></div>
+  <!-- LEFT VISUAL PANEL -->
+  <div class="auth-visual">
+    <div class="auth-visual-bg"></div>
+    <div class="auth-visual-plane">✈</div>
+
+    <div class="auth-tag">✦ AeroSphere Airlines</div>
+
+    <h1 class="auth-heading">
+      Your Next<br>
+      <span class="g">Adventure</span><br>
+      Awaits.
+    </h1>
+
+    <p class="auth-desc">
+      Book flights, manage reservations, and track your journeys —
+      all from one beautifully designed platform.
+    </p>
+
+    <div class="feature-pills">
+      <div class="fp fade-up d1">
+        <div class="fp-icon">✈</div>
+        <div>
+          <div class="fp-title">Instant Booking</div>
+          <div class="fp-sub">Reserve seats in under 2 minutes</div>
         </div>
-    </div>
-
-    <!-- LOGIN PANEL -->
-    <div class="login-panel">
-        <div class="login-box">
-            <div class="login-header">
-                <h2>Welcome back</h2>
-                <p>Sign in to your AeroSphere account</p>
-            </div>
-
-            <!-- TABS -->
-            <div class="login-tabs">
-                <button class="tab-btn active" id="tabUser" onclick="switchTab('user')">Passenger</button>
-                <button class="tab-btn" id="tabAdmin" onclick="switchTab('admin')">Admin</button>
-            </div>
-
-            <% if (err != null) { %>
-                <%-- XSS-safe error output using HtmlUtils.e() --%>
-                <div class="alert">⚠ <%= HtmlUtils.e(err) %></div>
-            <% } %>
-
-            <!-- USER FORM — CSRF token added -->
-            <form action="${pageContext.request.contextPath}/login" method="post" id="userForm">
-                <input type="hidden" name="loginType" value="USER">
-                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
-                <div class="field">
-                    <label>Email Address</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">✉</span>
-                        <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Password</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">🔒</span>
-                        <input type="password" name="password" id="userPw" placeholder="Enter your password" required autocomplete="current-password">
-                        <button type="button" class="pw-toggle" onclick="togglePw('userPw')">👁</button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-login"><span>Sign In</span><span>→</span></button>
-            </form>
-
-            <!-- ADMIN FORM — CSRF token added -->
-            <form action="${pageContext.request.contextPath}/login" method="post" id="adminForm">
-                <input type="hidden" name="loginType" value="ADMIN">
-                <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
-                <div class="field">
-                    <label>Admin Email</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">🛡</span>
-                        <input type="email" name="email" placeholder="admin@aerosphere.com" required autocomplete="email">
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Admin Password</label>
-                    <div class="input-wrap">
-                        <span class="input-icon">🔑</span>
-                        <input type="password" name="password" id="adminPw" placeholder="Admin password" required autocomplete="current-password">
-                        <button type="button" class="pw-toggle" onclick="togglePw('adminPw')">👁</button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-login"><span>Admin Sign In</span><span>→</span></button>
-            </form>
-
-            <div class="divider"><span>New to AeroSphere?</span></div>
-            <div class="register-link"><a href="${pageContext.request.contextPath}/register">Create a free account →</a></div>
+      </div>
+      <div class="fp fade-up d2">
+        <div class="fp-icon">📋</div>
+        <div>
+          <div class="fp-title">Manage Trips</div>
+          <div class="fp-sub">View, modify or cancel any booking</div>
         </div>
+      </div>
+      <div class="fp fade-up d3">
+        <div class="fp-icon">🔒</div>
+        <div>
+          <div class="fp-title">Secure Payments</div>
+          <div class="fp-sub">Safe checkout &amp; instant invoices</div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- RIGHT FORM PANEL -->
+  <div class="auth-form-panel">
+    <div class="auth-form-box">
+
+      <div class="auth-form-header">
+        <h2>Welcome back</h2>
+        <p>Sign in to your AeroSphere account</p>
+      </div>
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabUser"  onclick="switchTab('user')">✈ Passenger</button>
+        <button class="auth-tab-btn"        id="tabAdmin" onclick="switchTab('admin')">🛡 Admin</button>
+      </div>
+
+      <% if (err != null) { %>
+        <div class="alert alert-error">
+          <span>⚠</span>
+          <span><%= HtmlUtils.e(err) %></span>
+        </div>
+      <% } %>
+
+      <!-- USER FORM (KEEP ALL name/action ATTRIBUTES EXACTLY) -->
+      <form action="${pageContext.request.contextPath}/login" method="post" id="userForm">
+        <input type="hidden" name="loginType" value="USER">
+        <input type="hidden" name="_csrf"     value="<%= HtmlUtils.e(csrfToken) %>">
+
+        <div class="login-field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉</span>
+            <input type="email" name="email" class="form-input"
+                   placeholder="you@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label>Password</label>
+          <div class="input-wrap" style="position:relative">
+            <span class="input-icon">🔒</span>
+            <input type="password" name="password" id="userPw" class="form-input"
+                   placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('userPw')" tabindex="-1">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login-submit">
+          <span>Sign In</span><span>→</span>
+        </button>
+      </form>
+
+      <!-- ADMIN FORM (KEEP ALL name/action ATTRIBUTES EXACTLY) -->
+      <form action="${pageContext.request.contextPath}/login" method="post" id="adminForm">
+        <input type="hidden" name="loginType" value="ADMIN">
+        <input type="hidden" name="_csrf"     value="<%= HtmlUtils.e(csrfToken) %>">
+
+        <div class="login-field">
+          <label>Admin Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">🛡</span>
+            <input type="email" name="email" class="form-input"
+                   placeholder="admin@aerosphere.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label>Admin Password</label>
+          <div class="input-wrap" style="position:relative">
+            <span class="input-icon">🔑</span>
+            <input type="password" name="password" id="adminPw" class="form-input"
+                   placeholder="Admin password" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('adminPw')" tabindex="-1">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login-submit">
+          <span>Admin Sign In</span><span>→</span>
+        </button>
+      </form>
+
+      <div class="divider"><span>New to AeroSphere?</span></div>
+
+      <div class="auth-bottom">
+        <a href="${pageContext.request.contextPath}/register">Create a free account →</a>
+      </div>
+
+    </div>
+  </div>
 </div>
 
+<script src="${pageContext.request.contextPath}/assests/js/main.js"></script>
 <script>
-    // ── Theme: set correct icon now that DOM exists ──────────────────
-    (function() {
-        var t = document.documentElement.getAttribute('data-theme') || 'light';
-        var btn = document.getElementById('themeToggle');
-        if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
-    })();
+  // Tab switching — keep EXACTLY the same logic
+  var initialTab = '<%= HtmlUtils.escapeJs(activeTab) %>'.toLowerCase() === 'admin' ? 'admin' : 'user';
+  switchTab(initialTab);
 
-    function toggleTheme() {
-        var n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', n);
-        localStorage.setItem('aerosphere-theme', n);
-        document.getElementById('themeToggle').textContent = n === 'dark' ? '☀️' : '🌙';
-    }
+  function switchTab(tab) {
+    document.getElementById('userForm').style.display  = tab === 'user'  ? 'block' : 'none';
+    document.getElementById('adminForm').style.display = tab === 'admin' ? 'block' : 'none';
+    document.getElementById('tabUser').classList.toggle('active',  tab === 'user');
+    document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+  }
 
-    // ── Tab switching ─────────────────────────────────────────────────
-    var initialTab = '<%= HtmlUtils.escapeJs(activeTab) %>'.toLowerCase() === 'admin' ? 'admin' : 'user';
-    switchTab(initialTab);
+  function togglePw(id) {
+    var i = document.getElementById(id);
+    i.type = i.type === 'password' ? 'text' : 'password';
+  }
 
-    function switchTab(tab) {
-        document.getElementById('userForm').style.display  = tab === 'user'  ? 'block' : 'none';
-        document.getElementById('adminForm').style.display = tab === 'admin' ? 'block' : 'none';
-        document.getElementById('tabUser').classList.toggle('active', tab === 'user');
-        document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
-    }
-
-    function togglePw(id) {
-        var i = document.getElementById(id);
-        i.type = i.type === 'password' ? 'text' : 'password';
-    }
+  // Ripple on submit buttons
+  document.querySelectorAll('.btn-login-submit').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var r    = document.createElement('span');
+      var rect = this.getBoundingClientRect();
+      var size = Math.max(rect.width, rect.height);
+      r.className = 'btn-ripple';
+      r.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,.28);transform:scale(0);animation:rippleAnim .6s linear;pointer-events:none;width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px';
+      this.appendChild(r);
+      r.addEventListener('animationend', function() { r.remove(); });
+    });
+  });
 </script>
 </body>
 </html>
