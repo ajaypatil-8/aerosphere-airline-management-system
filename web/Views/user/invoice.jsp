@@ -122,9 +122,13 @@ tbody tr:last-child td{border-bottom:none}
         <div class="brand-icon">✈</div><span class="brand-name">Aero<span>Sphere</span></span>
     </a>
     <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/userBookings" class="nav-link">← My Bookings</a>
-        <button onclick="window.print()" class="btn">🖨 Print</button>
-        <a href="${pageContext.request.contextPath}/logout" class="nav-link btn-danger">Logout</a>
+        <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link ">🏠 Dashboard</a>
+        <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link ">🔍 Search</a>
+        <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link ">✈️ All Flights</a>
+        <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link ">🎫 My Bookings</a>
+        <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link ">💸 Refunds</a>
+        <a href="${pageContext.request.contextPath}/profile"           class="nav-link ">👤 Profile</a>
+        <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
         <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
     </div>
 </nav>

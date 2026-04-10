@@ -47,6 +47,11 @@
          role="menuitem">
         🔍 <span>Search Flights</span>
       </a>
+      <a href="${pageContext.request.contextPath}/allFlights"
+         class="as-nav-link <%= _hServletPath.contains("allFlights") ? "active" : "" %>"
+         role="menuitem">
+        ✈️ <span>All Flights</span>
+      </a>
       <a href="${pageContext.request.contextPath}/userBookings"
          class="as-nav-link <%= _hServletPath.contains("userBookings") ? "active" : "" %>"
          role="menuitem">
@@ -116,6 +121,7 @@
   <% if (_hUserName != null) { %>
     <a href="${pageContext.request.contextPath}/userDashboard" class="as-nav-link" role="menuitem">🏠 Dashboard</a>
     <a href="${pageContext.request.contextPath}/searchFlights"  class="as-nav-link" role="menuitem">🔍 Search Flights</a>
+    <a href="${pageContext.request.contextPath}/allFlights"     class="as-nav-link" role="menuitem">✈️ All Flights</a>
     <a href="${pageContext.request.contextPath}/userBookings"   class="as-nav-link" role="menuitem">🎫 My Bookings</a>
     <a href="${pageContext.request.contextPath}/userRefundHistory" class="as-nav-link" role="menuitem">💸 Refunds</a>
     <a href="${pageContext.request.contextPath}/profile"        class="as-nav-link" role="menuitem">👤 Profile</a>
