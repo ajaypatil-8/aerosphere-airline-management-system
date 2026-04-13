@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="com.skyconnect.util.CsrfUtil, com.skyconnect.util.HtmlUtils" %>
 <%
-    String userName = (String) session.getAttribute("userName");
-    String userRole = (String) session.getAttribute("userRole");
+    String userName  = (String) session.getAttribute("userName");
+    String userRole  = (String) session.getAttribute("userRole");
     if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     Integer id        = (Integer) request.getAttribute("id");
     String  flightNo  = (String)  request.getAttribute("flightNo");
@@ -17,127 +17,394 @@
     String depTimeStr = depTime != null ? depTime.toString().substring(0,5) : "";
     String arrTimeStr = arrTime != null ? arrTime.toString().substring(0,5) : "";
     String csrfToken  = CsrfUtil.getToken(request);
+    // Seat occupancy % for the mini progress bar
+    int occupiedPct   = (totalSeats != null && totalSeats > 0 && availSeats != null)
+                        ? (int)(((double)(totalSeats - availSeats) / totalSeats) * 100) : 0;
 %>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Flight – AeroSphere Admin</title>
+<title>Edit Flight <%= HtmlUtils.e(flightNo != null ? flightNo : "") %> – AeroSphere Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--primary:#10B981;--primary-dark:#059669;--primary-glow:rgba(16,185,129,.18);--bg:#FAFAF9;--card-bg:#FFFFFF;--text:#1C1917;--text-muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px}
-[data-theme="dark"]{--primary:#10B981;--primary-dark:#34D399;--primary-glow:rgba(16,185,129,.22);--bg:#0A0A0A;--card-bg:#141414;--text:#F5F5F4;--text-muted:#9CA3AF;--border:#262626;--shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.5)}
+/* ── Design Tokens ─────────────────────────────────────── */
+:root{
+  --sky:#0EA5E9;--sky-dark:#0284C7;--sky-glow:rgba(14,165,233,.18);
+  --em:#10B981;--em-dark:#059669;--em-glow:rgba(16,185,129,.18);
+  --warn:#F59E0B;--danger:#EF4444;
+  --grad:linear-gradient(135deg,var(--sky),var(--em));
+  --bg:#F0F9FF;--s0:#FFFFFF;--s1:#F8FAFC;--s2:#F0F9FF;
+  --text:#0F172A;--muted:#64748B;--border:#E2E8F0;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --sh-lg:0 8px 32px rgba(0,0,0,.08);--r:14px;
+  --sidebar-w:240px;
+}
+[data-theme="dark"]{
+  --bg:#060A12;--s0:#0D1117;--s1:#111827;--s2:#1A2232;
+  --text:#F1F5F9;--muted:#94A3B8;--border:#1E293B;
+  --sh:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  --sh-lg:0 8px 32px rgba(0,0,0,.5);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-.navbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--card-bg);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.brand-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px var(--primary-glow)}
-.brand-name{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
-.brand-name span{color:var(--primary)}
-.admin-badge{font-size:.6rem;background:rgba(245,158,11,.15);color:#D97706;border:1px solid rgba(245,158,11,.3);padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.05em;margin-left:4px;vertical-align:middle}
-.nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:8px;font-size:.86rem;font-weight:500;transition:all .2s}
-.nav-link:hover,.nav-link.active{color:var(--primary);background:var(--primary-glow)}
-.nav-link.btn-danger{color:#DC2626;background:rgba(220,38,38,.08)}
-.theme-toggle{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;margin-left:4px}
-.theme-toggle:hover{border-color:var(--primary)}
-.page-wrapper{max-width:680px;margin:0 auto;padding:32px 24px}
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
-.page-title{font-size:1.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
-.page-subtitle{color:var(--text-muted);font-size:.9rem}
-.page-subtitle strong{color:var(--primary)}
-.info-box{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:var(--primary-glow);border:1px solid var(--primary);border-radius:12px;padding:18px 20px;margin-bottom:22px}
-.info-item-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px}
-.info-item-val{font-weight:700;font-size:.92rem}
-.info-item-val.emerald{color:var(--primary)}
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;box-shadow:var(--shadow)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-group label{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted)}
-.field-wrap{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:0 14px;transition:border-color .2s}
-.field-wrap:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-.field-wrap .fi{font-size:1rem;flex-shrink:0}
-.field-wrap input{flex:1;border:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:.88rem;padding:11px 0;outline:none}
-.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;font-weight:600;font-size:.84rem;text-decoration:none;cursor:pointer;transition:all .2s;border:none;font-family:'Inter',sans-serif}
-.btn-primary{background:var(--primary);color:#fff;box-shadow:0 3px 10px var(--primary-glow)}
-.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
-.btn-secondary{background:var(--bg);border:1px solid var(--border);color:var(--text)}
-.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── Layout ────────────────────────────────────────────── */
+.as-layout{display:flex;min-height:100vh}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+.as-sidebar{width:var(--sidebar-w);background:var(--s0);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:200;
+  transition:transform .3s ease;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 18px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text)}
+.sb-brand-icon{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 3px 10px var(--sky-glow)}
+.sb-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:-.4px;line-height:1.1}
+.sb-brand-name span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-admin-tag{font-size:.6rem;background:rgba(245,158,11,.15);color:#D97706;border:1px solid rgba(245,158,11,.3);padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.05em;display:block;margin-top:2px}
+.sb-section-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:16px 20px 6px}
+.sb-nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;text-decoration:none;color:var(--muted);font-size:.86rem;font-weight:500;transition:all .18s;position:relative}
+.sb-link .sb-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
+.sb-link:hover{color:var(--text);background:var(--s2)}
+.sb-link.active{color:var(--sky);background:var(--sky-glow);font-weight:600}
+.sb-link.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--sky);border-radius:0 2px 2px 0}
+.sb-divider{border:none;border-top:1px solid var(--border);margin:10px 12px}
+.sb-footer{padding:16px 20px;border-top:1px solid var(--border);margin-top:auto}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:.82rem;font-weight:600}
+.sb-user-role{font-size:.7rem;color:var(--muted)}
+
+/* ── Main ──────────────────────────────────────────────── */
+.as-main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left .3s}
+
+/* ── Topbar ────────────────────────────────────────────── */
+.as-topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.85);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;gap:12px}
+[data-theme="dark"] .as-topbar{background:rgba(13,17,23,.85)}
+.sb-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--s0);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;color:var(--muted)}
+.sb-toggle:hover{border-color:var(--sky);color:var(--sky)}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem}
+.topbar-crumb{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px;margin-left:4px}
+.topbar-crumb a{color:var(--muted);text-decoration:none}.topbar-crumb a:hover{color:var(--sky)}
+.topbar-crumb span{color:var(--sky);font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--s0);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .2s;color:var(--muted)}
+.theme-toggle:hover{border-color:var(--sky);color:var(--sky)}
+.topbar-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:#EF4444;background:rgba(239,68,68,.08);padding:6px 14px;border-radius:8px;transition:all .2s}
+.topbar-logout:hover{background:rgba(239,68,68,.15)}
+
+/* ── Page content ──────────────────────────────────────── */
+.page-content{max-width:760px;margin:0 auto;padding:32px 28px;width:100%}
+
+/* ── Page header ───────────────────────────────────────── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:12px;flex-wrap:wrap}
+.page-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.page-subtitle{color:var(--muted);font-size:.9rem}
+.flight-tag{display:inline-flex;align-items:center;gap:6px;background:var(--grad);color:#fff;
+  padding:3px 12px;border-radius:99px;font-size:.8rem;font-weight:700;margin-left:6px;letter-spacing:.04em}
+
+/* ── Flight info strip ─────────────────────────────────── */
+.info-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;
+  background:var(--s0);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 24px;margin-bottom:22px;box-shadow:var(--sh)}
+.info-strip-item{}
+.info-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+.info-val{font-weight:700;font-size:.92rem}
+.info-val.grad-text{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.info-val.success{color:var(--em)}
+.info-val.warn{color:var(--warn)}
+
+/* ── Seat progress ─────────────────────────────────────── */
+.seat-bar-wrap{margin-top:6px}
+.seat-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden}
+.seat-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.fill-ok{background:var(--em)}
+.fill-warn{background:var(--warn)}
+.fill-full{background:var(--danger)}
+.seat-bar-label{font-size:.68rem;color:var(--muted);margin-top:4px}
+
+/* ── Warning banner ────────────────────────────────────── */
+.edit-warn{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;border-radius:11px;
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#92400E;
+  font-size:.83rem;margin-bottom:20px;line-height:1.45}
+[data-theme="dark"] .edit-warn{color:#FCD34D}
+.edit-warn strong{font-weight:700}
+
+/* ── Card ──────────────────────────────────────────────── */
+.card{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.card-header{padding:20px 28px;border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;gap:12px}
+.card-header-icon{width:38px;height:38px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px var(--sky-glow)}
+.card-header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem}
+.card-header-sub{font-size:.8rem;color:var(--muted);margin-top:2px}
+.card-body{padding:28px}
+
+/* ── Form ──────────────────────────────────────────────── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-group{display:flex;flex-direction:column;gap:7px}
+.form-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.field-wrap{display:flex;align-items:center;gap:10px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;padding:0 14px;transition:border-color .2s,box-shadow .2s}
+.field-wrap:focus-within{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow)}
+.field-wrap .fi{font-size:.95rem;flex-shrink:0;opacity:.7}
+.field-wrap input{flex:1;border:none;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;padding:11px 0;outline:none}
+
+/* ── Section sep ───────────────────────────────────────── */
+.section-sep{display:flex;align-items:center;gap:12px;margin:24px 0}
+.section-sep-line{flex:1;height:1px;background:var(--border)}
+.section-sep-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+
+/* ── Buttons ───────────────────────────────────────────── */
 .form-actions{display:flex;gap:10px;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:9px;font-weight:600;font-size:.85rem;text-decoration:none;cursor:pointer;transition:all .2s;border:none;font-family:'DM Sans',sans-serif}
+.btn-grad{background:var(--grad);color:#fff;box-shadow:0 4px 14px var(--sky-glow)}
+.btn-grad:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 6px 20px var(--sky-glow)}
+.btn-outline{background:var(--s0);border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--sky);color:var(--sky)}
+
+/* ── Animations ────────────────────────────────────────── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.animate-fadeup{animation:fadeUp .45s ease forwards}
-@media(max-width:600px){.form-grid{grid-template-columns:1fr}.info-box{grid-template-columns:1fr 1fr}.page-wrapper{padding:20px 14px}.navbar{padding:10px 16px}.nav-links .nav-link:not(.btn-danger){display:none}}
+.fu{animation:fadeUp .45s ease both}
+.fu-1{animation-delay:.05s}.fu-2{animation-delay:.1s}.fu-3{animation-delay:.15s}
+
+/* ── Mobile ────────────────────────────────────────────── */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199;backdrop-filter:blur(3px)}
+@media(max-width:768px){
+  .as-sidebar{transform:translateX(-100%)}
+  .as-sidebar.open{transform:translateX(0);box-shadow:var(--sh-lg)}
+  .sb-overlay.visible{display:block}
+  .as-main{margin-left:0}
+  .form-grid{grid-template-columns:1fr}
+  .info-strip{grid-template-columns:repeat(3,1fr)}
+  .page-content{padding:20px 16px}
+}
 </style>
 </head>
 <body>
+<div class="as-layout">
 
-<nav class="navbar">
-  <a href="${pageContext.request.contextPath}/adminDashboard" class="nav-brand">
-    <div class="brand-icon">✈</div>
-    <span class="brand-name">Aero<span>Sphere</span><span class="admin-badge">ADMIN</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="${pageContext.request.contextPath}/adminDashboard" class="nav-link">Dashboard</a>
-    <a href="${pageContext.request.contextPath}/adminFlights"   class="nav-link active">Flights</a>
-    <a href="${pageContext.request.contextPath}/logout"         class="nav-link btn-danger">Logout</a>
-    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
-  </div>
-</nav>
+  <!-- Sidebar -->
+  <aside class="as-sidebar" id="sidebar">
+    <a href="${pageContext.request.contextPath}/adminDashboard" class="sb-brand">
+      <div class="sb-brand-icon">✈</div>
+      <div>
+        <div class="sb-brand-name">Aero<span>Sphere</span></div>
+        <span class="sb-admin-tag">ADMIN PANEL</span>
+      </div>
+    </a>
 
-<div class="page-wrapper">
-  <div class="page-header animate-fadeup">
-    <div>
-      <h1 class="page-title">✏️ Edit Flight</h1>
-      <p class="page-subtitle">Flight <strong><%= flightNo %></strong> — <%= source %> → <%= dest %></p>
+    <div class="sb-section-label">Main</div>
+    <nav class="sb-nav">
+      <a href="${pageContext.request.contextPath}/adminDashboard" class="sb-link">
+        <span class="sb-icon">🏠</span>Dashboard
+      </a>
+      <a href="${pageContext.request.contextPath}/adminFlights" class="sb-link active">
+        <span class="sb-icon">✈</span>Flights
+      </a>
+      <a href="${pageContext.request.contextPath}/adminBookings" class="sb-link">
+        <span class="sb-icon">📋</span>Bookings
+      </a>
+      <a href="${pageContext.request.contextPath}/adminRefunds" class="sb-link">
+        <span class="sb-icon">💸</span>Refunds
+      </a>
+    </nav>
+
+    <div class="sb-section-label">Reports</div>
+    <nav class="sb-nav">
+      <a href="${pageContext.request.contextPath}/reports" class="sb-link">
+        <span class="sb-icon">📊</span>All Reports
+      </a>
+    </nav>
+
+    <hr class="sb-divider">
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><%= userName.substring(0,1).toUpperCase() %></div>
+        <div>
+          <div class="sb-user-name"><%= HtmlUtils.e(userName) %></div>
+          <div class="sb-user-role">Administrator</div>
+        </div>
+      </div>
     </div>
-    <a href="${pageContext.request.contextPath}/adminFlights" class="btn btn-secondary">← Back</a>
-  </div>
+  </aside>
+  <div class="sb-overlay" id="sbOverlay"></div>
 
-  <!-- Read-only info strip -->
-  <div class="info-box animate-fadeup">
-    <div><div class="info-item-label">Flight No</div><div class="info-item-val emerald"><%= flightNo %></div></div>
-    <div><div class="info-item-label">From</div><div class="info-item-val"><%= source %></div></div>
-    <div><div class="info-item-label">To</div><div class="info-item-val"><%= dest %></div></div>
-    <div><div class="info-item-label">Total Seats</div><div class="info-item-val"><%= totalSeats %></div></div>
-    <div><div class="info-item-label">Available</div><div class="info-item-val emerald"><%= availSeats %></div></div>
-  </div>
+  <!-- Main -->
+  <main class="as-main">
+    <header class="as-topbar">
+      <button class="sb-toggle" id="sbToggle">☰</button>
+      <span class="topbar-title">Edit Flight</span>
+      <div class="topbar-crumb">
+        <a href="${pageContext.request.contextPath}/adminFlights">Flights</a>
+        › <span><%= HtmlUtils.e(flightNo != null ? flightNo : "") %></span>
+      </div>
+      <div class="topbar-right">
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <a href="${pageContext.request.contextPath}/logout" class="topbar-logout">Logout</a>
+      </div>
+    </header>
 
-  <div class="card animate-fadeup">
-    <form action="${pageContext.request.contextPath}/editFlight" method="post">
-      <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
-      <input type="hidden" name="id" value="<%= id %>">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Departure Date *</label>
-          <div class="field-wrap"><span class="fi">📅</span><input type="date" name="depart_date" value="<%= date %>" required></div>
+    <div class="page-content">
+      <!-- Header -->
+      <div class="page-header fu">
+        <div>
+          <h1 class="page-title">
+            Edit Flight
+            <span class="flight-tag">✈ <%= HtmlUtils.e(flightNo != null ? flightNo : "") %></span>
+          </h1>
+          <p class="page-subtitle">
+            <%= HtmlUtils.e(source != null ? source : "") %> → <%= HtmlUtils.e(dest != null ? dest : "") %>
+          </p>
         </div>
-        <div class="form-group">
-          <label>Price per Seat (₹) *</label>
-          <div class="field-wrap"><span class="fi">💰</span><input type="number" name="price" value="<%= price != null ? price : "" %>" min="1" step="0.01" required></div>
+        <a href="${pageContext.request.contextPath}/adminFlights" class="btn btn-outline">← All Flights</a>
+      </div>
+
+      <!-- Flight info strip -->
+      <div class="info-strip fu-1">
+        <div class="info-strip-item">
+          <div class="info-label">Flight No</div>
+          <div class="info-val grad-text"><%= HtmlUtils.e(flightNo != null ? flightNo : "—") %></div>
         </div>
-        <div class="form-group">
-          <label>Departure Time *</label>
-          <div class="field-wrap"><span class="fi">🕐</span><input type="time" name="depart_time" value="<%= depTimeStr %>" required></div>
+        <div class="info-strip-item">
+          <div class="info-label">From</div>
+          <div class="info-val"><%= HtmlUtils.e(source != null ? source : "—") %></div>
         </div>
-        <div class="form-group">
-          <label>Arrival Time</label>
-          <div class="field-wrap"><span class="fi">🕑</span><input type="time" name="arrival_time" value="<%= arrTimeStr %>"></div>
+        <div class="info-strip-item">
+          <div class="info-label">To</div>
+          <div class="info-val"><%= HtmlUtils.e(dest != null ? dest : "—") %></div>
+        </div>
+        <div class="info-strip-item">
+          <div class="info-label">Total Seats</div>
+          <div class="info-val"><%= totalSeats != null ? totalSeats : "—" %></div>
+        </div>
+        <div class="info-strip-item">
+          <div class="info-label">Available</div>
+          <div class="info-val <%= occupiedPct >= 90 ? "warn" : "success" %>">
+            <%= availSeats != null ? availSeats : "—" %>
+          </div>
+          <% if (totalSeats != null && totalSeats > 0) { %>
+          <div class="seat-bar-wrap">
+            <div class="seat-bar">
+              <div class="seat-bar-fill <%= occupiedPct >= 90 ? "fill-full" : occupiedPct >= 60 ? "fill-warn" : "fill-ok" %>"
+                   style="width:<%= occupiedPct %>%"></div>
+            </div>
+            <div class="seat-bar-label"><%= occupiedPct %>% occupied</div>
+          </div>
+          <% } %>
         </div>
       </div>
-      <div class="divider"></div>
-      <div class="form-actions">
-        <a href="${pageContext.request.contextPath}/adminFlights" class="btn btn-secondary">Cancel</a>
-        <button type="submit" class="btn btn-primary">✅ Save Changes</button>
+
+      <!-- Warning -->
+      <div class="edit-warn fu-2">
+        ⚠ <div><strong>Editable fields only:</strong> You can update date, times, and price.
+        Route and total seat count are locked once a flight is created.</div>
       </div>
-    </form>
-  </div>
+
+      <!-- Form card -->
+      <div class="card fu-3">
+        <div class="card-header">
+          <div class="card-header-icon">✏️</div>
+          <div>
+            <div class="card-header-title">Update Flight Details</div>
+            <div class="card-header-sub">Changes apply immediately to new bookings</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="${pageContext.request.contextPath}/editFlight" method="post">
+            <input type="hidden" name="_csrf"  value="<%= HtmlUtils.e(csrfToken) %>">
+            <input type="hidden" name="id"     value="<%= id %>">
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Departure Date *</label>
+                <div class="field-wrap">
+                  <span class="fi">📅</span>
+                  <input type="date" name="depart_date" value="<%= date != null ? date : "" %>" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Price per Seat (₹) *</label>
+                <div class="field-wrap">
+                  <span class="fi">💰</span>
+                  <input type="number" name="price" value="<%= price != null ? price : "" %>" min="1" step="0.01" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Departure Time *</label>
+                <div class="field-wrap">
+                  <span class="fi">🕐</span>
+                  <input type="time" name="depart_time" value="<%= depTimeStr %>" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Arrival Time</label>
+                <div class="field-wrap">
+                  <span class="fi">🕑</span>
+                  <input type="time" name="arrival_time" value="<%= arrTimeStr %>">
+                </div>
+              </div>
+            </div>
+
+            <div class="section-sep"><div class="section-sep-line"></div></div>
+            <div class="form-actions">
+              <a href="${pageContext.request.contextPath}/adminFlights" class="btn btn-outline">Cancel</a>
+              <button type="submit" class="btn btn-grad">✅ Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
 </div>
 
 <script>
-(function(){const root=document.documentElement;const saved=localStorage.getItem('theme')||'light';root.setAttribute('data-theme',saved);document.getElementById('themeToggle').textContent=saved==='dark'?'☀️':'🌙';})();
-document.getElementById('themeToggle').addEventListener('click',function(){const cur=document.documentElement.getAttribute('data-theme');const next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('theme',next);this.textContent=next==='dark'?'☀️':'🌙';});
+// Theme
+(function(){
+  const root = document.documentElement;
+  const saved = localStorage.getItem('asTheme') || 'light';
+  root.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
+document.getElementById('themeToggle').addEventListener('click', function(){
+  const cur  = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('asTheme', next);
+  this.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+// Sidebar
+const sidebar  = document.getElementById('sidebar');
+const overlay  = document.getElementById('sbOverlay');
+document.getElementById('sbToggle').addEventListener('click', () => {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('visible');
+  } else {
+    sidebar.classList.toggle('collapsed');
+    document.querySelector('.as-main').style.marginLeft =
+      sidebar.classList.contains('collapsed') ? '0' : 'var(--sidebar-w)';
+  }
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('visible');
+});
+
+// Animate seat bar on load
+document.addEventListener('DOMContentLoaded', () => {
+  const fill = document.querySelector('.seat-bar-fill');
+  if (fill) {
+    const target = fill.style.width;
+    fill.style.width = '0';
+    requestAnimationFrame(() => { fill.style.width = target; });
+  }
+});
 </script>
 </body>
 </html>
