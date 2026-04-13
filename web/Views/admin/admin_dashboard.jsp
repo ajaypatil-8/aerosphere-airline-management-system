@@ -28,7 +28,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin Dashboard – AeroSphere</title>
-<script>(function(){var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
+<script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
@@ -220,62 +220,7 @@
 <div class="as-admin-layout">
 
   <%-- ── SIDEBAR ─────────────────────────────────────────────── --%>
-  <aside class="as-sidebar" id="as-sidebar" role="navigation" aria-label="Admin sidebar">
-
-    <div class="as-sidebar-brand">
-      <div class="as-sidebar-logo">✈</div>
-      <span class="as-sidebar-brand-name">Aero<span class="accent">Sphere</span></span>
-      <span class="as-sidebar-badge">ADMIN</span>
-    </div>
-
-    <div class="as-sidebar-section">
-      <div class="as-sidebar-label">Overview</div>
-      <a href="${pageContext.request.contextPath}/adminDashboard" class="as-sidebar-link active">
-        <span class="icon">🏠</span>Dashboard
-      </a>
-
-      <div class="as-sidebar-label">Flight Management</div>
-      <a href="${pageContext.request.contextPath}/adminFlights" class="as-sidebar-link">
-        <span class="icon">✈️</span>All Flights
-      </a>
-      <a href="${pageContext.request.contextPath}/addFlight" class="as-sidebar-link">
-        <span class="icon">➕</span>Add Flight
-      </a>
-
-      <div class="as-sidebar-label">Bookings & Users</div>
-      <a href="${pageContext.request.contextPath}/adminBookings" class="as-sidebar-link">
-        <span class="icon">🎫</span>All Bookings
-      </a>
-      <a href="${pageContext.request.contextPath}/adminRefunds" class="as-sidebar-link">
-        <span class="icon">💸</span>Refund Requests
-        <% if (pendingRefunds > 0) { %>
-          <span class="badge"><%= pendingRefunds %></span>
-        <% } %>
-      </a>
-
-      <div class="as-sidebar-label">Reports</div>
-      <a href="${pageContext.request.contextPath}/reports"           class="as-sidebar-link"><span class="icon">📊</span>All Reports</a>
-      <a href="${pageContext.request.contextPath}/reportBookings"    class="as-sidebar-link"><span class="icon">📋</span>Booking Report</a>
-      <a href="${pageContext.request.contextPath}/reportFlights"     class="as-sidebar-link"><span class="icon">📈</span>Flight Report</a>
-      <a href="${pageContext.request.contextPath}/reportPayments"    class="as-sidebar-link"><span class="icon">💰</span>Revenue Report</a>
-      <a href="${pageContext.request.contextPath}/reportUsers"       class="as-sidebar-link"><span class="icon">👥</span>User Report</a>
-      <a href="${pageContext.request.contextPath}/reportCancelled"   class="as-sidebar-link"><span class="icon">❌</span>Cancellation Report</a>
-      <a href="${pageContext.request.contextPath}/reportPassengers"  class="as-sidebar-link"><span class="icon">🧳</span>Passenger Report</a>
-    </div>
-
-    <div class="as-sidebar-footer">
-      <div class="as-sidebar-user">
-        <div class="as-sidebar-user-avatar"><%= adminFirst.charAt(0) %></div>
-        <div>
-          <div class="as-sidebar-user-name"><%= userName %></div>
-          <div class="as-sidebar-user-role">Administrator</div>
-        </div>
-      </div>
-      <a href="${pageContext.request.contextPath}/logout" class="as-sidebar-logout">
-        <span>↩</span>Sign Out
-      </a>
-    </div>
-  </aside>
+  <%@ include file="/Views/common/sidebar.jsp" %>
 
   <%-- Sidebar overlay (mobile) --%>
   <div id="as-sidebar-overlay" aria-hidden="true"></div>

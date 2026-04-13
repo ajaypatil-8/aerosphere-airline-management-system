@@ -42,20 +42,6 @@
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
 h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 
-.as-navbar{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:62px;background:var(--card-bg);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
-.as-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.as-brand-logo{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;box-shadow:0 3px 12px var(--sky-glow)}
-.as-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.4px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.as-nav-links{display:flex;align-items:center;gap:2px}
-.as-nav-link{text-decoration:none;color:var(--text-muted);padding:7px 13px;border-radius:9px;font-size:.85rem;font-weight:500;transition:all .2s}
-.as-nav-link:hover,.as-nav-link.active{color:var(--sky);background:var(--sky-glow)}
-.as-nav-link.danger{color:#EF4444}
-.as-theme-toggle{width:33px;height:33px;border:1px solid var(--border);border-radius:9px;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
-.as-user-pill{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:99px;text-decoration:none;color:var(--text);font-size:.82rem;font-weight:600;transition:all .2s}
-.as-user-pill:hover{border-color:var(--sky)}
-.as-user-avatar-sm{width:26px;height:26px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800}
-.as-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:.83rem;font-weight:600;text-decoration:none;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;color:var(--text-muted);background:transparent}
-.as-btn:hover{border-color:var(--sky);color:var(--sky)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fadeUp .45s ease forwards}
 
@@ -83,33 +69,7 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 </style>
 </head>
 <body>
-<%
-  String _nUser=(String)session.getAttribute("userName");
-  String _nInit=(_nUser!=null&&!_nUser.isEmpty())?String.valueOf(_nUser.charAt(0)).toUpperCase():"U";
-  String _nFirst=(_nUser!=null&&_nUser.contains(" "))?_nUser.split(" ")[0]:_nUser;
-%>
-<nav class="as-navbar">
-  <a href="${pageContext.request.contextPath}/userDashboard" class="as-brand">
-    <div class="as-brand-logo">✈</div>
-    <span class="as-brand-name">AeroSphere</span>
-  </a>
-  <div class="as-nav-links">
-    <a href="${pageContext.request.contextPath}/userDashboard"     class="as-nav-link ">🏠 Dashboard</a>
-    <a href="${pageContext.request.contextPath}/searchFlights"     class="as-nav-link ">🔍 Search</a>
-    <a href="${pageContext.request.contextPath}/allFlights"        class="as-nav-link ">✈️ Flights</a>
-    <a href="${pageContext.request.contextPath}/userBookings"      class="as-nav-link ">🎫 My Bookings</a>
-    <a href="${pageContext.request.contextPath}/userRefundHistory" class="as-nav-link active">💸 Refunds</a>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <button class="as-theme-toggle" id="asThemeToggle">🌙</button>
-    <a href="${pageContext.request.contextPath}/profile" class="as-user-pill">
-      <div class="as-user-avatar-sm"><%=_nInit%></div>
-      <span><%=_nFirst%></span>
-    </a>
-    <a href="${pageContext.request.contextPath}/logout" class="as-btn">↩ Logout</a>
-  </div>
-</nav>
-
+<%@ include file="/Views/common/navbar.jsp" %>
 <div class="page-wrap">
   <div class="receipt-card fu">
     <div class="receipt-top">
@@ -146,4 +106,5 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
   btn.addEventListener('click',function(){apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
 })();
 </script>
+<%@ include file="/Views/common/Footer.jsp" %>
 </body></html>

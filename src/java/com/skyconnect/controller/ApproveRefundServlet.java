@@ -1,6 +1,7 @@
 package com.skyconnect.controller;
 
 import com.skyconnect.service.EmailService;
+import com.skyconnect.util.CsrfUtil;
 import com.skyconnect.util.DBConnection;
 
 import javax.servlet.annotation.WebServlet;
@@ -27,6 +28,11 @@ public class ApproveRefundServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
+
+        if (!CsrfUtil.isValid(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "CSRF validation failed.");
+            return;
+        }
 
         HttpSession session = req.getSession(false);
         if (session == null || !"ADMIN".equals(session.getAttribute("userRole"))) {

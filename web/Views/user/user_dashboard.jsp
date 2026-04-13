@@ -24,7 +24,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dashboard – AeroSphere</title>
-<script>(function(){var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
+<script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
@@ -240,40 +240,7 @@
 </head>
 <body>
 
-<%-- ── NAVBAR (uses global include pattern inline for self-contained page) ──%>
-<nav class="navbar" role="navigation">
-  <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-    <div class="brand-icon">✈</div>
-    <span class="brand-name">Aero<span>Sphere</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link active">🏠 Dashboard</a>
-    <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search</a>
-    <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 Bookings</a>
-    <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refunds</a>
-    <a href="${pageContext.request.contextPath}/profile"           class="nav-link">👤 Profile</a>
-  </div>
-  <div class="nav-right">
-    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()" aria-label="Toggle theme">🌙</button>
-    <a href="${pageContext.request.contextPath}/profile" class="user-pill">
-      <div class="user-avatar"><%= firstName.charAt(0) %></div>
-      <span><%= firstName %></span>
-    </a>
-    <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-danger">↩ Logout</a>
-    <button class="hamburger" id="as-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-
-<%-- Mobile nav --%>
-<div class="mobile-nav" id="as-mobile-nav">
-  <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
-  <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search Flights</a>
-  <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
-  <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refund History</a>
-  <a href="${pageContext.request.contextPath}/profile"           class="nav-link">👤 Profile</a>
-  <hr style="border:none;border-top:1px solid var(--border);margin:6px 0">
-  <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger">↩ Logout</a>
-</div>
+<%@ include file="/Views/common/navbar.jsp" %>
 
 <%-- ── PAGE CONTENT ─────────────────────────────────────────────── --%>
 <div class="page-wrapper">
@@ -435,5 +402,6 @@
     }
   })();
 </script>
+<%@ include file="/Views/common/Footer.jsp" %>
 </body>
 </html>

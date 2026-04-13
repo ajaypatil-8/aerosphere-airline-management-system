@@ -13,7 +13,7 @@
   'use strict';
 
   /* ─── Constants ─────────────────────────────────────────────── */
-  var STORAGE_KEY = 'aerosphere-theme';
+  var STORAGE_KEY = 'asTheme';
   var DARK_CLASS  = 'dark-mode';           // optional body class (for legacy pages)
   var ATTR        = 'data-theme';           // html attribute approach (preferred)
   var ICON_DARK   = '🌙';

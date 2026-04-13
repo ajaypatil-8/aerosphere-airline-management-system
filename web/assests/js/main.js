@@ -5,7 +5,7 @@
 
 /* ─── 1. THEME ──────────────────────────────────────────────── */
 const AS = {
-  THEME_KEY: 'aerosphere-theme',
+  THEME_KEY: 'asTheme',
 
   initTheme() {
     const saved = localStorage.getItem(this.THEME_KEY);

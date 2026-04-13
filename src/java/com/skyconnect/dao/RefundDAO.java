@@ -13,11 +13,9 @@ public class RefundDAO {
     public int requestRefund(Refund refund) {
         // Prevent duplicate
         if (getRefundByBooking(refund.getBookingId()) != null) return -2;
-        String sql = "INSERT INTO refunds (booking_id, user_id, refund_amount, refund_reason, refund_status) VALUES (?,?,?,'PENDING',?)";
-        // fix: wrong order above
-        String sql2 = "INSERT INTO refunds (booking_id, user_id, refund_amount, refund_reason) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO refunds (booking_id, user_id, refund_amount, refund_reason) VALUES (?,?,?,?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, refund.getBookingId());
             ps.setInt(2, refund.getUserId());
             ps.setDouble(3, refund.getRefundAmount());

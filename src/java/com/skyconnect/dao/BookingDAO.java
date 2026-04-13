@@ -32,7 +32,7 @@ public class BookingDAO {
 
     /** Update booking to BOOKED + payment SUCCESS after Razorpay verification */
     public boolean confirmBooking(int bookingId) {
-        String sql = "UPDATE bookings SET status='BOOKED', payment_status='SUCCESS' WHERE id=?";
+        String sql = "UPDATE bookings SET status='BOOKED', payment_status='PAID' WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, bookingId);

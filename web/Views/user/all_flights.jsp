@@ -133,27 +133,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 
-<nav class="navbar">
-  <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-    <div class="brand-icon">✈</div>
-    <span class="brand-name">Aero<span>Sphere</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
-    <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search</a>
-    <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link active">✈ All Flights</a>
-    <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
-    <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refunds</a>
-  </div>
-  <div class="nav-right">
-    <button class="theme-toggle" id="themeToggle">🌙</button>
-    <a href="${pageContext.request.contextPath}/profile" class="user-pill">
-      <div class="user-av"><%= initials %></div><span><%= firstName %></span>
-    </a>
-    <a href="${pageContext.request.contextPath}/logout" class="btn-logout">↩</a>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  </div>
-</nav>
+<%@ include file="/Views/common/navbar.jsp" %>
 <div class="mobile-nav" id="mobileNav">
   <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
   <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search</a>
@@ -362,5 +342,6 @@ function applyFilters(){
   });
 }
 </script>
+<%@ include file="/Views/common/Footer.jsp" %>
 </body>
 </html>

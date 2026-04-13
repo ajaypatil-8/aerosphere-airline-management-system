@@ -77,27 +77,7 @@ tbody tr:hover{background:var(--sky-glow)}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-    <div class="brand-icon">✈</div>
-    <span class="brand-name">Aero<span>Sphere</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
-    <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search</a>
-    <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link">✈ All Flights</a>
-    <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
-    <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link active">💸 Refunds</a>
-  </div>
-  <div class="nav-right">
-    <button class="theme-toggle" id="themeToggle">🌙</button>
-    <a href="${pageContext.request.contextPath}/profile" class="user-pill">
-      <div class="user-av"><%= initials %></div><span><%= firstName %></span>
-    </a>
-    <a href="${pageContext.request.contextPath}/logout" class="btn-logout">↩ Logout</a>
-  </div>
-</nav>
-
+<%@ include file="/Views/common/navbar.jsp" %>
 <div class="page-wrap">
   <div class="page-header fu">
     <div>
@@ -162,5 +142,6 @@ tbody tr:hover{background:var(--sky-glow)}
 (function(){const s=localStorage.getItem('asTheme')||'light';document.documentElement.setAttribute('data-theme',s);document.getElementById('themeToggle').textContent=s==='dark'?'☀️':'🌙';})();
 document.getElementById('themeToggle').addEventListener('click',function(){const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('asTheme',n);this.textContent=n==='dark'?'☀️':'🌙';});
 </script>
+<%@ include file="/Views/common/Footer.jsp" %>
 </body>
 </html>

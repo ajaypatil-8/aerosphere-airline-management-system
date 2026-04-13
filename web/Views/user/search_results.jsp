@@ -20,7 +20,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><%= srcE.isEmpty() ? "Search Results" : srcE + " → " + dstE %> – AeroSphere</title>
-<script>(function(){var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
+<script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
@@ -145,33 +145,7 @@
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar" role="navigation">
-  <a href="${pageContext.request.contextPath}/userDashboard" class="nav-brand">
-    <div class="brand-icon">✈</div>
-    <span class="brand-name">Aero<span>Sphere</span></span>
-  </a>
-  <div class="nav-links">
-    <% if (userName != null) { %>
-      <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
-      <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link active">🔍 Search</a>
-      <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 Bookings</a>
-      <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refunds</a>
-    <% } else { %>
-      <a href="${pageContext.request.contextPath}/login" class="nav-link">Sign In</a>
-    <% } %>
-  </div>
-  <div class="nav-right">
-    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()">🌙</button>
-    <% if (userName != null) { %>
-      <a href="${pageContext.request.contextPath}/profile" class="user-pill">
-        <div class="user-avatar"><%= firstName.charAt(0) %></div>
-        <span><%= firstName %></span>
-      </a>
-      <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-danger">↩ Logout</a>
-    <% } %>
-    <button class="hamburger" id="as-hamburger"><span></span><span></span><span></span></button>
-  </div>
-</nav>
+<%@ include file="/Views/common/navbar.jsp" %>
 <div class="mobile-nav" id="as-mobile-nav">
   <% if (userName != null) { %>
     <a href="${pageContext.request.contextPath}/userDashboard" class="nav-link">🏠 Dashboard</a>
@@ -290,5 +264,6 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/assests/js/main.js"></script>
+<%@ include file="/Views/common/Footer.jsp" %>
 </body>
 </html>

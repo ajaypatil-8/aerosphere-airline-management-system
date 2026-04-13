@@ -54,9 +54,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .as-layout{display:flex;min-height:100vh}
 
 /* ── Sidebar ───────────────────────────────────────────── */
-.as-sidebar{width:var(--sidebar-w);background:var(--s0);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:200;
-  transition:transform .3s ease;overflow-y:auto}
 .sb-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 18px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text)}
 .sb-brand-icon{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 3px 10px var(--sky-glow)}
 .sb-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:-.4px;line-height:1.1}
@@ -77,8 +74,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sb-user-role{font-size:.7rem;color:var(--muted)}
 
 /* ── Main ──────────────────────────────────────────────── */
-.as-main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left .3s}
-
 /* ── Topbar ────────────────────────────────────────────── */
 .as-topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.85);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -173,10 +168,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ── Mobile ────────────────────────────────────────────── */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199;backdrop-filter:blur(3px)}
 @media(max-width:768px){
-  .as-sidebar{transform:translateX(-100%)}
   .as-sidebar.open{transform:translateX(0);box-shadow:var(--sh-lg)}
   .sb-overlay.visible{display:block}
-  .as-main{margin-left:0}
   .form-grid{grid-template-columns:1fr}
   .info-strip{grid-template-columns:repeat(3,1fr)}
   .page-content{padding:20px 16px}
@@ -187,49 +180,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div class="as-layout">
 
   <!-- Sidebar -->
-  <aside class="as-sidebar" id="sidebar">
-    <a href="${pageContext.request.contextPath}/adminDashboard" class="sb-brand">
-      <div class="sb-brand-icon">✈</div>
-      <div>
-        <div class="sb-brand-name">Aero<span>Sphere</span></div>
-        <span class="sb-admin-tag">ADMIN PANEL</span>
-      </div>
-    </a>
-
-    <div class="sb-section-label">Main</div>
-    <nav class="sb-nav">
-      <a href="${pageContext.request.contextPath}/adminDashboard" class="sb-link">
-        <span class="sb-icon">🏠</span>Dashboard
-      </a>
-      <a href="${pageContext.request.contextPath}/adminFlights" class="sb-link active">
-        <span class="sb-icon">✈</span>Flights
-      </a>
-      <a href="${pageContext.request.contextPath}/adminBookings" class="sb-link">
-        <span class="sb-icon">📋</span>Bookings
-      </a>
-      <a href="${pageContext.request.contextPath}/adminRefunds" class="sb-link">
-        <span class="sb-icon">💸</span>Refunds
-      </a>
-    </nav>
-
-    <div class="sb-section-label">Reports</div>
-    <nav class="sb-nav">
-      <a href="${pageContext.request.contextPath}/reports" class="sb-link">
-        <span class="sb-icon">📊</span>All Reports
-      </a>
-    </nav>
-
-    <hr class="sb-divider">
-    <div class="sb-footer">
-      <div class="sb-user">
-        <div class="sb-avatar"><%= userName.substring(0,1).toUpperCase() %></div>
-        <div>
-          <div class="sb-user-name"><%= HtmlUtils.e(userName) %></div>
-          <div class="sb-user-role">Administrator</div>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <%@ include file="/Views/common/sidebar.jsp" %>
   <div class="sb-overlay" id="sbOverlay"></div>
 
   <!-- Main -->

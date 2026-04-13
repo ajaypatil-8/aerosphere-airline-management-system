@@ -14,7 +14,7 @@
 %>
 <script>
 (function(){
-  var t=localStorage.getItem('aerosphere-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  var t=localStorage.getItem('asTheme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
   document.documentElement.setAttribute('data-theme',t);
 })();
 </script>
@@ -40,6 +40,8 @@
          class="nav-link <%= _nvPath.contains("userDashboard") ? "active" : "" %>">🏠 Dashboard</a>
       <a href="${pageContext.request.contextPath}/searchFlights"
          class="nav-link <%= _nvPath.contains("searchFlights") || _nvPath.contains("search") ? "active" : "" %>">🔍 Search</a>
+      <a href="${pageContext.request.contextPath}/allFlights"
+         class="nav-link <%= _nvPath.contains("allFlights") ? "active" : "" %>">🛫 All Flights</a>
       <a href="${pageContext.request.contextPath}/userBookings"
          class="nav-link <%= _nvPath.contains("userBookings") ? "active" : "" %>">🎫 Bookings</a>
       <a href="${pageContext.request.contextPath}/userRefundHistory"
@@ -85,6 +87,7 @@
   <% if (_nvUser != null && !"ADMIN".equals(_nvRole)) { %>
     <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
     <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search Flights</a>
+    <a href="${pageContext.request.contextPath}/allFlights"       class="nav-link">🛫 All Flights</a>
     <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
     <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refund History</a>
     <a href="${pageContext.request.contextPath}/profile"           class="nav-link">👤 Profile</a>
