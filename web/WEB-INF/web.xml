@@ -9,16 +9,12 @@
 
     <!-- ═══════════════════════════════════════════════════════════
          SESSION CONFIGURATION
-         - 30-minute timeout
-         - HttpOnly: JS cannot read JSESSIONID (XSS protection)
-         - Secure: set to true when deploying on HTTPS production
          ═══════════════════════════════════════════════════════════ -->
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
-            <!-- Change to true when you deploy on HTTPS -->
-            <secure>false</secure>
+            <secure>false</secure><!-- Change to true on HTTPS -->
             <path>/</path>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>
@@ -32,7 +28,81 @@
     </welcome-file-list>
 
     <!-- ═══════════════════════════════════════════════════════════
-         ERROR PAGES — custom themed 404 and 500 pages
+         STATIC PAGES — direct JSP forwards (no Java logic needed)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- Help Center -->
+    <servlet>
+        <servlet-name>HelpCenter</servlet-name>
+        <jsp-file>/Views/common/help_center.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HelpCenter</servlet-name>
+        <url-pattern>/help</url-pattern>
+    </servlet-mapping>
+
+    <!-- FAQs -->
+    <servlet>
+        <servlet-name>Faqs</servlet-name>
+        <jsp-file>/Views/common/faqs.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Faqs</servlet-name>
+        <url-pattern>/faqs</url-pattern>
+    </servlet-mapping>
+
+    <!-- Cancellation Policy -->
+    <servlet>
+        <servlet-name>CancellationPolicy</servlet-name>
+        <jsp-file>/Views/common/cancellation_policy.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CancellationPolicy</servlet-name>
+        <url-pattern>/cancellationPolicy</url-pattern>
+    </servlet-mapping>
+
+    <!-- Baggage Policy -->
+    <servlet>
+        <servlet-name>BaggagePolicy</servlet-name>
+        <jsp-file>/Views/common/baggage_policy.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BaggagePolicy</servlet-name>
+        <url-pattern>/baggagePolicy</url-pattern>
+    </servlet-mapping>
+
+    <!-- Privacy Policy -->
+    <servlet>
+        <servlet-name>PrivacyPolicy</servlet-name>
+        <jsp-file>/Views/common/privacy_policy.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PrivacyPolicy</servlet-name>
+        <url-pattern>/privacyPolicy</url-pattern>
+    </servlet-mapping>
+
+    <!-- Terms of Service -->
+    <servlet>
+        <servlet-name>TermsOfService</servlet-name>
+        <jsp-file>/Views/common/terms_of_service.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TermsOfService</servlet-name>
+        <url-pattern>/termsOfService</url-pattern>
+    </servlet-mapping>
+
+    <!-- Cookie Policy -->
+    <servlet>
+        <servlet-name>CookiePolicy</servlet-name>
+        <jsp-file>/Views/common/cookie_policy.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CookiePolicy</servlet-name>
+        <url-pattern>/cookiePolicy</url-pattern>
+    </servlet-mapping>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ERROR PAGES
          ═══════════════════════════════════════════════════════════ -->
     <error-page>
         <error-code>404</error-code>

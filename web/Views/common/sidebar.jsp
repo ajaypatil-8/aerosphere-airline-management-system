@@ -85,6 +85,9 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
       <span class="icon">💸</span>Refund Requests
       <% if(_pRefs!=null&&(Integer)_pRefs>0){%><span class="badge"><%= _pRefs %></span><%}%>
     </a>
+    <a href="${pageContext.request.contextPath}/adminMessages" class="as-sidebar-link <%= _sbActive.apply("adminMessages") %>">
+      <span class="icon">📧</span>Contact Messages
+    </a>
 
     <div class="as-sidebar-label" style="margin-top:12px">Reports</div>
     <a href="${pageContext.request.contextPath}/reports"          class="as-sidebar-link <%= _sbActive.apply("reports").isEmpty()?_sbActive.apply("report"):"active" %>"><span class="icon">📊</span>All Reports</a>

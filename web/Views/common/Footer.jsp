@@ -36,36 +36,38 @@
       <div>
         <p class="as-footer-col-title">Quick Links</p>
         <ul class="as-footer-col-links">
-          <li><a href="${pageContext.request.contextPath}/index.jsp">Home</a></li>
+          <li><a href="${pageContext.request.contextPath}/">Home</a></li>
           <li><a href="${pageContext.request.contextPath}/searchFlights">Search Flights</a></li>
+          <li><a href="${pageContext.request.contextPath}/allFlights">All Flights</a></li>
           <li><a href="${pageContext.request.contextPath}/userBookings">My Bookings</a></li>
           <li><a href="${pageContext.request.contextPath}/userRefundHistory">Refund History</a></li>
-          <li><a href="${pageContext.request.contextPath}/profile">My Profile</a></li>
         </ul>
       </div>
       <div>
         <p class="as-footer-col-title">Support</p>
         <ul class="as-footer-col-links">
-          <li><a href="#">Help Center</a></li>
-          <li><a href="#">FAQs</a></li>
-          <li><a href="#">Cancellation Policy</a></li>
-          <li><a href="#">Baggage Policy</a></li>
-          <li><a href="#">Contact Us</a></li>
+          <li><a href="${pageContext.request.contextPath}/help">Help Center</a></li>
+          <li><a href="${pageContext.request.contextPath}/faqs">FAQs</a></li>
+          <li><a href="${pageContext.request.contextPath}/cancellationPolicy">Cancellation Policy</a></li>
+          <li><a href="${pageContext.request.contextPath}/baggagePolicy">Baggage Policy</a></li>
+          <li><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
         </ul>
       </div>
       <div>
         <p class="as-footer-col-title">Legal</p>
         <ul class="as-footer-col-links">
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="${pageContext.request.contextPath}/privacyPolicy">Privacy Policy</a></li>
+          <li><a href="${pageContext.request.contextPath}/termsOfService">Terms of Service</a></li>
+          <li><a href="${pageContext.request.contextPath}/cookiePolicy">Cookie Policy</a></li>
         </ul>
       </div>
     </div>
     <div class="as-footer-bottom">
       <p class="as-footer-copy">&copy; <%= new java.util.Date().getYear()+1900 %> AeroSphere. All rights reserved.</p>
       <div class="as-footer-bottom-links">
-        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a>
+        <a href="${pageContext.request.contextPath}/privacyPolicy">Privacy</a>
+        <a href="${pageContext.request.contextPath}/termsOfService">Terms</a>
+        <a href="${pageContext.request.contextPath}/cookiePolicy">Cookies</a>
       </div>
     </div>
   </div>

@@ -182,6 +182,28 @@ public class EmailService {
         sendAsync(toEmail, subject, body);
     }
 
+    /**
+     * Send a raw HTML email asynchronously.
+     * Used by ContactServlet to notify the admin of a new contact message.
+     */
+    public static void sendRaw(String toEmail, String subject, String htmlBody) {
+        sendAsync(toEmail, subject, htmlBody);
+    }
+
+    /**
+     * Send a raw HTML email SYNCHRONOUSLY.
+     * Used by AdminMessagesServlet to reply to users — returns true on success.
+     */
+    public static boolean sendRawSync(String toEmail, String subject, String htmlBody) {
+        try {
+            doSend(toEmail, subject, htmlBody);
+            return true;
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "[EmailService] sendRawSync failed to " + toEmail + ": " + e.getMessage(), e);
+            return false;
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────
     // Internal helpers
     // ─────────────────────────────────────────────────────────────────
