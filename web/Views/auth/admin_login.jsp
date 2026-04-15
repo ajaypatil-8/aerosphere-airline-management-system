@@ -75,10 +75,15 @@ body::after{content:'';position:fixed;width:500px;height:500px;border-radius:50%
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <div class="field-wrap"><span class="fi">🔐</span>
-          <input type="password" name="password" placeholder="Enter admin password" required>
+        <div class="field-wrap" style="position:relative"><span class="fi">🔐</span>
+          <input type="password" name="password" id="adminPwd" placeholder="Enter admin password" required>
+          <button type="button" onclick="var i=document.getElementById('adminPwd');i.type=i.type==='password'?'text':'password'" style="border:none;background:none;cursor:pointer;color:var(--muted);padding:0 4px;font-size:.85rem">👁</button>
+        </div>
+        <div style="text-align:right;margin-top:6px">
+          <a href="${pageContext.request.contextPath}/forgotPassword" style="font-size:.76rem;color:var(--muted);text-decoration:none">Forgot password?</a>
         </div>
       </div>
+      <input type="hidden" name="loginType" value="ADMIN">
       <button type="submit" class="btn-submit">Sign In to Admin Panel →</button>
     </form>
     <a href="${pageContext.request.contextPath}/login" class="back-link">← Back to User Login</a>

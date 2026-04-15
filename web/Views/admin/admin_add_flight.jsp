@@ -198,6 +198,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <!-- Route & Schedule -->
             <div class="form-grid">
               <div class="form-group">
+                <label class="form-label">Airline / Operator *</label>
+                <div class="field-wrap">
+                  <span class="fi">🏢</span>
+                  <input type="text" name="airline" placeholder="e.g. AeroSphere Airlines" required maxlength="100" autocomplete="off">
+                </div>
+                <span class="form-hint">Name of the operating airline</span>
+              </div>
+              <div class="form-group">
                 <label class="form-label">Flight Number *</label>
                 <div class="field-wrap">
                   <span class="fi">🛩</span>
@@ -210,6 +218,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                 <div class="field-wrap">
                   <span class="fi">📅</span>
                   <input type="date" name="depart_date" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Flight Class</label>
+                <div class="field-wrap">
+                  <span class="fi">🎫</span>
+                  <select name="flight_class">
+                    <option value="Economy">Economy</option>
+                    <option value="Business">Business</option>
+                    <option value="First Class">First Class</option>
+                  </select>
                 </div>
               </div>
               <div class="form-group">
@@ -230,15 +249,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                 <label class="form-label">Departure Time *</label>
                 <div class="field-wrap">
                   <span class="fi">🕐</span>
-                  <input type="time" name="depart_time" required>
+                  <input type="time" name="depart_time" id="departTime" required>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Arrival Time</label>
                 <div class="field-wrap">
                   <span class="fi">🕑</span>
-                  <input type="time" name="arrival_time">
+                  <input type="time" name="arrival_time" id="arrivalTime">
                 </div>
+                <span class="form-hint" id="arrivalHint"> </span>
               </div>
             </div>
 
@@ -318,6 +338,27 @@ overlay.addEventListener('click', () => {
 
 // Date min = today
 document.querySelector('input[name="depart_date"]').min = new Date().toISOString().split('T')[0];
+
+// Arrival time validation vs departure time
+var departTime = document.getElementById('departTime');
+var arrivalTime = document.getElementById('arrivalTime');
+var arrivalHint = document.getElementById('arrivalHint');
+function validateArrival(){
+  if(departTime.value && arrivalTime.value){
+    if(arrivalTime.value <= departTime.value){
+      arrivalHint.textContent = '⚠ Arrival time should be after departure (next day flights are fine)';
+      arrivalHint.style.color = '#EF4444';
+    } else {
+      var dep=departTime.value.split(':'), arr=arrivalTime.value.split(':');
+      var mins=(parseInt(arr[0])-parseInt(dep[0]))*60+(parseInt(arr[1])-parseInt(dep[1]));
+      var h=Math.floor(mins/60), m=mins%60;
+      arrivalHint.textContent = '✓ Duration: '+h+'h '+(m>0?m+'m':'');
+      arrivalHint.style.color = '#10B981';
+    }
+  } else { arrivalHint.textContent=' '; }
+}
+departTime.addEventListener('change', validateArrival);
+arrivalTime.addEventListener('change', validateArrival);
 
 // Live seat/price preview
 const priceInput = document.querySelector('input[name="price"]');

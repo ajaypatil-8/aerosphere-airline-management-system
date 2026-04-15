@@ -95,6 +95,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 .swap-btn{width:46px;height:42px;border:1.5px solid var(--border);border-radius:10px;background:var(--s1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--muted);transition:all .2s;align-self:flex-end;font-family:inherit}
 .swap-btn:hover{border-color:var(--sky);color:var(--sky);transform:rotate(180deg)}
 .btn-search{height:42px;padding:0 22px;font-size:.88rem;align-self:flex-end;white-space:nowrap;border-radius:10px}
+/* Route row: from + swap + to side by side */
+.search-route-row{display:grid;grid-template-columns:1fr 46px 1fr;gap:10px;align-items:end}
+.search-bottom-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-top:10px}
 
 /* ── Stats ── */
 .stats{padding:0 24px 80px;display:flex;justify-content:center}
@@ -165,15 +168,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
   .features-grid{grid-template-columns:1fr 1fr}
   .how-grid{grid-template-columns:1fr 1fr}
   .how-grid::before{display:none}
-  .search-grid{grid-template-columns:1fr 1fr}
-  .swap-btn,.btn-search{display:none}
+  .search-grid{display:none}
+  .search-route-row,.search-bottom-row{display:grid}
 }
 @media(max-width:580px){
   .hero{padding:90px 16px 48px}
   .features-grid{grid-template-columns:1fr}
   .how-grid{grid-template-columns:1fr}
   .hero-search{padding:18px 16px}
-  .search-grid{grid-template-columns:1fr}
+  .search-route-row{grid-template-columns:1fr 36px 1fr;gap:7px}
+  .search-bottom-row{grid-template-columns:1fr 1fr;gap:7px}
+  .btn-search-mobile{grid-column:1/-1;width:100%;justify-content:center}
   .cta-card{padding:36px 20px}
   .footer{padding:20px 20px;flex-direction:column;text-align:center}
 }
@@ -236,6 +241,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
   <div class="hero-search fu-3">
     <div class="search-label">✈ Quick Flight Search</div>
     <form action="${pageContext.request.contextPath}/searchFlights" method="get">
+      <%-- Desktop single-row grid (hidden on mobile via CSS) --%>
       <div class="search-grid">
         <div class="sf-group">
           <label class="sf-label">From</label>
@@ -269,6 +275,43 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
           </div>
         </div>
         <button type="submit" class="btn btn-grad btn-search">🔍 Search</button>
+      </div>
+      <%-- Mobile responsive layout (shown on ≤900px) --%>
+      <div class="search-route-row" style="display:none">
+        <div class="sf-group">
+          <label class="sf-label">From</label>
+          <div class="sf-wrap"><span class="sf-icon">🛫</span>
+            <input type="text" name="source" id="srcInputM" placeholder="Mumbai…" autocomplete="off">
+          </div>
+        </div>
+        <button type="button" class="swap-btn" id="swapBtnM" title="Swap">⇄</button>
+        <div class="sf-group">
+          <label class="sf-label">To</label>
+          <div class="sf-wrap"><span class="sf-icon">🛬</span>
+            <input type="text" name="destination" id="dstInputM" placeholder="Delhi…" autocomplete="off">
+          </div>
+        </div>
+      </div>
+      <div class="search-bottom-row" style="display:none;margin-top:10px">
+        <div class="sf-group">
+          <label class="sf-label">Date</label>
+          <div class="sf-wrap"><span class="sf-icon">📅</span>
+            <input type="date" name="date" id="dateInputM">
+          </div>
+        </div>
+        <div class="sf-group">
+          <label class="sf-label">Passengers</label>
+          <div class="sf-wrap"><span class="sf-icon">👥</span>
+            <select name="seats">
+              <option value="1">1 Passenger</option>
+              <option value="2">2 Passengers</option>
+              <option value="3">3 Passengers</option>
+              <option value="4">4 Passengers</option>
+              <option value="5">5 Passengers</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-grad btn-search btn-search-mobile" style="height:42px;padding:0 18px">🔍</button>
       </div>
     </form>
   </div>
@@ -395,16 +438,42 @@ const ham=document.getElementById('hamburger'),drawer=document.getElementById('m
 ham.addEventListener('click',()=>{ham.classList.toggle('open');drawer.classList.toggle('open');});
 function closeMobile(){ham.classList.remove('open');drawer.classList.remove('open');}
 
-// Swap cities
+// Swap cities (desktop)
 document.getElementById('swapBtn').addEventListener('click',()=>{
   const s=document.getElementById('srcInput'),d=document.getElementById('dstInput');
   [s.value,d.value]=[d.value,s.value];
   s.closest('.sf-wrap').style.boxShadow='0 0 0 3px var(--sky-glow)';
   setTimeout(()=>s.closest('.sf-wrap').style.boxShadow='',400);
 });
+// Swap cities (mobile)
+document.getElementById('swapBtnM').addEventListener('click',()=>{
+  const s=document.getElementById('srcInputM'),d=document.getElementById('dstInputM');
+  [s.value,d.value]=[d.value,s.value];
+});
+
+// Sync mobile inputs from desktop and vice versa
+function syncInputs(fromId, toId){
+  const from=document.getElementById(fromId), to=document.getElementById(toId);
+  if(from&&to) from.addEventListener('input',()=>to.value=from.value);
+}
+syncInputs('srcInput','srcInputM'); syncInputs('srcInputM','srcInput');
+syncInputs('dstInput','dstInputM'); syncInputs('dstInputM','dstInput');
+syncInputs('dateInput','dateInputM'); syncInputs('dateInputM','dateInput');
+
+// Responsive: show correct layout
+function applyLayout(){
+  const isMobile=window.innerWidth<=900;
+  document.querySelector('.search-grid').style.display=isMobile?'none':'grid';
+  document.querySelector('.search-route-row').style.display=isMobile?'grid':'none';
+  document.querySelector('.search-bottom-row').style.display=isMobile?'grid':'none';
+}
+applyLayout();
+window.addEventListener('resize',applyLayout);
 
 // Date min = today
-document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('dateInput').min=today;
+document.getElementById('dateInputM').min=today;
 
 // Scroll-reveal (IntersectionObserver)
 const obs=new IntersectionObserver(entries=>{

@@ -301,6 +301,9 @@
         <button type="submit" class="btn-login-submit">
           <span>Sign In</span><span>→</span>
         </button>
+        <div style="text-align:right;margin-top:10px">
+          <a href="${pageContext.request.contextPath}/forgotPassword" style="font-size:.8rem;color:var(--text-muted);text-decoration:none;transition:color .2s" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">Forgot password?</a>
+        </div>
       </form>
 
       <!-- ADMIN FORM (KEEP ALL name/action ATTRIBUTES EXACTLY) -->
@@ -336,6 +339,9 @@
 
       <div class="auth-bottom">
         <a href="${pageContext.request.contextPath}/register">Create a free account →</a>
+      </div>
+      <div class="auth-bottom" style="margin-top:10px">
+        <a href="${pageContext.request.contextPath}/" style="color:var(--text-muted);font-size:.82rem">← Back to Home</a>
       </div>
 
     </div>

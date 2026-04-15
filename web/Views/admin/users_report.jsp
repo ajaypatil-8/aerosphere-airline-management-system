@@ -124,7 +124,7 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
   </div>
   <div class="table-wrap animate-fadeup">
     <% if(users==null||users.isEmpty()){ %>
-      <div class="empty-state"><div class="empty-icon">👤</div><h3>No data available</h3></div>
+      <div class="empty-state"><div class="empty-icon">👤</div><h3>No data available</h3><p style="font-size:.83rem;margin-top:8px">The report servlet may not have returned data. Check your database connection and that the servlet is properly mapping the request attribute.</p></div>
     <%}else{%>
     <table class="sc-table">
       <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th></tr></thead>
