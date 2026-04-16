@@ -124,6 +124,44 @@ public class UserDAO {
         return false;
     }
 
+    /** Get user by email (for forgot-password flow) */
+    public User getUserByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email.toLowerCase().trim());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapRow(rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /** Reset password by email — no old-password check (OTP already verified) */
+    public boolean resetPasswordByEmail(String email, String newPassword) {
+        String sql = "UPDATE users SET password=? WHERE email=?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
+            ps.setString(2, email.toLowerCase().trim());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /** Change password by email — verifies old password first */
+    public boolean changePasswordByEmail(String email, String oldPassword, String newPassword) {
+        User user = getUserByEmail(email);
+        if (user == null) return false;
+        String stored = user.getPassword();
+        boolean match = (stored.startsWith("$2") ? BCrypt.checkpw(oldPassword, stored) : stored.equals(oldPassword));
+        if (!match) return false;
+        return resetPasswordByEmail(email, newPassword);
+    }
+
     /** Admin: get all users */
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();

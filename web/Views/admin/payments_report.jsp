@@ -138,7 +138,7 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
   <td style="color:var(--emerald);font-weight:600">#<%=p.bookingId%></td>
   <td><%=p.userName%></td>
   <td style="font-weight:700"><%=p.flightNo%></td>
-  <td style="font-size:.83rem"><%=p.source%> <span style="color:var(--sky)">→</span> <%=p.destination%></td>
+  <td style="font-size:.83rem"><%=p.route!=null?p.route:"—"%></td>
   <td style="color:var(--emerald);font-weight:700">₹<%=String.format("%,.0f",p.amount)%></td>
   <td style="font-size:.82rem"><%=p.paymentMethod!=null?p.paymentMethod:"—"%></td>
   <td><span class="badge <%=bc%>"><%=ps.substring(0,1).toUpperCase()+ps.substring(1)%></span></td>

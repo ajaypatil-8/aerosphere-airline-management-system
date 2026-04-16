@@ -66,7 +66,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 .mobile-drawer.open{transform:translateY(0);opacity:1;pointer-events:all}
 
 /* ── Hero ── */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+@media(min-height:800px){.hero{justify-content:center}}
+@media(max-height:799px){.hero{padding-top:88px;padding-bottom:32px}}
+@media(max-height:700px){.hero{padding-top:76px}.hero-title{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:12px}.hero-sub{margin-bottom:18px;font-size:.9rem}.hero-actions{margin-bottom:28px}}
 .hero-mesh{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hero-mesh::before{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,var(--sky-glow) 0%,transparent 70%);top:-200px;left:50%;transform:translateX(-50%);animation:float 8s ease-in-out infinite}
 .hero-mesh::after{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,var(--em-glow) 0%,transparent 70%);bottom:-100px;right:0;animation:float 10s ease-in-out infinite reverse}

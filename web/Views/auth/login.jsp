@@ -117,6 +117,8 @@
       display:flex; align-items:center; justify-content:center;
       padding:40px 48px; background:var(--bg);
       animation:fadeLeft .7s var(--ease) .1s both;
+      overflow-y:auto;
+      max-height:calc(100vh - 64px);
     }
     .auth-form-box { width:100%; max-width:360px; }
 
