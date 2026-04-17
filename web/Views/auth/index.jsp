@@ -83,11 +83,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;margin-bottom:56px}
 .btn-hero{padding:13px 28px;font-size:.95rem;border-radius:11px}
 /* Search card */
-.hero-search{background:var(--s0);border:1px solid var(--border);border-radius:18px;padding:22px 28px;box-shadow:var(--sh-xl);max-width:720px;width:100%;margin:0 auto;position:relative}
+.hero-search{background:var(--s0);border:1px solid var(--border);border-radius:18px;padding:22px 28px;box-shadow:var(--sh-xl);max-width:1100px;width:100%;margin:0 auto;position:relative;overflow:hidden}
 .hero-search::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);border-radius:18px 18px 0 0}
 .search-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px;text-align:left}
-.search-grid{display:grid;grid-template-columns:1fr 46px 1fr 1fr 1fr auto;gap:10px;align-items:end}
-.sf-group{display:flex;flex-direction:column;gap:6px;text-align:left}
+.search-grid{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) minmax(100px,1fr) minmax(110px,1fr) auto;gap:8px;align-items:end}
+.sf-group{display:flex;flex-direction:column;gap:6px;text-align:left;justify-content:flex-end}
 .sf-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .sf-wrap{display:flex;align-items:center;gap:8px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;padding:0 12px;transition:border-color .2s,box-shadow .2s}
 .sf-wrap:focus-within{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow)}
@@ -97,7 +97,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 .sf-wrap select{appearance:none;cursor:pointer}
 .swap-btn{width:46px;height:42px;border:1.5px solid var(--border);border-radius:10px;background:var(--s1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--muted);transition:all .2s;align-self:flex-end;font-family:inherit}
 .swap-btn:hover{border-color:var(--sky);color:var(--sky);transform:rotate(180deg)}
-.btn-search{height:42px;padding:0 22px;font-size:.88rem;align-self:flex-end;white-space:nowrap;border-radius:10px}
+.btn-search{height:42px;padding:0 16px;font-size:.85rem;align-self:flex-end;white-space:nowrap;border-radius:10px;flex-shrink:0}
 /* Route row: from + swap + to side by side */
 .search-route-row{display:grid;grid-template-columns:1fr 46px 1fr;gap:10px;align-items:end}
 .search-bottom-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-top:10px}
@@ -163,6 +163,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 .fu-4{animation-delay:.4s}.fu-5{animation-delay:.5s}
 
 /* ── Responsive ── */
+.search-mobile-row{display:none}
 @media(max-width:900px){
   .navbar{padding:0 24px}
   .nav-links{display:none}
@@ -173,12 +174,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
   .how-grid::before{display:none}
   .search-grid{display:none}
   .search-route-row,.search-bottom-row{display:grid}
+  .search-mobile-row{display:grid}
+}
+@media(max-width:760px){
+  .hero-search{padding:18px 16px}
 }
 @media(max-width:580px){
   .hero{padding:90px 16px 48px}
   .features-grid{grid-template-columns:1fr}
   .how-grid{grid-template-columns:1fr}
-  .hero-search{padding:18px 16px}
+  .hero-search{padding:16px 14px}
   .search-route-row{grid-template-columns:1fr 36px 1fr;gap:7px}
   .search-bottom-row{grid-template-columns:1fr 1fr;gap:7px}
   .btn-search-mobile{grid-column:1/-1;width:100%;justify-content:center}
@@ -280,7 +285,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
         <button type="submit" class="btn btn-grad btn-search">🔍 Search</button>
       </div>
       <%-- Mobile responsive layout (shown on ≤900px) --%>
-      <div class="search-route-row" style="display:none">
+      <div class="search-route-row search-mobile-row">
         <div class="sf-group">
           <label class="sf-label">From</label>
           <div class="sf-wrap"><span class="sf-icon">🛫</span>
@@ -295,7 +300,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
           </div>
         </div>
       </div>
-      <div class="search-bottom-row" style="display:none;margin-top:10px">
+      <div class="search-bottom-row search-mobile-row" style="margin-top:10px">
         <div class="sf-group">
           <label class="sf-label">Date</label>
           <div class="sf-wrap"><span class="sf-icon">📅</span>
@@ -464,14 +469,7 @@ syncInputs('dstInput','dstInputM'); syncInputs('dstInputM','dstInput');
 syncInputs('dateInput','dateInputM'); syncInputs('dateInputM','dateInput');
 
 // Responsive: show correct layout
-function applyLayout(){
-  const isMobile=window.innerWidth<=900;
-  document.querySelector('.search-grid').style.display=isMobile?'none':'grid';
-  document.querySelector('.search-route-row').style.display=isMobile?'grid':'none';
-  document.querySelector('.search-bottom-row').style.display=isMobile?'grid':'none';
-}
-applyLayout();
-window.addEventListener('resize',applyLayout);
+// Layout handled by CSS media queries
 
 // Date min = today
 const today=new Date().toISOString().split('T')[0];

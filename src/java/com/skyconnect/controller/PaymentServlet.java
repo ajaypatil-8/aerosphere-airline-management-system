@@ -59,8 +59,13 @@ public class PaymentServlet extends HttpServlet {
         try (Connection con = DBConnection.getConnection()) {
 
             String sql =
-                "SELECT total_amount, status, payment_status " +
-                "FROM bookings WHERE id=? AND user_id=?";
+                "SELECT b.total_amount, b.status, b.payment_status, b.num_seats, " +
+                "f.flight_no, f.source, f.destination, " +
+                "DATE_FORMAT(f.depart_date,'%d %b %Y') AS depart_date, " +
+                "TIME_FORMAT(f.depart_time,'%H:%i') AS depart_time, " +
+                "TIME_FORMAT(f.arrival_time,'%H:%i') AS arrival_time " +
+                "FROM bookings b JOIN flights f ON b.flight_id=f.id " +
+                "WHERE b.id=? AND b.user_id=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, bookingId);
             ps.setInt(2, userId);
@@ -91,6 +96,13 @@ public class PaymentServlet extends HttpServlet {
             req.setAttribute("baseAmount",  amount);
             req.setAttribute("gst",         gst);
             req.setAttribute("finalAmount", finalAmount);
+            req.setAttribute("numSeats",    rs.getInt("num_seats"));
+            req.setAttribute("flightNo",    rs.getString("flight_no"));
+            req.setAttribute("source",      rs.getString("source"));
+            req.setAttribute("destination", rs.getString("destination"));
+            req.setAttribute("departDate",  rs.getString("depart_date"));
+            req.setAttribute("departTime",  rs.getString("depart_time"));
+            req.setAttribute("arrivalTime", rs.getString("arrival_time"));
 
             req.getRequestDispatcher("/Views/user/payment.jsp").forward(req, resp);
 

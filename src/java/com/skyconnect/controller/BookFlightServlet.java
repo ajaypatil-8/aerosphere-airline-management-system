@@ -206,6 +206,28 @@ import java.sql.*;
 public class BookFlightServlet extends HttpServlet {
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
+
+        if (userId == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        String flightIdStr = req.getParameter("flightId");
+        if (flightIdStr == null) {
+            resp.sendRedirect(req.getContextPath() + "/searchFlights");
+            return;
+        }
+
+        // Forward to the booking confirmation page (JSP handles DB fetch)
+        req.getRequestDispatcher("/Views/user/book_flight.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 

@@ -85,6 +85,7 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 </style>
 </head>
 <body>
+<div class="as-admin-layout">
 <%@ include file="/Views/common/sidebar.jsp" %>
 <div class="as-main">
   <div class="topbar">
@@ -145,5 +146,6 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 })();
 
 </script>
+</div><!-- as-admin-layout -->
 </body>
 </html>
