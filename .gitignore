@@ -27,3 +27,9 @@ desktop.ini
 # ── Logs ───────────────────────────────────────────────────────
 logs/
 *.log
+
+
+/build/
+/target/
+*.class
+*.log
