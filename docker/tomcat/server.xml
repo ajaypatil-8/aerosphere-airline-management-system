@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    AeroSphere — Tuned Tomcat server.xml
+    Removes AJP connector, disables autoDeploy, adds compression
+-->
+<Server port="8005" shutdown="SHUTDOWN">
+    <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+    <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+    <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+    <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+    <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+
+    <Service name="Catalina">
+
+        <Connector port="8080" protocol="HTTP/1.1"
+                   connectionTimeout="20000"
+                   redirectPort="8443"
+                   maxThreads="200"
+                   minSpareThreads="10"
+                   compression="on"
+                   compressableMimeType="text/html,text/xml,text/plain,text/css,application/json,application/javascript"
+                   compressionMinSize="1024"
+                   URIEncoding="UTF-8"
+                   server="AeroSphere" />
+
+        <!-- AJP connector DISABLED (security: CVE-2020-1938 Ghostcat) -->
+
+        <Engine name="Catalina" defaultHost="localhost">
+
+            <Host name="localhost" appBase="webapps"
+                  unpackWARs="true"
+                  autoDeploy="false"
+                  deployOnStartup="true">
+
+                <Valve className="org.apache.catalina.valves.AccessLogValve"
+                       directory="logs"
+                       prefix="access_log"
+                       suffix=".txt"
+                       pattern="%h %l %u %t &quot;%r&quot; %s %b %D ms" />
+
+                <Valve className="org.apache.catalina.valves.RemoteIpValve"
+                       remoteIpHeader="x-forwarded-for"
+                       protocolHeader="x-forwarded-proto" />
+
+            </Host>
+        </Engine>
+    </Service>
+</Server>

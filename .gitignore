@@ -1,48 +1,29 @@
-
-build/
-dist/
+# ── Build outputs ──────────────────────────────────────────────
 target/
-
-
-nbproject/private/
-.idea/
-*.iml
-*.iws
-*.ipr
-.classpath
-.project
-.settings/
-
-
+*.war
+*.jar
 *.class
 
-*.jar
-!web/WEB-INF/lib/*.jar
+# ── Environment / Secrets — NEVER commit these ─────────────────
+.env
+*.env.local
+*.env.production
 
-# Logs
-*.log
-logs/
+# ── IDE files ──────────────────────────────────────────────────
+.idea/
+*.iml
+.eclipse/
+.settings/
+.project
+.classpath
+nbproject/
+nb-configuration.xml
 
-
-*.tmp
-*.bak
-*.swp
-
-
+# ── OS files ───────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 desktop.ini
 
-
-web/META-INF/context.xml
-build/web/META-INF/context.xml
-
-
-application.properties
-db.properties
-config.properties
-.env
-
-
-!nbproject/project.properties
-!nbproject/genfiles.properties
+# ── Logs ───────────────────────────────────────────────────────
+logs/
+*.log

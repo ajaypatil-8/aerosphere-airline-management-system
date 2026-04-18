@@ -1,120 +1,99 @@
 package com.skyconnect.util;
 
 import javax.servlet.ServletContext;
+import java.util.logging.Logger;
 
 /**
  * AeroSphere — Centralized Application Configuration
  *
- * Singleton populated at startup by AppInitListener.
- * All values come from META-INF/context.xml  <Parameter> entries.
- *
- * Usage anywhere in the app:
- *   AppConfig cfg = AppConfig.get();
- *   String keyId  = cfg.getRazorpayKeyId();
+ * Resolution order (first non-empty value wins):
+ *   1. Environment variable  → ideal for Docker / Kubernetes
+ *   2. context.xml <Parameter> → fallback for local Tomcat dev
+ *   3. Hard-coded default   → safe fallback
  */
 public class AppConfig {
 
+    private static final Logger LOG = Logger.getLogger(AppConfig.class.getName());
     private static volatile AppConfig instance;
 
-    // ── Database ───────────────────────────────────────────────
     private String dbUrl;
     private String dbUser;
     private String dbPassword;
-
-    // ── Razorpay ───────────────────────────────────────────────
     private String razorpayKeyId;
     private String razorpayKeySecret;
-
-    // ── SMTP / Email ───────────────────────────────────────────
     private String smtpHost;
     private int    smtpPort;
     private String smtpUser;
     private String smtpPassword;
     private String smtpFrom;
-
-    // ── SMS ────────────────────────────────────────────────────
     private String smsApiKey;
-
-    // ── App ────────────────────────────────────────────────────
     private String appName;
     private String appBaseUrl;
 
     private AppConfig() {}
 
-    // ─────────────────────────────────────────────────────────────
-    // Initialisation — called ONCE by AppInitListener on startup
-    // ─────────────────────────────────────────────────────────────
-
     public static synchronized void init(ServletContext ctx) {
-        if (instance != null) return;   // already initialised
-
+        if (instance != null) return;
         AppConfig cfg = new AppConfig();
 
-        cfg.dbUrl           = param(ctx, "db.url",      "jdbc:mysql://localhost:3306/airlinedb?useSSL=false&serverTimezone=UTC");
-        cfg.dbUser          = param(ctx, "db.user",     "root");
-        cfg.dbPassword      = param(ctx, "db.password", "");
-
-        cfg.razorpayKeyId     = param(ctx, "razorpay.key_id",     "");
-        cfg.razorpayKeySecret = param(ctx, "razorpay.key_secret", "");
-
-        cfg.smtpHost        = param(ctx, "smtp.host",     "smtp.gmail.com");
-        cfg.smtpPort        = Integer.parseInt(param(ctx, "smtp.port", "587"));
-        cfg.smtpUser        = param(ctx, "smtp.user",     "");
-        cfg.smtpPassword    = param(ctx, "smtp.password", "");
-        cfg.smtpFrom        = param(ctx, "smtp.from",     "AeroSphere");
-
-        cfg.smsApiKey       = param(ctx, "sms.api.key",  "");
-
-        cfg.appName         = param(ctx, "app.name",     "AeroSphere");
-        cfg.appBaseUrl      = param(ctx, "app.baseUrl",  "http://localhost:8080/airline");
+        cfg.dbUrl      = resolve(ctx, "DB_URL",      "db.url",
+                "jdbc:mysql://mysql:3306/airlinedb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true");
+        cfg.dbUser     = resolve(ctx, "DB_USER",     "db.user",     "root");
+        cfg.dbPassword = resolve(ctx, "DB_PASSWORD", "db.password", "");
+        cfg.razorpayKeyId     = resolve(ctx, "RAZORPAY_KEY_ID",     "razorpay.key_id",     "");
+        cfg.razorpayKeySecret = resolve(ctx, "RAZORPAY_KEY_SECRET", "razorpay.key_secret", "");
+        cfg.smtpHost     = resolve(ctx, "SMTP_HOST",     "smtp.host",     "smtp.gmail.com");
+        cfg.smtpPort     = Integer.parseInt(resolve(ctx, "SMTP_PORT", "smtp.port", "587"));
+        cfg.smtpUser     = resolve(ctx, "SMTP_USER",     "smtp.user",     "");
+        cfg.smtpPassword = resolve(ctx, "SMTP_PASSWORD", "smtp.password", "");
+        cfg.smtpFrom     = resolve(ctx, "SMTP_FROM",     "smtp.from",     "AeroSphere");
+        cfg.smsApiKey    = resolve(ctx, "SMS_API_KEY",   "sms.api.key",   "");
+        cfg.appName      = resolve(ctx, "APP_NAME",      "app.name",      "AeroSphere");
+        cfg.appBaseUrl   = resolve(ctx, "APP_BASE_URL",  "app.baseUrl",   "http://localhost");
 
         instance = cfg;
+
+        LOG.info("══════════════════════════════════════════");
+        LOG.info("  AeroSphere — Configuration Loaded");
+        LOG.info("  DB URL    : " + cfg.dbUrl);
+        LOG.info("  Razorpay  : " + (cfg.isRazorpayConfigured() ? "CONFIGURED" : "NOT SET"));
+        LOG.info("  SMTP      : " + (cfg.isSmtpConfigured() ? cfg.smtpUser : "NOT SET"));
+        LOG.info("  App URL   : " + cfg.appBaseUrl);
+        LOG.info("══════════════════════════════════════════");
     }
 
-    /**
-     * Returns the singleton.
-     * Throws if called before AppInitListener has run.
-     */
     public static AppConfig get() {
-        if (instance == null) {
-            throw new IllegalStateException(
-                "AppConfig not initialized. Is AppInitListener registered in web.xml?");
-        }
+        if (instance == null) throw new IllegalStateException("AppConfig not initialized.");
         return instance;
     }
 
-    // ── Private helper ─────────────────────────────────────────
-    private static String param(ServletContext ctx, String name, String fallback) {
-        String v = ctx.getInitParameter(name);
-        return (v != null && !v.trim().isEmpty()) ? v.trim() : fallback;
+    private static String resolve(ServletContext ctx, String envKey, String paramName, String fallback) {
+        String envVal = System.getenv(envKey);
+        if (envVal != null && !envVal.trim().isEmpty()) return envVal.trim();
+        if (ctx != null) {
+            String paramVal = ctx.getInitParameter(paramName);
+            if (paramVal != null && !paramVal.trim().isEmpty()) return paramVal.trim();
+        }
+        return fallback;
     }
-
-    // ── Getters ────────────────────────────────────────────────
 
     public String getDbUrl()             { return dbUrl; }
     public String getDbUser()            { return dbUser; }
     public String getDbPassword()        { return dbPassword; }
-
     public String getRazorpayKeyId()     { return razorpayKeyId; }
     public String getRazorpayKeySecret() { return razorpayKeySecret; }
-
     public String getSmtpHost()          { return smtpHost; }
     public int    getSmtpPort()          { return smtpPort; }
     public String getSmtpUser()          { return smtpUser; }
     public String getSmtpPassword()      { return smtpPassword; }
     public String getSmtpFrom()          { return smtpFrom; }
-
     public String getSmsApiKey()         { return smsApiKey; }
-
     public String getAppName()           { return appName; }
     public String getAppBaseUrl()        { return appBaseUrl; }
 
-    /** Returns true if Razorpay keys are configured (not placeholder). */
     public boolean isRazorpayConfigured() {
         return !razorpayKeyId.isEmpty() && !razorpayKeyId.startsWith("rzp_test_XXX");
     }
-
-    /** Returns true if SMTP is configured for sending emails. */
     public boolean isSmtpConfigured() {
         return !smtpUser.isEmpty() && !smtpUser.contains("your_gmail");
     }
