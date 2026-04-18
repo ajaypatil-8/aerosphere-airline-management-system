@@ -71,6 +71,10 @@ tbody tr:hover{background:var(--sky-glow)}
 .btn-cancel:hover{background:rgba(239,68,68,.15)}
 .btn-receipt{padding:5px 12px;border:1px solid var(--border);border-radius:8px;font-size:.77rem;font-weight:600;color:var(--sky);text-decoration:none;transition:all .2s}
 .btn-receipt:hover{border-color:var(--sky);background:var(--sky-glow)}
+.btn-invoice{padding:5px 12px;border:1px solid var(--emerald);border-radius:8px;font-size:.77rem;font-weight:600;color:var(--emerald);text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.btn-invoice:hover{background:rgba(16,185,129,.1)}
+.btn-pdf{padding:5px 12px;background:linear-gradient(135deg,var(--sky),var(--emerald));border:none;border-radius:8px;font-size:.77rem;font-weight:700;color:#fff;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.btn-pdf:hover{opacity:.88;transform:translateY(-1px)}
 .empty-state{text-align:center;padding:56px 24px;color:var(--text-muted)}
 .empty-icon{font-size:2.5rem;margin-bottom:12px}
 .empty-state h3{font-family:'Syne',sans-serif;color:var(--text)}
@@ -124,6 +128,10 @@ tbody tr:hover{background:var(--sky-glow)}
                   <input type="hidden" name="bookingId" value="<%=b.id%>">
                   <button type="submit" class="btn-cancel">Cancel</button>
                 </form>
+                <a href="${pageContext.request.contextPath}/invoice?bookingId=<%=b.id%>" class="btn-invoice">📄 Invoice</a>
+                <% if("PAID".equals(b.paymentStatus)){%>
+                  <a href="${pageContext.request.contextPath}/invoice?bookingId=<%=b.id%>&download=true" class="btn-pdf">⬇ PDF</a>
+                <%}%>
               <%}%>
               <% if("CANCELLED".equals(st)){%>
                 <a href="${pageContext.request.contextPath}/refundReceipt?bookingId=<%=b.id%>" class="btn-receipt">Receipt</a>

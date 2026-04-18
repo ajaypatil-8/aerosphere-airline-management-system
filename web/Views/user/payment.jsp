@@ -273,12 +273,33 @@ async function startPayment() {
       },
       notes: { booking_id: '<%= bookingId %>' },
       theme: { color: '#0EA5E9' },
-      handler: function(response) {
-        // 3. Submit to verifyPayment servlet
-        document.getElementById('f_payment_id').value = response.razorpay_payment_id;
-        document.getElementById('f_order_id').value   = response.razorpay_order_id;
-        document.getElementById('f_signature').value  = response.razorpay_signature;
-        document.getElementById('verifyForm').submit();
+      handler: async function(response) {
+        // 3. Verify payment signature on server via fetch (servlet returns JSON)
+        try {
+          var params = new URLSearchParams();
+          params.append('razorpay_payment_id', response.razorpay_payment_id);
+          params.append('razorpay_order_id',   response.razorpay_order_id);
+          params.append('razorpay_signature',  response.razorpay_signature);
+          params.append('bookingId',           '<%= bookingId %>');
+
+          var vRes = await fetch('${pageContext.request.contextPath}/verifyPayment', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: params.toString()
+          });
+
+          var vData = await vRes.json();
+
+          if (vData.success && vData.redirect) {
+            window.location.href = vData.redirect;
+          } else {
+            showErr(vData.error || 'Payment verification failed. Contact support.');
+            btn.classList.remove('loading'); btn.disabled = false;
+          }
+        } catch(e) {
+          showErr('Verification error. Please check My Bookings to confirm status.');
+          btn.classList.remove('loading'); btn.disabled = false;
+        }
       },
       modal: {
         ondismiss: function() {

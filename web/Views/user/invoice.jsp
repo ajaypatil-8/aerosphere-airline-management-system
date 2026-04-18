@@ -1,40 +1,54 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.flightapp.model.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="java.util.List, com.skyconnect.controller.InvoiceServlet.Passenger" %>
 <%
     HttpSession sess = request.getSession(false);
-    String userEmail = (sess != null) ? (String) sess.getAttribute("userEmail") : null;
-    if (userEmail == null) { response.sendRedirect("login.jsp"); return; }
+    String userName = (sess != null) ? (String) sess.getAttribute("userName") : null;
+    if (userName == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
 
-    // ── Preserve all existing attribute reads ──
-    String bookingId     = (String) request.getAttribute("bookingId");
-    String flightNo      = (String) request.getAttribute("flightNo");
-    String from          = (String) request.getAttribute("from");
-    String to            = (String) request.getAttribute("to");
-    String depTime       = (String) request.getAttribute("depTime");
-    String arrTime       = (String) request.getAttribute("arrTime");
-    String depDate       = (String) request.getAttribute("depDate");
-    String travelClass   = (String) request.getAttribute("travelClass");
-    String seatNumbers   = (String) request.getAttribute("seatNumbers");
-    String passengers    = (String) request.getAttribute("passengers");
-    String totalFare     = (String) request.getAttribute("totalFare");
-    String paymentId     = (String) request.getAttribute("paymentId");
-    String passengerName = (String) request.getAttribute("passengerName");
-    String bookingDate   = (String) request.getAttribute("bookingDate");
-    String airline       = (String) request.getAttribute("airline");
-    String duration      = (String) request.getAttribute("duration");
+    // Attributes set by InvoiceServlet.doGet
+    Integer bookingId     = (Integer) request.getAttribute("bookingId");
+    if (bookingId == null) { response.sendRedirect(request.getContextPath() + "/userBookings"); return; }
+
+    String  userEmail     = (String)  request.getAttribute("userEmail");
+    String  flightNo      = (String)  request.getAttribute("flightNo");
+    String  source        = (String)  request.getAttribute("source");
+    String  destination   = (String)  request.getAttribute("destination");
+    String  departDate    = (String)  request.getAttribute("departDate");
+    String  departTime    = (String)  request.getAttribute("departTime");
+    String  arrivalTime   = (String)  request.getAttribute("arrivalTime");
+    Integer seats         = (Integer) request.getAttribute("seats");
+    Double  amount        = (Double)  request.getAttribute("amount");
+    Double  gst           = (Double)  request.getAttribute("gst");
+    Double  totalAmount   = (Double)  request.getAttribute("totalAmount");
+    Double  paidAmount    = (Double)  request.getAttribute("paidAmount");
+    String  paymentMethod = (String)  request.getAttribute("paymentMethod");
+    String  paymentStatus = (String)  request.getAttribute("paymentStatus");
+    String  status        = (String)  request.getAttribute("status");
+    @SuppressWarnings("unchecked")
+    List<Passenger> passengers = (List<Passenger>) request.getAttribute("passengers");
+
+    if (seats    == null) seats    = 1;
+    if (amount   == null) amount   = 0.0;
+    if (gst      == null) gst      = 0.0;
+    if (paidAmount == null) paidAmount = (totalAmount != null ? totalAmount : 0.0);
+    if (userEmail == null) userEmail = "";
+
+    String srcCode = (source != null && source.length() >= 3) ? source.substring(0,3).toUpperCase() : (source != null ? source.toUpperCase() : "DEP");
+    String dstCode = (destination != null && destination.length() >= 3) ? destination.substring(0,3).toUpperCase() : (destination != null ? destination.toUpperCase() : "ARR");
+    boolean isPaid = "PAID".equals(paymentStatus);
 %>
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>E-Ticket — Booking <%= bookingId %></title>
-
+    <title>E-Ticket — Booking #<%= bookingId %> – AeroSphere</title>
+    <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-    <link rel="stylesheet" href="assests/css/style.css"/>
-    <link rel="stylesheet" href="assests/css/animations.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css"/>
 
     <style>
         .inv-page {
@@ -471,7 +485,7 @@
 </head>
 <body>
 <div class="inv-page">
-    <%@ include file="common/navbar.jsp" %>
+    <%@ include file="/Views/common/navbar.jsp" %>
 
     <div class="inv-wrapper">
 
@@ -480,14 +494,14 @@
             <div>
                 <div class="inv-page-title">E-Ticket &amp; <span>Invoice</span></div>
                 <div style="font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text-muted); margin-top:.3rem;">
-                    Booking confirmed • <%= bookingDate != null ? bookingDate : "—" %>
+                    Booking #<%= bookingId %> &nbsp;·&nbsp; <%= departDate != null ? departDate : "—" %>
                 </div>
             </div>
             <div class="inv-actions">
                 <button class="btn-inv" onclick="window.print()">
                     <i class="fa fa-print"></i> Print
                 </button>
-                <a href="DownloadInvoiceServlet?bookingId=<%= bookingId %>" class="btn-inv primary">
+                <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= bookingId %>&download=true" class="btn-inv primary">
                     <i class="fa fa-download"></i> Download PDF
                 </a>
             </div>
@@ -500,23 +514,23 @@
                 <div class="bp-watermark">✈</div>
                 <div class="bp-airline-row">
                     <div>
-                        <div class="bp-airline-name">✈ <%= airline != null ? airline : "SkyBook Airlines" %></div>
+                        <div class="bp-airline-name">✈ AeroSphere Airlines</div>
                         <div class="bp-flight-no">Flight <%= flightNo != null ? flightNo : "—" %></div>
                     </div>
                     <div class="bp-status">
                         <div class="bp-status-dot"></div>
-                        Confirmed
+                        <%= isPaid ? "Confirmed" : status != null ? status : "Booked" %>
                     </div>
                 </div>
                 <!-- Route -->
                 <div class="bp-route">
                     <div class="bp-city">
-                        <div class="bp-city-code"><%= from != null ? from.substring(0, Math.min(3, from.length())).toUpperCase() : "DEP" %></div>
-                        <div class="bp-city-name"><%= from != null ? from : "Departure" %></div>
-                        <div class="bp-city-time"><%= depTime != null ? depTime : "--:--" %></div>
+                        <div class="bp-city-code"><%= srcCode %></div>
+                        <div class="bp-city-name"><%= source != null ? source : "Departure" %></div>
+                        <div class="bp-city-time"><%= departTime != null ? departTime : "--:--" %></div>
                     </div>
                     <div class="bp-route-mid">
-                        <div class="bp-duration"><%= duration != null ? duration : "Direct" %></div>
+                        <div class="bp-duration">Direct</div>
                         <div class="bp-route-line">
                             <div class="bp-dot"></div>
                             <div class="bp-line"></div>
@@ -527,9 +541,9 @@
                         <div class="bp-duration" style="color:rgba(255,255,255,.25); font-size:.7rem;">Direct Flight</div>
                     </div>
                     <div class="bp-city right">
-                        <div class="bp-city-code"><%= to != null ? to.substring(0, Math.min(3, to.length())).toUpperCase() : "ARR" %></div>
-                        <div class="bp-city-name"><%= to != null ? to : "Arrival" %></div>
-                        <div class="bp-city-time"><%= arrTime != null ? arrTime : "--:--" %></div>
+                        <div class="bp-city-code"><%= dstCode %></div>
+                        <div class="bp-city-name"><%= destination != null ? destination : "Arrival" %></div>
+                        <div class="bp-city-time"><%= arrivalTime != null ? arrivalTime : "--:--" %></div>
                     </div>
                 </div>
             </div>
@@ -547,19 +561,29 @@
             <div class="bp-info-grid">
                 <div class="bp-info-cell">
                     <div class="bp-info-label">Passenger</div>
-                    <div class="bp-info-val"><%= passengerName != null ? passengerName : "—" %></div>
+                    <div class="bp-info-val"><%= userName %></div>
                 </div>
                 <div class="bp-info-cell">
                     <div class="bp-info-label">Date</div>
-                    <div class="bp-info-val"><%= depDate != null ? depDate : "—" %></div>
+                    <div class="bp-info-val"><%= departDate != null ? departDate : "—" %></div>
                 </div>
                 <div class="bp-info-cell">
                     <div class="bp-info-label">Class</div>
-                    <div class="bp-info-val"><%= travelClass != null ? travelClass : "Economy" %></div>
+                    <div class="bp-info-val">Economy</div>
                 </div>
                 <div class="bp-info-cell">
                     <div class="bp-info-label">Seat(s)</div>
-                    <div class="bp-info-val mono"><%= seatNumbers != null ? seatNumbers : "—" %></div>
+                    <div class="bp-info-val mono">
+                        <%
+                          if (passengers != null && !passengers.isEmpty()) {
+                              StringBuilder seatList = new StringBuilder();
+                              for (Passenger p : passengers) {
+                                  if (p.seatNo != null) { if (seatList.length()>0) seatList.append(", "); seatList.append(p.seatNo); }
+                              }
+                              out.print(seatList.length() > 0 ? seatList.toString() : seats + " seat(s)");
+                          } else { out.print(seats + " seat(s)"); }
+                        %>
+                    </div>
                 </div>
             </div>
 
@@ -583,54 +607,49 @@
             </div>
             <table class="inv-table">
                 <tr>
-                    <td>Base Fare (<%= passengers != null ? passengers : "1" %> passenger(s))</td>
-                    <td>₹<%= totalFare != null ? totalFare : "0" %></td>
+                    <td>Base Fare (<%= seats %> passenger<%= seats > 1 ? "s" : "" %>)</td>
+                    <td>₹<%= String.format("%,.2f", amount) %></td>
                 </tr>
                 <tr>
-                    <td>Taxes &amp; Airport Charges</td>
-                    <td style="color:var(--text-muted);">Included</td>
+                    <td>GST (5%)</td>
+                    <td>₹<%= String.format("%,.2f", gst) %></td>
                 </tr>
                 <tr>
-                    <td>Seat Selection</td>
-                    <td style="color:var(--accent-green);">Complimentary</td>
-                </tr>
-                <tr>
-                    <td>Convenience Fee</td>
-                    <td style="color:var(--text-muted);">₹0</td>
+                    <td>Payment Method</td>
+                    <td><%= paymentMethod != null ? paymentMethod : "—" %></td>
                 </tr>
                 <tr class="total-row">
                     <td>Total Paid</td>
-                    <td>₹<%= totalFare != null ? totalFare : "0" %></td>
+                    <td>₹<%= String.format("%,.2f", paidAmount) %></td>
                 </tr>
             </table>
             <div class="inv-verified-banner">
                 <div class="ivb-icon"><i class="fa fa-circle-check"></i></div>
                 <div class="ivb-text">
-                    <div class="ivb-title">Payment Verified</div>
+                    <div class="ivb-title"><%= isPaid ? "Payment Verified" : "Booking Confirmed" %></div>
                     <div class="ivb-sub">Processed securely via Razorpay</div>
                 </div>
-                <div class="ivb-pid">TXN: <%= paymentId != null ? paymentId : "—" %></div>
+                <div class="ivb-pid">Booking #<%= String.format("%06d", bookingId) %></div>
             </div>
         </div>
-
         <!-- CTA strip -->
         <div class="inv-cta-strip">
-            <a href="user_dashboard.jsp" class="btn-inv">
+            <a href="${pageContext.request.contextPath}/userDashboard" class="btn-inv">
                 <i class="fa fa-arrow-left"></i> Back to Dashboard
             </a>
-            <a href="seat_map.jsp?bookingId=<%= bookingId %>" class="btn-inv">
-                <i class="fa fa-chair"></i> View Seat Map
+            <a href="${pageContext.request.contextPath}/userBookings" class="btn-inv">
+                <i class="fa fa-list"></i> My Bookings
             </a>
-            <a href="DownloadInvoiceServlet?bookingId=<%= bookingId %>" class="btn-inv primary">
-                <i class="fa fa-download"></i> Download E-Ticket
+            <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= bookingId %>&download=true" class="btn-inv primary">
+                <i class="fa fa-download"></i> Download E-Ticket PDF
             </a>
         </div>
 
     </div>
-    <%@ include file="common/footer.jsp" %>
+    <%@ include file="/Views/common/Footer.jsp" %>
 </div>
 
-<script src="assests/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/assests/js/main.js"></script>
 <script>
     /* ── Decorative barcode generator ── */
     (function() {
