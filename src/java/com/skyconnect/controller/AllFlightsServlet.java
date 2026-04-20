@@ -23,11 +23,12 @@ public class AllFlightsServlet extends HttpServlet {
             return;
         }
 
-        // Fetch all flights ordered by date + time
+        // Fetch only upcoming/current flights (filter out past departures)
         List<Map<String, Object>> flights = new ArrayList<>();
         String sql = "SELECT id, flight_no, source, destination, depart_date, " +
                      "depart_time, arrival_time, price, seats_total, seats_available " +
                      "FROM flights " +
+                     "WHERE TIMESTAMP(depart_date, depart_time) >= NOW() " +
                      "ORDER BY depart_date ASC, depart_time ASC";
 
         try (Connection con = DBConnection.getConnection();

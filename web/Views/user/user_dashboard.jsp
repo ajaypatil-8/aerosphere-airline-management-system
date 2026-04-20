@@ -124,6 +124,8 @@
   box-shadow: 0 0 0 3px var(--primary-glow);
 }
 .search-field input::placeholder { color: var(--text-faint); }
+input[type="date"] { color-scheme: light; }
+[data-theme="dark"] input[type="date"] { color-scheme: dark; }
 .btn-search {
   padding: 10px 22px; background: var(--grad-brand);
   color: #fff; border: none; border-radius: var(--radius-sm);

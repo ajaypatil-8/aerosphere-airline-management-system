@@ -67,6 +67,8 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 .field-wrap input:focus,.field-wrap select:focus{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow);background:var(--card-bg)}
 .btn-submit{padding:12px 32px;background:var(--grad);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 5px 16px var(--sky-glow)}
+input[type="date"]{color-scheme:light}
+[data-theme="dark"] input[type="date"]{color-scheme:dark}
 @media(max-width:640px){.pax-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -93,11 +95,10 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
       <div class="pax-badge">Passenger <%=p%></div>
       <div class="pax-grid">
         <div class="form-group"><label>Full Name</label><div class="field-wrap"><span class="fi">👤</span><input type="text" name="full_name[]" required placeholder="Full name"></div></div>
-        <div class="form-group"><label>Age</label><div class="field-wrap"><span class="fi">🔢</span><input type="number" name="age[]" min="1" max="120" required placeholder="Age"></div></div>
+        <div class="form-group"><label>Date of Birth</label><div class="field-wrap"><span class="fi">📅</span><input type="date" name="dob[]" class="dob-input" required max="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>"></div></div>
         <div class="form-group"><label>Gender</label><div class="field-wrap"><span class="fi">⚧</span><select name="gender[]" required><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div></div>
         <div class="form-group"><label>Phone</label><div class="field-wrap"><span class="fi">📞</span><input type="tel" name="phone[]" required placeholder="Phone number"></div></div>
         <div class="form-group"><label>Email</label><div class="field-wrap"><span class="fi">✉️</span><input type="email" name="email[]" required placeholder="Email address"></div></div>
-        <div class="form-group"><label>Date of Birth</label><div class="field-wrap"><span class="fi">📅</span><input type="date" name="dob[]" placeholder="YYYY-MM-DD"></div></div>
       </div>
     </div>
     <%}%>
@@ -114,6 +115,31 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
   apply(document.documentElement.getAttribute('data-theme')||'light');
   btn.addEventListener('click',function(){apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
 })();
+
+// Auto-calculate age from DOB
+function calcAge(dob){
+  if(!dob) return '';
+  var today=new Date(), birth=new Date(dob);
+  var age=today.getFullYear()-birth.getFullYear();
+  var m=today.getMonth()-birth.getMonth();
+  if(m<0||(m===0&&today.getDate()<birth.getDate())) age--;
+  return age;
+}
+document.querySelectorAll('.dob-input').forEach(function(input){
+  input.addEventListener('change',function(){
+    var age=calcAge(this.value);
+    // Show age feedback next to the label
+    var card=this.closest('.pax-card');
+    var ageDisplay=card.querySelector('.age-display');
+    if(!ageDisplay){
+      ageDisplay=document.createElement('span');
+      ageDisplay.className='age-display';
+      ageDisplay.style.cssText='font-size:.75rem;color:var(--sky);font-weight:600;margin-left:6px';
+      this.closest('.form-group').querySelector('label').appendChild(ageDisplay);
+    }
+    ageDisplay.textContent=age>=0?'('+age+' yrs)':'';
+  });
+});
 </script>
 <%@ include file="/Views/common/Footer.jsp" %>
 </body></html>

@@ -124,7 +124,6 @@ public class SavePassengersServlet extends HttpServlet {
         }
 
         String[] names   = req.getParameterValues("full_name[]");
-        String[] ages    = req.getParameterValues("age[]");
         String[] genders = req.getParameterValues("gender[]");
         String[] phones  = req.getParameterValues("phone[]");
         String[] emails  = req.getParameterValues("email[]");
@@ -202,12 +201,20 @@ public class SavePassengersServlet extends HttpServlet {
 
                 ps.setInt(1, bookingId);
                 ps.setString(2, names[i]);
-                ps.setInt(3, Integer.parseInt(ages[i]));
+
+                // Calculate age automatically from DOB
+                int age = 0;
+                if (dobs != null && dobs[i] != null && !dobs[i].isEmpty()) {
+                    java.time.LocalDate birth = java.sql.Date.valueOf(dobs[i]).toLocalDate();
+                    age = (int) java.time.temporal.ChronoUnit.YEARS.between(birth, java.time.LocalDate.now());
+                }
+                ps.setInt(3, age);
+
                 ps.setString(4, genders[i]);
                 ps.setString(5, phones[i]);
                 ps.setString(6, emails[i]);
 
-                if (dobs[i] != null && !dobs[i].isEmpty())
+                if (dobs != null && dobs[i] != null && !dobs[i].isEmpty())
                    ps.setDate(7, java.sql.Date.valueOf(dobs[i]));
 
                 else

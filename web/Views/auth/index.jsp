@@ -95,6 +95,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);ove
 .sf-wrap input,.sf-wrap select{flex:1;border:none;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;padding:10px 0;outline:none}
 .sf-wrap input::placeholder{color:var(--muted);opacity:.65}
 .sf-wrap select{appearance:none;cursor:pointer}
+input[type="date"]{color-scheme:light}
+[data-theme="dark"] input[type="date"]{color-scheme:dark}
 .swap-btn{width:46px;height:42px;border:1.5px solid var(--border);border-radius:10px;background:var(--s1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--muted);transition:all .2s;align-self:flex-end;font-family:inherit}
 .swap-btn:hover{border-color:var(--sky);color:var(--sky);transform:rotate(180deg)}
 .btn-search{height:42px;padding:0 16px;font-size:.85rem;align-self:flex-end;white-space:nowrap;border-radius:10px;flex-shrink:0}

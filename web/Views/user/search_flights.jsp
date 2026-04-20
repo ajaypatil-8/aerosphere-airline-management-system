@@ -80,6 +80,8 @@
   background: var(--surface-0);
 }
 .sf-field input::placeholder { color: var(--text-faint); }
+input[type="date"] { color-scheme: light; }
+[data-theme="dark"] input[type="date"] { color-scheme: dark; }
 .btn-search-main {
   padding: 11px 24px;
   background: var(--grad-brand); color: #fff; border: none;
