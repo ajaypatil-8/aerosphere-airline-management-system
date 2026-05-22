@@ -1,109 +1,53 @@
-# ═══════════════════════════════════════════════════════════════
-#  AeroSphere — GitHub Actions CI/CD Pipeline
-#
-#  Triggers: push to main / pull requests
-#  Jobs:
-#    1. build   — compile + package WAR with Maven
-#    2. docker  — DISABLED (Railway deploys directly from GitHub)
-# ═══════════════════════════════════════════════════════════════
-
 name: AeroSphere CI/CD
 
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
 
 env:
-  IMAGE_NAME: aerosphere-app
   JAVA_VERSION: '11'
 
 jobs:
 
-  # ─────────────────────────────────────────────────────────────
-  #  Job 1: Build & Test
-  # ─────────────────────────────────────────────────────────────
   build:
     name: Maven Build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Build WAR with Maven
-        run: mvn clean package -DskipTests -B --no-transfer-progress
-
-      - name: Verify WAR exists
-        run: |
-          ls -la target/app.war
-          echo "WAR size: $(du -sh target/app.war | cut -f1)"
-
-      - name: Upload WAR artifact
-        uses: actions/upload-artifact@v4
+      - run: mvn clean package -DskipTests -B --no-transfer-progress
+      - run: ls -la target/app.war
+      - uses: actions/upload-artifact@v4
         with:
           name: aerosphere-war
           path: target/app.war
           retention-days: 7
 
-  # ─────────────────────────────────────────────────────────────
-  #  Job 2: Docker Build & Push — DISABLED
-  #  Railway deploys directly from GitHub, Docker Hub not needed
-  # ─────────────────────────────────────────────────────────────
-  docker:
-    name: Docker Build & Push
-    if: false
+  deploy:
+    name: Deploy to EC2
     runs-on: ubuntu-latest
     needs: build
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build WAR
-        run: mvn clean package -DskipTests -B --no-transfer-progress
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - uses: actions/checkout@v4
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key.pem
+          chmod 600 ~/.ssh/ec2_key.pem
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+      - name: Deploy
+        run: |
+          ssh -i ~/.ssh/ec2_key.pem \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+              "cd ${{ secrets.EC2_APP_DIR }} && \
+               git fetch origin && \
+               git reset --hard origin/main && \
+               docker-compose build --no-cache app && \
+               docker-compose up -d --no-deps app && \
+               sleep 20 && \
+               curl -sf http://localhost:8080/health && echo ' Deploy OK!' || echo ' Health check failed'"
