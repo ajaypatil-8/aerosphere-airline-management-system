@@ -10,6 +10,12 @@
 
     @SuppressWarnings("unchecked")
     List<Map<String,Object>> flights = (List<Map<String,Object>>) request.getAttribute("flights");
+    int currentPage  = request.getAttribute("currentPage")  != null ? (Integer) request.getAttribute("currentPage")  : 1;
+    int totalPages   = request.getAttribute("totalPages")   != null ? (Integer) request.getAttribute("totalPages")   : 1;
+    int totalFlights = request.getAttribute("totalFlights") != null ? (Integer) request.getAttribute("totalFlights") : 0;
+    int pageSize     = request.getAttribute("pageSize")     != null ? (Integer) request.getAttribute("pageSize")     : 20;
+    int showingFrom  = totalFlights == 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    int showingTo    = Math.min(currentPage * pageSize, totalFlights);
     String error = (String) request.getAttribute("error");
 
     Map<String, List<Map<String,Object>>> grouped = new LinkedHashMap<>();
@@ -111,6 +117,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #backTop.show{display:flex}
 @media(max-width:768px){.page-wrap{padding:20px 14px}}
 @media(max-width:640px){.fc-body{grid-template-columns:1fr 1fr}.flight-center{display:none}.search-wrap{display:none}}
+
+/* ── Pagination ─────────────────────────── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin:36px 0 20px;flex-wrap:wrap}
+.pg-btn{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 10px;
+  border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none;border:1.5px solid var(--border);
+  color:var(--text);background:var(--card);transition:.2s}
+.pg-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pg-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pg-btn.disabled{opacity:.4;pointer-events:none}
+.pg-info{font-size:.82rem;color:var(--muted);margin:0 6px}
 </style>
 </head>
 <body>
@@ -129,7 +145,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="page-header">
     <div>
       <h1 class="page-title">✈ All Flights</h1>
-      <p class="page-subtitle">Browse every available flight — no search needed</p>
+      <p class="page-subtitle">Showing <%= showingFrom %>–<%= showingTo %> of <%= totalFlights %> upcoming flights</p>
     </div>
     <a href="${pageContext.request.contextPath}/searchFlights" class="btn-book" style="padding:9px 18px;font-size:.84rem">🔍 Advanced Search</a>
   </div>
@@ -287,6 +303,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
   <% } %>
 </div>
+
+
+<% if (totalPages > 1) { %>
+<div class="pagination">
+  <%-- Prev --%>
+  <% if (currentPage > 1) { %>
+    <a class="pg-btn" href="?page=<%= currentPage - 1 %>">‹ Prev</a>
+  <% } else { %>
+    <span class="pg-btn disabled">‹ Prev</span>
+  <% } %>
+
+  <%-- Page numbers (window of 5) --%>
+  <% int pgStart = Math.max(1, currentPage - 2);
+     int pgEnd   = Math.min(totalPages, pgStart + 4);
+     pgStart      = Math.max(1, pgEnd - 4);
+     if (pgStart > 1) { %>
+    <a class="pg-btn" href="?page=1">1</a>
+    <% if (pgStart > 2) { %><span class="pg-info">…</span><% } %>
+  <% }
+     for (int pg = pgStart; pg <= pgEnd; pg++) { %>
+    <a class="pg-btn <%= pg == currentPage ? "active" : "" %>" href="?page=<%= pg %>"><%= pg %></a>
+  <% }
+     if (pgEnd < totalPages) {
+       if (pgEnd < totalPages - 1) { %><span class="pg-info">…</span><% } %>
+    <a class="pg-btn" href="?page=<%= totalPages %>"><%= totalPages %></a>
+  <% } %>
+
+  <%-- Next --%>
+  <% if (currentPage < totalPages) { %>
+    <a class="pg-btn" href="?page=<%= currentPage + 1 %>">Next ›</a>
+  <% } else { %>
+    <span class="pg-btn disabled">Next ›</span>
+  <% } %>
+</div>
+<p style="text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:24px">
+  Page <%= currentPage %> of <%= totalPages %>
+</p>
+<% } %>
 
 <button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 

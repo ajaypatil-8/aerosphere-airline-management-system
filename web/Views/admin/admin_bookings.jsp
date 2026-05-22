@@ -5,7 +5,12 @@
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
     if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
-    List<BookingRow> bookings = (List<BookingRow>) request.getAttribute("bookings");
+    List<BookingRow> bookings   = (List<BookingRow>) request.getAttribute("bookings");
+    int currentPage   = request.getAttribute("currentPage")   != null ? (Integer) request.getAttribute("currentPage")   : 1;
+    int totalPages    = request.getAttribute("totalPages")    != null ? (Integer) request.getAttribute("totalPages")    : 1;
+    int totalBookings = request.getAttribute("totalBookings") != null ? (Integer) request.getAttribute("totalBookings") : 0;
+    String search     = request.getAttribute("search")        != null ? (String)  request.getAttribute("search")        : "";
+    String statusFilt = request.getAttribute("statusFilter")  != null ? (String)  request.getAttribute("statusFilter")  : "";
     String cancelSuccess = (String) session.getAttribute("cancelSuccess");
     String cancelError   = (String) session.getAttribute("cancelError");
     session.removeAttribute("cancelSuccess"); session.removeAttribute("cancelError");
@@ -44,6 +49,14 @@
   .sidebar-toggle-btn{display:flex}
   .admin-topbar{padding:0 16px}
 }
+
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin:24px 0 8px;flex-wrap:wrap}
+.pg-btn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;
+  border-radius:7px;font-size:.83rem;font-weight:600;text-decoration:none;border:1.5px solid var(--border);
+  color:var(--text);background:var(--card);transition:.2s}
+.pg-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pg-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pg-btn.disabled{opacity:.4;pointer-events:none}
 </style>
 </head>
 <body>
@@ -73,7 +86,7 @@
       <div class="page-header anim-fade-up">
         <div>
           <h1 class="page-title">🎫 All Bookings</h1>
-          <p class="page-subtitle"><%= bookings != null ? bookings.size() : 0 %> total reservations</p>
+          <p class="page-subtitle"><%= totalBookings %> total reservations — page <%= currentPage %> of <%= totalPages %></p>
         </div>
       </div>
 
@@ -127,7 +140,29 @@
           </tbody>
         </table>
         <% } %>
-      </div>
+  
+        <%-- ── Pagination ── --%>
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% String qStr = "search=" + java.net.URLEncoder.encode(search,"UTF-8") + "&status=" + java.net.URLEncoder.encode(statusFilt,"UTF-8"); %>
+          <% if (currentPage > 1) { %>
+            <a class="pg-btn" href="?page=<%= currentPage-1 %>&<%= qStr %>">‹</a>
+          <% } else { %><span class="pg-btn disabled">‹</span><% } %>
+          <% int ps = Math.max(1, currentPage-2), pe = Math.min(totalPages, ps+4); ps = Math.max(1, pe-4);
+             if (ps > 1) { %><a class="pg-btn" href="?page=1&<%= qStr %>">1</a><% if(ps>2){%><span style="color:var(--text-muted)">…</span><%}}
+             for (int pg = ps; pg <= pe; pg++) { %>
+            <a class="pg-btn <%= pg==currentPage?"active":"" %>" href="?page=<%= pg %>&<%= qStr %>"><%= pg %></a>
+          <% } if (pe < totalPages) { if(pe<totalPages-1){%><span style="color:var(--text-muted)">…</span><%}
+               %><a class="pg-btn" href="?page=<%= totalPages %>&<%= qStr %>"><%= totalPages %></a><% } %>
+          <% if (currentPage < totalPages) { %>
+            <a class="pg-btn" href="?page=<%= currentPage+1 %>&<%= qStr %>">›</a>
+          <% } else { %><span class="pg-btn disabled">›</span><% } %>
+        </div>
+        <p style="text-align:center;font-size:.8rem;color:var(--text-muted);margin-bottom:16px">
+          Showing <%= ((currentPage-1)*25)+1 %>–<%= Math.min(currentPage*25,totalBookings) %> of <%= totalBookings %> bookings
+        </p>
+        <% } %>
+    </div>
 
     </div>
   </main>
@@ -147,18 +182,7 @@
     });
   }
   // Filter
-  function filterTable() {
-    var q = document.getElementById('searchBox').value.toLowerCase();
-    var s = document.getElementById('statusFilter').value.toLowerCase();
-    document.querySelectorAll('#bookTable tbody tr').forEach(function(r) {
-      var txt = r.textContent.toLowerCase();
-      r.style.display = (txt.includes(q) && (s === '' || txt.includes(s))) ? '' : 'none';
-    });
-  }
-  var sb = document.getElementById('searchBox');
-  var sf = document.getElementById('statusFilter');
-  if (sb) sb.addEventListener('input', filterTable);
-  if (sf) sf.addEventListener('change', filterTable);
+  // Search/filter handled server-side via form submission
   // Sidebar
   var tog = document.getElementById('as-sidebar-toggle');
   var sid = document.getElementById('as-sidebar');

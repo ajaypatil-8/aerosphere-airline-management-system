@@ -6,7 +6,11 @@
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
     if (userName == null || !"ADMIN".equals(userRole)) { response.sendRedirect(request.getContextPath() + "/login"); return; }
-    List<Flight> flights    = (List<Flight>) request.getAttribute("flights");
+    List<Flight> flights     = (List<Flight>) request.getAttribute("flights");
+    int currentPage  = request.getAttribute("currentPage")  != null ? (Integer) request.getAttribute("currentPage")  : 1;
+    int totalPages   = request.getAttribute("totalPages")   != null ? (Integer) request.getAttribute("totalPages")   : 1;
+    int totalFlights = request.getAttribute("totalFlights") != null ? (Integer) request.getAttribute("totalFlights") : 0;
+    String search    = request.getAttribute("search")       != null ? (String)  request.getAttribute("search")       : "";
     String deleteError   = (String) session.getAttribute("deleteError");
     String deleteSuccess = (String) session.getAttribute("deleteSuccess");
     session.removeAttribute("deleteError"); session.removeAttribute("deleteSuccess");
@@ -48,6 +52,14 @@
   .sidebar-toggle-btn{display:flex}
   .admin-topbar{padding:0 16px}
 }
+
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin:24px 0 8px;flex-wrap:wrap}
+.pg-btn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;
+  border-radius:7px;font-size:.83rem;font-weight:600;text-decoration:none;border:1.5px solid var(--border);
+  color:var(--text);background:var(--card);transition:.2s}
+.pg-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pg-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pg-btn.disabled{opacity:.4;pointer-events:none}
 </style>
 </head>
 <body>
@@ -77,7 +89,7 @@
       <div class="page-header anim-fade-up">
         <div>
           <h1 class="page-title">✈ Flight Schedule</h1>
-          <p class="page-subtitle"><%= flights != null ? flights.size() : 0 %> flights in the system</p>
+          <p class="page-subtitle"><%= totalFlights %> flights in the system — page <%= currentPage %> of <%= totalPages %></p>
         </div>
         <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary">➕ Add Flight</a>
       </div>
@@ -146,7 +158,35 @@
           </tbody>
         </table>
         <% } %>
-      </div>
+  
+        <%-- ── Pagination ── --%>
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% if (currentPage > 1) { %>
+            <a class="pg-btn" href="?page=<%= currentPage - 1 %>&search=<%= java.net.URLEncoder.encode(search,"UTF-8") %>">‹</a>
+          <% } else { %>
+            <span class="pg-btn disabled">‹</span>
+          <% } %>
+          <% int ps = Math.max(1, currentPage-2), pe = Math.min(totalPages, ps+4); ps = Math.max(1, pe-4);
+             if (ps > 1) { %><a class="pg-btn" href="?page=1&search=<%= java.net.URLEncoder.encode(search,"UTF-8") %>">1</a><% if(ps>2){%><span style="color:var(--text-muted)">…</span><%}}
+             for (int pg = ps; pg <= pe; pg++) { %>
+            <a class="pg-btn <%= pg==currentPage?"active":"" %>"
+               href="?page=<%= pg %>&search=<%= java.net.URLEncoder.encode(search,"UTF-8") %>"><%= pg %></a>
+          <% }
+             if (pe < totalPages) { if(pe<totalPages-1){%><span style="color:var(--text-muted)">…</span><%}
+               %><a class="pg-btn" href="?page=<%= totalPages %>&search=<%= java.net.URLEncoder.encode(search,"UTF-8") %>"><%= totalPages %></a>
+          <% } %>
+          <% if (currentPage < totalPages) { %>
+            <a class="pg-btn" href="?page=<%= currentPage+1 %>&search=<%= java.net.URLEncoder.encode(search,"UTF-8") %>">›</a>
+          <% } else { %>
+            <span class="pg-btn disabled">›</span>
+          <% } %>
+        </div>
+        <p style="text-align:center;font-size:.8rem;color:var(--text-muted);margin-bottom:16px">
+          Showing <%= ((currentPage-1)*25)+1 %>–<%= Math.min(currentPage*25,totalFlights) %> of <%= totalFlights %> flights
+        </p>
+        <% } %>
+    </div>
 
     </div>
   </main>
@@ -165,14 +205,7 @@
       btn.textContent = next === 'dark' ? '☀️' : '🌙';
     });
   }
-  // Search filter
-  var sb = document.getElementById('searchBox');
-  if (sb) sb.addEventListener('input', function() {
-    var q = this.value.toLowerCase();
-    document.querySelectorAll('#flightTable tbody tr').forEach(function(r) {
-      r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-  });
+  // Search handled server-side via form submission
   // Sidebar
   var tog = document.getElementById('as-sidebar-toggle');
   var sid = document.getElementById('as-sidebar');

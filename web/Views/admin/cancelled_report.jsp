@@ -1,6 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,java.text.SimpleDateFormat" %>
 <%@ page import="com.skyconnect.controller.ReportCancelledServlet.CancelledRow" %>
+<%!
+  private String _ps(boolean a){
+    String b="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;border:1.5px solid;transition:all .15s;";
+    return a ? b+"background:linear-gradient(135deg,#0EA5E9,#10B981);color:#fff;border-color:transparent;"
+             : b+"background:transparent;color:var(--text-muted,#64748B);border-color:var(--border,#E2E8F0);";
+  }
+  private String _ps(){ return _ps(false); }
+%>
+
 <%
   String userName=(String)session.getAttribute("userName");
   String userRole=(String)session.getAttribute("userRole");
@@ -149,6 +158,23 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 <%}%>
       </tbody>
     </table>
+    
+<%{ int _cp=(request.getAttribute("currentPage")!=null)?(Integer)request.getAttribute("currentPage"):1;
+     int _tp=(request.getAttribute("totalPages")!=null)?(Integer)request.getAttribute("totalPages"):1;
+     int _tc=(request.getAttribute("totalCount")!=null)?(Integer)request.getAttribute("totalCount"):0;
+     if(_tp>1){
+       int _s=Math.max(1,_cp-2),_e=Math.min(_tp,_cp+2); %>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:16px 0 4px">
+  <small style="color:var(--text-muted,#64748B);font-size:.8rem">Page <%=_cp%> of <%=_tp%> &nbsp;·&nbsp; <%=_tc%> total records</small>
+  <div style="display:flex;gap:4px;flex-wrap:wrap">
+    <%if(_cp>1){%><a href="?dateFrom=<%=dateFrom!=null?java.net.URLEncoder.encode(dateFrom,"UTF-8"):""%>&amp;dateTo=<%=dateTo!=null?java.net.URLEncoder.encode(dateTo,"UTF-8"):""%>&amp;page=1" style="<%=_ps()%>">«</a><%}%>
+    <%if(_cp>1){%><a href="?dateFrom=<%=dateFrom!=null?java.net.URLEncoder.encode(dateFrom,"UTF-8"):""%>&amp;dateTo=<%=dateTo!=null?java.net.URLEncoder.encode(dateTo,"UTF-8"):""%>&amp;page=<%=_cp-1%>" style="<%=_ps()%>">‹</a><%}%>
+    <%for(int _pg=_s;_pg<=_e;_pg++){%><a href="?dateFrom=<%=dateFrom!=null?java.net.URLEncoder.encode(dateFrom,"UTF-8"):""%>&amp;dateTo=<%=dateTo!=null?java.net.URLEncoder.encode(dateTo,"UTF-8"):""%>&amp;page=<%=_pg%>" style="<%=_ps(_pg==_cp)%>"><%=_pg%></a><%}%>
+    <%if(_cp<_tp){%><a href="?dateFrom=<%=dateFrom!=null?java.net.URLEncoder.encode(dateFrom,"UTF-8"):""%>&amp;dateTo=<%=dateTo!=null?java.net.URLEncoder.encode(dateTo,"UTF-8"):""%>&amp;page=<%=_cp+1%>" style="<%=_ps()%>">›</a><%}%>
+    <%if(_cp<_tp){%><a href="?dateFrom=<%=dateFrom!=null?java.net.URLEncoder.encode(dateFrom,"UTF-8"):""%>&amp;dateTo=<%=dateTo!=null?java.net.URLEncoder.encode(dateTo,"UTF-8"):""%>&amp;page=<%=_tp%>" style="<%=_ps()%>">»</a><%}%>
+  </div>
+</div>
+<%}}%>
     <%}%>
   </div>
 </div>
