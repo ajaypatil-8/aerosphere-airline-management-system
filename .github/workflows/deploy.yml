@@ -47,6 +47,7 @@ jobs:
               "cd ${{ secrets.EC2_APP_DIR }} && \
                git fetch origin && \
                git reset --hard origin/main && \
-               docker-compose up -d --build --no-deps app && \
-               sleep 20 && \
+               docker rm -f \$(docker ps -aq --filter name=aerosphere_app) 2>/dev/null || true && \
+               docker-compose up -d --build app && \
+               sleep 30 && \
                curl -sf http://localhost:8080/health && echo 'Deploy OK!' || echo 'Health check failed'"
