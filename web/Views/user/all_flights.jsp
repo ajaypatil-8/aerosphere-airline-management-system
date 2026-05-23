@@ -153,7 +153,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <% if (error != null) { %><div class="alert">⚠ <%= error %></div><% } %>
 
   <%
-    int totalFlights = (flights != null) ? flights.size() : 0;
     int totalDays    = grouped.size();
     double minPrice  = Double.MAX_VALUE;
     if (flights != null) {
