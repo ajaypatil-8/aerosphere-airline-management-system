@@ -3,14 +3,7 @@ package com.skyconnect.util;
 import javax.servlet.ServletContext;
 import java.util.logging.Logger;
 
-/**
- * AeroSphere — Centralized Application Configuration
- *
- * Resolution order (first non-empty value wins):
- *   1. Environment variable  → ideal for Docker / Kubernetes
- *   2. context.xml <Parameter> → fallback for local Tomcat dev
- *   3. Hard-coded default   → safe fallback
- */
+
 public class AppConfig {
 
     private static final Logger LOG = Logger.getLogger(AppConfig.class.getName());
@@ -26,6 +19,7 @@ public class AppConfig {
     private String smtpUser;
     private String smtpPassword;
     private String smtpFrom;
+    private String brevoApiKey;
     private String smsApiKey;
     private String appName;
     private String appBaseUrl;
@@ -47,6 +41,7 @@ public class AppConfig {
         cfg.smtpUser     = resolve(ctx, "SMTP_USER",     "smtp.user",     "");
         cfg.smtpPassword = resolve(ctx, "SMTP_PASSWORD", "smtp.password", "");
         cfg.smtpFrom     = resolve(ctx, "SMTP_FROM",     "smtp.from",     "AeroSphere");
+        cfg.brevoApiKey  = resolve(ctx, "BREVO_API_KEY", "brevo.api.key", "");
         cfg.smsApiKey    = resolve(ctx, "SMS_API_KEY",   "sms.api.key",   "");
         cfg.appName      = resolve(ctx, "APP_NAME",      "app.name",      "AeroSphere");
         cfg.appBaseUrl   = resolve(ctx, "APP_BASE_URL",  "app.baseUrl",   "http://localhost");
@@ -57,7 +52,7 @@ public class AppConfig {
         LOG.info("  AeroSphere — Configuration Loaded");
         LOG.info("  DB URL    : " + cfg.dbUrl);
         LOG.info("  Razorpay  : " + (cfg.isRazorpayConfigured() ? "CONFIGURED" : "NOT SET"));
-        LOG.info("  SMTP      : " + (cfg.isSmtpConfigured() ? cfg.smtpUser : "NOT SET"));
+        LOG.info("  Email     : " + (cfg.isEmailConfigured() ? cfg.smtpUser + " (via Brevo API)" : "NOT SET"));
         LOG.info("  App URL   : " + cfg.appBaseUrl);
         LOG.info("══════════════════════════════════════════");
     }
@@ -87,6 +82,7 @@ public class AppConfig {
     public String getSmtpUser()          { return smtpUser; }
     public String getSmtpPassword()      { return smtpPassword; }
     public String getSmtpFrom()          { return smtpFrom; }
+    public String getBrevoApiKey()       { return brevoApiKey; }
     public String getSmsApiKey()         { return smsApiKey; }
     public String getAppName()           { return appName; }
     public String getAppBaseUrl()        { return appBaseUrl; }
@@ -96,5 +92,9 @@ public class AppConfig {
     }
     public boolean isSmtpConfigured() {
         return !smtpUser.isEmpty() && !smtpUser.contains("your_gmail");
+    }
+    /** True once BREVO_API_KEY and a sender address are both set — used by EmailService. */
+    public boolean isEmailConfigured() {
+        return !brevoApiKey.isEmpty() && isSmtpConfigured();
     }
 }

@@ -1,33 +1,28 @@
 package com.skyconnect.service;
 
 import com.skyconnect.util.AppConfig;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.Properties;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * AeroSphere — EmailService
- *
- * Sends transactional emails (booking confirmation, cancellation, refund, OTP).
- *
- * OTP is sent SYNCHRONOUSLY so errors can be detected and reported to the user.
- * All other sends are ASYNC — fire-and-forget on a background thread.
- *
- * Configuration (via context.xml / AppConfig):
- *   smtp.host     = smtp.gmail.com
- *   smtp.port     = 587
- *   smtp.user     = YOUR_GMAIL@gmail.com
- *   smtp.password = YOUR_APP_PASSWORD_16_CHARS   (no spaces)
- *   smtp.from     = AeroSphere
- */
+
 public class EmailService {
 
     private static final Logger LOG = Logger.getLogger(EmailService.class.getName());
+    private static final String BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
+
+    private static final HttpClient HTTP = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(15))
+            .build();
 
     // Single background thread for all non-critical async email sending
     private static final ExecutorService EXEC = Executors.newSingleThreadExecutor(r -> {
@@ -219,42 +214,49 @@ public class EmailService {
     }
 
     private static void doSend(String to, String subject, String htmlBody)
-            throws MessagingException, java.io.UnsupportedEncodingException {
+            throws java.io.IOException, InterruptedException {
         AppConfig cfg = AppConfig.get();
 
-        if (!cfg.isSmtpConfigured()) {
-            LOG.info("[EmailService] SMTP not configured — skipping email to " + to);
+        if (!cfg.isEmailConfigured()) {
+            LOG.info("[EmailService] Email not configured — skipping email to " + to);
             return;
         }
 
-        Properties props = new Properties();
-        props.put("mail.smtp.auth",                "true");
-        props.put("mail.smtp.starttls.enable",     "true");
-        props.put("mail.smtp.starttls.required",   "true");   // FIX: enforce STARTTLS, don't allow plaintext fallback
-        props.put("mail.smtp.ssl.trust",           cfg.getSmtpHost()); // FIX: trust Gmail's SSL cert to prevent handshake failure
-        props.put("mail.smtp.host",                cfg.getSmtpHost());
-        props.put("mail.smtp.port",                String.valueOf(cfg.getSmtpPort()));
-        props.put("mail.smtp.connectiontimeout",   "15000");  // FIX: was 5000 — too short for Gmail
-        props.put("mail.smtp.timeout",             "15000");  // FIX: was 5000
-        props.put("mail.smtp.writetimeout",        "15000");  // FIX: was missing entirely
+        JsonObject sender = new JsonObject();
+        sender.addProperty("name", cfg.getSmtpFrom());
+        sender.addProperty("email", cfg.getSmtpUser());
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(cfg.getSmtpUser(), cfg.getSmtpPassword());
-            }
-        });
+        JsonObject recipient = new JsonObject();
+        recipient.addProperty("email", to);
+        JsonArray recipients = new JsonArray();
+        recipients.add(recipient);
 
-        // Uncomment the line below to see detailed SMTP handshake logs in Tomcat console (useful for debugging)
-        // session.setDebug(true);
+        JsonObject payload = new JsonObject();
+        payload.add("sender", sender);
+        payload.add("to", recipients);
+        payload.addProperty("subject", subject);
+        payload.addProperty("htmlContent", htmlBody);
 
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(cfg.getSmtpUser(), cfg.getSmtpFrom()));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        msg.setSubject(subject);
-        msg.setContent(htmlBody, "text/html; charset=UTF-8");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BREVO_ENDPOINT))
+                .header("accept", "application/json")
+                .header("content-type", "application/json")
+                .header("api-key", cfg.getBrevoApiKey())
+                .timeout(Duration.ofSeconds(15))
+                .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+                .build();
 
-        Transport.send(msg);
-        LOG.info("[EmailService] Sent '" + subject + "' to " + to);
+        HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Brevo returns 201 on success; treat any other status as a failure and
+        // surface the response body, since it names the exact problem (bad key,
+        // unverified sender, etc.) instead of leaving you to guess.
+        if (response.statusCode() / 100 != 2) {
+            throw new java.io.IOException(
+                "Brevo API returned HTTP " + response.statusCode() + ": " + response.body());
+        }
+
+        LOG.info("[EmailService] Sent '" + subject + "' to " + to + " (Brevo status " + response.statusCode() + ")");
     }
 
     private static String tableRow(String label, String value) {
