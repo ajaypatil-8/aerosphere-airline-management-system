@@ -21,19 +21,21 @@
 <title>Contact Us – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
 .page-hero{background:var(--grad-brand);padding:56px 32px;text-align:center;color:#fff}
-.page-hero h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
+.page-hero h1{font-family:'Fraunces',serif;font-weight:400;font-size:2.2rem;margin-bottom:10px;letter-spacing:-.01em}
 .page-hero p{opacity:.85;font-size:1rem;max-width:500px;margin:0 auto}
 .contact-wrap{max-width:1060px;margin:0 auto;padding:56px 32px}
 .contact-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:36px;align-items:start}
 .info-card{background:var(--surface-0);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px}
-.info-card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:24px}
+.info-card-title{font-family:'Fraunces',serif;font-weight:500;font-size:1.15rem;margin-bottom:24px}
 .info-item{display:flex;gap:14px;align-items:flex-start;margin-bottom:24px}
-.info-icon{width:42px;height:42px;border-radius:var(--radius-sm);background:var(--primary-glow);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.info-icon{width:42px;height:42px;border-radius:var(--radius-sm);background:var(--primary-glow);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
 .info-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:3px}
 .info-val{font-size:.9rem;font-weight:600;color:var(--text)}
 .info-sub{font-size:.78rem;color:var(--text-muted);margin-top:2px}
@@ -42,19 +44,19 @@
 .quick-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:500;transition:all .2s;margin-bottom:4px}
 .quick-link:hover{background:var(--primary-glow);color:var(--primary)}
 .form-card{background:var(--surface-0);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px}
-.form-card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:24px}
+.form-card-title{font-family:'Fraunces',serif;font-weight:500;font-size:1.15rem;margin-bottom:24px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-group{margin-bottom:18px}
 .form-group label{display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:7px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-2);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-2);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
 .form-group textarea{min-height:130px}
 .char-count{font-size:.72rem;color:var(--text-muted);text-align:right;margin-top:4px}
-.submit-btn{width:100%;padding:13px;background:var(--grad-brand);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:opacity .2s,transform .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.submit-btn{width:100%;padding:13px;background:var(--grad-brand);color:#fff;border:none;border-radius:var(--radius-full);font-family:'Inter',sans-serif;font-weight:500;font-size:.95rem;cursor:pointer;transition:opacity .2s,transform .2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .submit-btn:hover{opacity:.9;transform:translateY(-1px)}
 .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.alert-success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:var(--radius);padding:14px 18px;color:#059669;font-size:.9rem;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
-.alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);padding:14px 18px;color:#DC2626;font-size:.9rem;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.alert-success{background:var(--success-bg);border:1px solid var(--success-border);border-radius:var(--radius);padding:14px 18px;color:var(--secondary-dark);font-size:.9rem;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.alert-error{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:var(--radius);padding:14px 18px;color:var(--danger-dark);font-size:.9rem;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
 @media(max-width:768px){.contact-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.contact-wrap{padding:32px 16px}}
 </style>
 </head>
@@ -62,7 +64,7 @@
 <%@ include file="/Views/common/navbar.jsp" %>
 
 <div class="page-hero fade-up">
-  <h1>📧 Contact Us</h1>
+  <h1><i class="ph-bold ph-envelope-simple"></i> Contact Us</h1>
   <p>Have a question, issue, or feedback? Send us a message and we'll get back to you within 24–48 hours.</p>
 </div>
 
@@ -74,7 +76,7 @@
       <div class="info-card-title">Get in Touch</div>
 
       <div class="info-item">
-        <div class="info-icon">📧</div>
+        <div class="info-icon"><i class="ph-bold ph-envelope-simple"></i></div>
         <div>
           <div class="info-label">Email Support</div>
           <div class="info-val">support@aerosphere.in</div>
@@ -83,7 +85,7 @@
       </div>
 
       <div class="info-item">
-        <div class="info-icon">🕐</div>
+        <div class="info-icon"><i class="ph-bold ph-clock"></i></div>
         <div>
           <div class="info-label">Support Hours</div>
           <div class="info-val">Mon – Fri, 9:00 AM – 6:00 PM IST</div>
@@ -92,7 +94,7 @@
       </div>
 
       <div class="info-item">
-        <div class="info-icon">⚡</div>
+        <div class="info-icon"><i class="ph-bold ph-lightning"></i></div>
         <div>
           <div class="info-label">Urgent Queries</div>
           <div class="info-val">For flight-day issues</div>
@@ -102,10 +104,10 @@
 
       <hr class="divider">
       <div class="quick-links-title">Quick Links</div>
-      <a href="${pageContext.request.contextPath}/help" class="quick-link">📖 Help Center</a>
-      <a href="${pageContext.request.contextPath}/faqs" class="quick-link">❓ FAQs</a>
-      <a href="${pageContext.request.contextPath}/cancellationPolicy" class="quick-link">💸 Cancellation Policy</a>
-      <a href="${pageContext.request.contextPath}/baggagePolicy" class="quick-link">🧳 Baggage Policy</a>
+      <a href="${pageContext.request.contextPath}/help" class="quick-link"><i class="ph-bold ph-book-open"></i> Help Center</a>
+      <a href="${pageContext.request.contextPath}/faqs" class="quick-link"><i class="ph-bold ph-question"></i> FAQs</a>
+      <a href="${pageContext.request.contextPath}/cancellationPolicy" class="quick-link"><i class="ph-bold ph-hand-coins"></i> Cancellation Policy</a>
+      <a href="${pageContext.request.contextPath}/baggagePolicy" class="quick-link"><i class="ph-bold ph-suitcase"></i> Baggage Policy</a>
     </div>
 
     <%-- Right: Contact Form --%>
@@ -113,10 +115,10 @@
       <div class="form-card-title">Send a Message</div>
 
       <% if (success != null) { %>
-        <div class="alert-success">✅ <span><%= success %></span></div>
+        <div class="alert-success"><i class="ph-bold ph-check-circle"></i> <span><%= success %></span></div>
       <% } %>
       <% if (error != null) { %>
-        <div class="alert-error">⚠️ <span><%= error %></span></div>
+        <div class="alert-error"><i class="ph-bold ph-warning"></i> <span><%= error %></span></div>
       <% } %>
 
       <form action="${pageContext.request.contextPath}/contact" method="post" id="contactForm">
@@ -148,7 +150,7 @@
             <option value="Technical Issue">Technical Issue</option>
             <option value="General Inquiry">General Inquiry</option>
             <option value="Feedback / Suggestion">Feedback / Suggestion</option>
-            <option value="Urgent - Flight Day Issue">🔴 Urgent – Flight Day Issue</option>
+            <option value="Urgent - Flight Day Issue">Urgent – Flight Day Issue</option>
           </select>
         </div>
 
@@ -165,7 +167,7 @@
         </div>
 
         <button type="submit" class="submit-btn" id="submitBtn">
-          <span id="btnText">📧 Send Message</span>
+          <span id="btnText"><i class="ph-bold ph-paper-plane-tilt"></i> Send Message</span>
         </button>
       </form>
     </div>

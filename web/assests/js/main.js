@@ -25,7 +25,7 @@ const AS = {
 
   _syncThemeIcons(theme) {
     document.querySelectorAll('.theme-toggle').forEach(btn => {
-      btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+      btn.innerHTML = theme === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
       btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
     });
   }

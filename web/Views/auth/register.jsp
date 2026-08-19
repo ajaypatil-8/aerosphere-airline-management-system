@@ -14,259 +14,181 @@
   <title>Create Account – AeroSphere</title>
   <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
   <style>
-    /* ── REGISTER PAGE ─────────────────────────────────────── */
-    body { min-height:100vh; display:flex; flex-direction:column; }
-
-    .auth-nav {
-      position:sticky; top:0; z-index:500;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:0 40px; height:64px;
-      background:var(--glass-bg); border-bottom:1px solid var(--border);
-      backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
-      animation:navbarDrop .5s var(--ease) both;
+    :root{
+      --primary:#2E4A3D; --primary-dark:#253D33;
+      --primary-glow:rgba(46,74,61,.12); --primary-glow-lg:rgba(46,74,61,.22);
+      --grad-brand:var(--primary);
+      --surface-0:#FFFFFF; --surface-1:#F5F4F2; --border:#E7E5E4; --border-2:#DDDBD8;
+      --text:#202A36; --text-muted:#6B7280; --text-faint:#9CA3AF; --bg:#FAFAF9;
+      --radius:16px; --radius-sm:10px; --radius-full:999px; --radius-xl:22px;
+      --trans:250ms cubic-bezier(.4,0,.2,1); --trans-fast:150ms cubic-bezier(.4,0,.2,1); --ease:cubic-bezier(.4,0,.2,1);
+      --glass-bg:rgba(255,255,255,.72); --glass-blur:blur(16px);
+      --danger:#B3554A; --warning:#B8863F; --success:#5B8A6E;
+      --shadow-xl:0 24px 64px rgba(0,0,0,.10);
     }
-
-    .page-outer {
-      flex:1; display:flex; align-items:flex-start;
-      justify-content:center; padding:40px 20px 60px;
-      background: radial-gradient(ellipse 80% 50% at 50% 0%, var(--primary-glow) 0%, transparent 60%);
+    [data-theme="dark"]{
+      --primary:#4A7A63; --primary-dark:#5B8F76;
+      --primary-glow:rgba(74,122,99,.16); --primary-glow-lg:rgba(74,122,99,.26);
+      --grad-brand:var(--primary);
+      --surface-0:#11161D; --surface-1:#161C24; --border:#232A33; --border-2:#2B333E;
+      --text:#F4F4F3; --text-muted:#A8ADB4; --text-faint:#6B7280; --bg:#060B12;
+      --glass-bg:rgba(6,11,18,.72); --glass-blur:blur(16px);
+      --danger:#C77A70; --warning:#D1A25C; --success:#6FAE8B;
+      --shadow-xl:0 24px 64px rgba(0,0,0,.55);
     }
+    body{font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column;}
 
-    .reg-container {
-      width:100%; max-width:680px;
-      animation:fadeUp .6s var(--ease) .1s both;
-    }
+    .auth-nav { position:sticky; top:0; z-index:500; display:flex; align-items:center; justify-content:space-between;
+      padding:0 40px; height:64px; background:var(--glass-bg); border-bottom:1px solid var(--border);
+      backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); animation:navbarDrop .5s var(--ease) both; }
+    .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+    .brand-icon{width:34px;height:34px;border-radius:10px;background:var(--text);color:var(--surface-0);display:flex;align-items:center;justify-content:center;font-size:14px}
+    .brand-name{font-family:'Fraunces',serif;font-weight:500;font-size:1.12rem;letter-spacing:-.01em;color:var(--text)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-full);font-weight:500;font-size:.83rem;text-decoration:none;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all var(--trans-fast)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn-ghost:hover{border-color:var(--text)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:var(--radius-full);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.9rem}
 
-    /* Header */
+    .page-outer { flex:1; display:flex; align-items:flex-start; justify-content:center; padding:40px 20px 60px;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, var(--primary-glow) 0%, transparent 60%); }
+    .reg-container { width:100%; max-width:680px; animation:fadeUp .6s var(--ease) .1s both; }
+
     .reg-header { text-align:center; margin-bottom:28px; }
-    .reg-badge {
-      display:inline-flex; align-items:center; gap:8px;
-      background:var(--primary-glow); border:1px solid rgba(14,165,233,.35);
-      border-radius:var(--radius-full); padding:6px 16px;
-      font-size:.76rem; font-weight:700; letter-spacing:.08em;
-      text-transform:uppercase; color:var(--primary); margin-bottom:16px;
-    }
-    .reg-badge::before {
-      content:''; width:6px; height:6px; background:var(--primary);
-      border-radius:50%; animation:pulseDot 2s infinite;
-    }
+    .reg-badge { display:inline-flex; align-items:center; gap:8px; background:var(--surface-0); border:1px solid var(--border);
+      border-radius:var(--radius-full); padding:6px 16px; font-size:.72rem; font-weight:600; letter-spacing:.08em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:16px; }
+    .reg-badge::before { content:''; width:6px; height:6px; background:var(--primary); border-radius:50%; animation:pulseDot 2s infinite; }
     @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-    .reg-header h1 {
-      font-family:'Syne',sans-serif;
-      font-size:2.2rem; font-weight:800; letter-spacing:-.05em; margin-bottom:8px;
-    }
+    .reg-header h1 { font-family:'Fraunces',serif; font-size:2rem; font-weight:400; letter-spacing:-.02em; margin-bottom:8px; }
     .reg-header h1 span { color:var(--primary); }
     .reg-header p { color:var(--text-muted); font-size:.9rem; }
 
-    /* Card */
-    .reg-card {
-      background:var(--surface-0); border:1px solid var(--border);
-      border-radius:var(--radius-xl); padding:36px;
-      box-shadow:var(--shadow-xl); position:relative; overflow:hidden;
-    }
-    .reg-card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:3px;
-      background:var(--grad-brand);
-    }
+    .reg-card { background:var(--surface-0); border:1px solid var(--border); border-radius:var(--radius-xl);
+      padding:36px; box-shadow:var(--shadow-xl); position:relative; overflow:hidden; }
+    .reg-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--grad-brand); }
 
-    /* Form grid */
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
     .form-grid .full { grid-column:1/-1; }
+    .section-sep { grid-column:1/-1; display:flex; align-items:center; gap:10px; margin:6px 0; }
+    .section-sep span { font-size:.68rem; font-weight:600; color:var(--text-faint); text-transform:uppercase; letter-spacing:.09em; white-space:nowrap; }
+    .section-sep::before,.section-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
-    /* Section divider */
-    .section-sep {
-      grid-column:1/-1; display:flex; align-items:center; gap:10px;
-      margin:6px 0;
-    }
-    .section-sep span {
-      font-size:.7rem; font-weight:700; color:var(--text-faint);
-      text-transform:uppercase; letter-spacing:.1em; white-space:nowrap;
-    }
-    .section-sep::before,.section-sep::after {
-      content:''; flex:1; height:1px; background:var(--border);
-    }
-
-    /* Field */
     .field { display:flex; flex-direction:column; gap:7px; }
-    .field label {
-      font-size:.72rem; font-weight:700;
-      text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted);
-    }
+    .field label { font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); }
     .field:focus-within label { color:var(--primary); }
     .field-wrap { position:relative; }
-    .field-icon {
-      position:absolute; left:13px; top:50%; transform:translateY(-50%);
-      font-size:14px; pointer-events:none; z-index:1;
-      transition:color var(--trans-fast);
-    }
+    .field-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:14px; pointer-events:none; z-index:1; color:var(--text-faint); transition:color var(--trans-fast); }
     .field:focus-within .field-icon { color:var(--primary); }
-    .field-wrap input,
-    .field-wrap select,
-    .field-wrap textarea {
-      width:100%; background:var(--surface-1); border:1.5px solid var(--border-2);
-      border-radius:var(--radius); padding:12px 14px 12px 40px; color:var(--text);
-      font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none;
-      transition:border-color var(--trans-fast),box-shadow var(--trans-fast),background var(--trans-fast);
-      appearance:none;
-    }
-    .field-wrap textarea { padding:12px 14px 12px 40px; height:80px; resize:none; }
-    .field-wrap input::placeholder,
-    .field-wrap textarea::placeholder { color:var(--text-faint); }
-    .field-wrap input:focus,
-    .field-wrap select:focus,
-    .field-wrap textarea:focus {
-      border-color:var(--primary); background:var(--surface-0);
-      box-shadow:0 0 0 3px var(--primary-glow);
-    }
-    input[type="date"]::-webkit-calendar-picker-indicator { cursor:pointer; opacity:.6; }
+    .field-wrap input, .field-wrap select, .field-wrap textarea {
+      width:100%; background:var(--surface-1); border:1.5px solid var(--border-2); border-radius:var(--radius-sm);
+      padding:12px 14px 12px 40px; color:var(--text); font-family:'Inter',sans-serif; font-size:.9rem; outline:none;
+      transition:border-color var(--trans-fast),box-shadow var(--trans-fast),background var(--trans-fast); appearance:none; }
+    .field-wrap textarea { padding:12px 14px 12px 40px; height:76px; resize:none; }
+    .field-wrap input::placeholder, .field-wrap textarea::placeholder { color:var(--text-faint); }
+    .field-wrap input:focus, .field-wrap select:focus, .field-wrap textarea:focus {
+      border-color:var(--primary); background:var(--surface-0); box-shadow:0 0 0 3px var(--primary-glow); }
     [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(1); }
-    .toggle-pw {
-      position:absolute; right:10px; top:50%; transform:translateY(-50%);
-      background:none; border:none; color:var(--text-faint); cursor:pointer;
-      font-size:14px; transition:color var(--trans-fast);
-    }
+    .toggle-pw { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:14px; }
     .toggle-pw:hover { color:var(--primary); }
 
-    /* Password strength */
     .strength-bar { display:flex; gap:4px; margin-top:6px; }
     .strength-seg { flex:1; height:3px; border-radius:var(--radius-full); background:var(--border-2); transition:background .3s; }
     .seg-weak   { background:var(--danger); }
     .seg-medium { background:var(--warning); }
     .seg-strong { background:var(--success); }
 
-    /* Email+OTP row */
     .email-otp-row { display:flex; gap:8px; align-items:flex-end; }
     .email-otp-row .field-wrap { flex:1; }
-    .btn-send-otp {
-      flex-shrink:0; padding:0 18px; height:46px;
-      background:var(--grad-brand); border:none; border-radius:var(--radius);
-      color:#fff; font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:700;
-      cursor:pointer; white-space:nowrap; box-shadow:0 4px 14px var(--primary-glow-lg);
-      transition:transform var(--trans-fast), box-shadow var(--trans-fast);
-    }
-    .btn-send-otp:hover { transform:translateY(-1px); box-shadow:0 6px 20px var(--primary-glow-lg); }
+    .btn-send-otp { flex-shrink:0; padding:0 18px; height:46px; background:var(--primary); border:none; border-radius:var(--radius-full);
+      color:#fff; font-family:'Inter',sans-serif; font-size:.8rem; font-weight:500; cursor:pointer; white-space:nowrap;
+      box-shadow:0 4px 14px var(--primary-glow-lg); transition:transform var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast); }
+    .btn-send-otp:hover { background:var(--primary-dark); transform:translateY(-1px); }
     .btn-send-otp:disabled { opacity:.5; cursor:not-allowed; transform:none; }
     .otp-status { font-size:.75rem; margin-top:5px; min-height:16px; }
     .otp-status.ok  { color:var(--success); font-weight:600; }
     .otp-status.err { color:var(--danger); font-weight:600; }
 
-    /* Submit */
-    .btn-submit {
-      width:100%; padding:15px; margin-top:10px;
-      background:var(--grad-brand); border:none; border-radius:var(--radius);
-      color:#fff; font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:700;
-      cursor:pointer; box-shadow:0 6px 20px var(--primary-glow-lg);
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      transition:transform var(--trans-fast), box-shadow var(--trans-fast);
-      position:relative; overflow:hidden;
-    }
-    .btn-submit:hover { transform:translateY(-2px); box-shadow:0 10px 28px var(--primary-glow-lg); }
+    .btn-submit { width:100%; padding:15px; margin-top:10px; background:var(--primary); border:none; border-radius:var(--radius-full);
+      color:#fff; font-family:'Inter',sans-serif; font-size:.92rem; font-weight:500; cursor:pointer; box-shadow:0 6px 20px var(--primary-glow-lg);
+      display:flex; align-items:center; justify-content:center; gap:8px; transition:transform var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast); }
+    .btn-submit:hover { background:var(--primary-dark); transform:translateY(-1px); }
     .btn-submit:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
     .form-footer { text-align:center; margin-top:20px; color:var(--text-muted); font-size:.875rem; }
-    .form-footer a { color:var(--primary); font-weight:600; }
+    .form-footer a { color:var(--primary); font-weight:600; text-decoration:none; }
     .form-footer a:hover { text-decoration:underline; }
 
-    /* ── OTP MODAL ──────────────────────────────────────────── */
-    .modal-overlay {
-      display:none; position:fixed; inset:0;
-      background:rgba(7,11,15,.65); backdrop-filter:blur(8px);
-      z-index:1000; align-items:center; justify-content:center;
-    }
+    .alert{padding:12px 14px;border-radius:var(--radius-sm);font-size:.84rem;margin-bottom:18px;display:flex;align-items:flex-start;gap:8px}
+    .alert-error{background:rgba(179,85,74,.09);border:1px solid rgba(179,85,74,.25);color:#B3554A}
+    .alert-success{background:rgba(91,138,110,.1);border:1px solid rgba(91,138,110,.3);color:#3E6350}
+    [data-theme="dark"] .alert-error{color:#D99089}
+    [data-theme="dark"] .alert-success{color:#8FC5A8}
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(6,11,18,.6); backdrop-filter:blur(8px);
+      z-index:1000; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal-box {
-      background:var(--surface-0); border:1px solid var(--border-2);
-      border-radius:var(--radius-xl); padding:36px 32px;
-      max-width:420px; width:90%; box-shadow:var(--shadow-xl);
-      animation:zoomIn .35s var(--ease);
-      position:relative; overflow:hidden;
-    }
-    .modal-box::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:3px;
-      background:var(--grad-brand);
-    }
-    .modal-icon { font-size:2.5rem; text-align:center; margin-bottom:12px; }
-    .modal-title {
-      font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800;
-      text-align:center; margin-bottom:6px; letter-spacing:-.03em;
-    }
+    .modal-box { background:var(--surface-0); border:1px solid var(--border-2); border-radius:var(--radius-xl);
+      padding:36px 32px; max-width:420px; width:90%; box-shadow:var(--shadow-xl); animation:zoomIn .35s var(--ease); position:relative; overflow:hidden; }
+    .modal-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--grad-brand); }
+    .modal-icon { font-size:2.2rem; text-align:center; margin-bottom:12px; color:var(--primary); }
+    .modal-title { font-family:'Fraunces',serif; font-size:1.25rem; font-weight:500; text-align:center; margin-bottom:6px; letter-spacing:-.01em; }
     .modal-sub { font-size:.875rem; color:var(--text-muted); text-align:center; margin-bottom:24px; line-height:1.6; }
     .modal-sub strong { color:var(--primary); }
 
-    /* OTP digit inputs */
     .otp-input-wrap { display:flex; gap:8px; justify-content:center; margin-bottom:20px; }
-    .otp-digit {
-      width:50px; height:58px; text-align:center;
-      font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800;
-      border:2px solid var(--border-2); border-radius:var(--radius);
-      background:var(--surface-1); color:var(--text); outline:none;
-      transition:border-color var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast);
-    }
-    .otp-digit:focus {
-      border-color:var(--primary);
-      box-shadow:0 0 0 3px var(--primary-glow);
-      background:var(--surface-0);
-    }
+    .otp-digit { width:48px; height:56px; text-align:center; font-family:'Fraunces',serif; font-size:1.4rem; font-weight:500;
+      border:2px solid var(--border-2); border-radius:var(--radius-sm); background:var(--surface-1); color:var(--text); outline:none;
+      transition:border-color var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast); }
+    .otp-digit:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); background:var(--surface-0); }
     .otp-digit:not(:placeholder-shown) { border-color:var(--primary); background:var(--primary-glow); }
 
     .modal-error { color:var(--danger); font-size:.82rem; text-align:center; min-height:18px; margin-bottom:12px; font-weight:600; }
-    .btn-verify {
-      width:100%; padding:14px; background:var(--grad-brand); border:none;
-      border-radius:var(--radius); color:#fff; font-family:'DM Sans',sans-serif;
-      font-size:.95rem; font-weight:700; cursor:pointer;
-      box-shadow:0 6px 20px var(--primary-glow-lg);
-      transition:transform var(--trans-fast), box-shadow var(--trans-fast);
-    }
-    .btn-verify:hover { transform:translateY(-1px); box-shadow:0 8px 24px var(--primary-glow-lg); }
+    .btn-verify { width:100%; padding:14px; background:var(--primary); border:none; border-radius:var(--radius-full); color:#fff;
+      font-family:'Inter',sans-serif; font-size:.92rem; font-weight:500; cursor:pointer; box-shadow:0 6px 20px var(--primary-glow-lg);
+      transition:transform var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast); }
+    .btn-verify:hover { background:var(--primary-dark); transform:translateY(-1px); }
     .btn-verify:disabled { opacity:.45; cursor:not-allowed; transform:none; }
     .modal-resend { text-align:center; margin-top:14px; font-size:.82rem; color:var(--text-muted); }
-    .modal-resend button {
-      background:none; border:none; color:var(--primary); cursor:pointer;
-      font-weight:600; font-size:.82rem; transition:color var(--trans-fast);
-    }
+    .modal-resend button { background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:.82rem; }
     .modal-resend button:hover { color:var(--primary-dark); }
     .modal-resend button:disabled { color:var(--text-faint); cursor:not-allowed; }
 
     @media(max-width:600px) {
-      .auth-nav { padding:0 20px }
-      .reg-card  { padding:24px 18px }
-      .reg-header h1 { font-size:1.7rem }
-      .form-grid { grid-template-columns:1fr }
-      .form-grid .full { grid-column:1 }
-      .email-otp-row { flex-direction:column; align-items:stretch }
-      .btn-send-otp  { height:46px }
-      .otp-digit { width:42px; height:50px; font-size:1.2rem }
+      .auth-nav { padding:0 20px } .reg-card { padding:24px 18px } .reg-header h1 { font-size:1.6rem }
+      .form-grid { grid-template-columns:1fr } .form-grid .full { grid-column:1 }
+      .email-otp-row { flex-direction:column; align-items:stretch } .btn-send-otp { height:46px }
+      .otp-digit { width:42px; height:50px; font-size:1.15rem }
     }
   </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="auth-nav">
   <a href="${pageContext.request.contextPath}/" class="nav-brand">
-    <div class="brand-icon">✈</div>
-    <span class="brand-name">Aero<span>Sphere</span></span>
+    <div class="brand-icon"><i class="ph-bold ph-airplane-tilt"></i></div>
+    <span class="brand-name">AeroSphere</span>
   </a>
   <div style="display:flex;align-items:center;gap:8px">
-    <a href="${pageContext.request.contextPath}/" class="btn btn-ghost btn-sm">Home</a>
-    <a href="${pageContext.request.contextPath}/login" class="btn btn-primary btn-sm">Sign In</a>
-    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()" aria-label="Toggle theme">🌙</button>
+    <a href="${pageContext.request.contextPath}/" class="btn btn-ghost">Home</a>
+    <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Sign In</a>
+    <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()" aria-label="Toggle theme"><i class="ph-bold ph-moon"></i></button>
   </div>
 </nav>
 
 <!-- OTP MODAL (IDs kept identical to original for JS compatibility) -->
 <div class="modal-overlay" id="otpModal">
   <div class="modal-box">
-    <div class="modal-icon">📧</div>
-    <div class="modal-title">Verify Your Email</div>
-    <div class="modal-sub">
-      We sent a 6-digit code to<br>
-      <strong id="modalEmailDisplay"></strong>
-    </div>
+    <div class="modal-icon"><i class="ph-bold ph-envelope-simple-open"></i></div>
+    <div class="modal-title">Verify your email</div>
+    <div class="modal-sub">We sent a 6-digit code to<br><strong id="modalEmailDisplay"></strong></div>
     <div class="otp-input-wrap">
       <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" id="d0" oninput="otpInput(this,0)" placeholder="·">
       <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" id="d1" oninput="otpInput(this,1)" placeholder="·">
@@ -276,32 +198,30 @@
       <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" id="d5" oninput="otpInput(this,5)" placeholder="·">
     </div>
     <div class="modal-error" id="modalError"></div>
-    <button class="btn-verify" id="btnVerify" onclick="submitWithOtp()" disabled>Verify &amp; Create Account</button>
+    <button class="btn-verify" id="btnVerify" onclick="submitWithOtp()" disabled>Verify &amp; create account</button>
     <div class="modal-resend">
-      Didn't receive it?
-      <button id="btnResend" onclick="resendOtp()">Resend OTP</button>
+      Didn't receive it? <button id="btnResend" onclick="resendOtp()">Resend OTP</button>
       <span id="resendTimer" style="display:none"></span>
     </div>
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="page-outer">
   <div class="reg-container">
 
     <div class="reg-header">
-      <div class="reg-badge">✦ Create Account</div>
-      <h1>Join <span>AeroSphere</span> Today</h1>
+      <div class="reg-badge"><i class="ph-bold ph-sparkle"></i> Create Account</div>
+      <h1>Join <span>AeroSphere</span> today</h1>
       <p>Book flights, manage trips, fly smarter.</p>
     </div>
 
     <div class="reg-card">
 
       <% if (error != null) { %>
-        <div class="alert alert-error"><span>⚠</span><span><%= HtmlUtils.e(error) %></span></div>
+        <div class="alert alert-error"><span><i class="ph-bold ph-warning"></i></span><span><%= HtmlUtils.e(error) %></span></div>
       <% } %>
       <% if (success != null) { %>
-        <div class="alert alert-success"><span>✓</span><span><%= HtmlUtils.e(success) %></span></div>
+        <div class="alert alert-success"><span><i class="ph-bold ph-check-circle"></i></span><span><%= HtmlUtils.e(success) %></span></div>
       <% } %>
 
       <%-- FORM: action, method, all name attrs kept EXACTLY as original --%>
@@ -311,26 +231,22 @@
 
         <div class="form-grid">
 
-          <!-- Personal Info -->
-          <div class="section-sep"><span>Personal Information</span></div>
+          <div class="section-sep"><span>Personal information</span></div>
 
           <div class="field full">
             <label>Full Name <span style="color:var(--danger)">*</span></label>
             <div class="field-wrap">
-              <span class="field-icon">👤</span>
-              <input type="text" name="name" placeholder="Your full name"
-                     required autocomplete="name" maxlength="100">
+              <span class="field-icon"><i class="ph-bold ph-user"></i></span>
+              <input type="text" name="name" placeholder="Your full name" required autocomplete="name" maxlength="100">
             </div>
           </div>
 
-          <!-- Email + OTP -->
           <div class="field full">
             <label>Email Address <span style="color:var(--danger)">*</span></label>
             <div class="email-otp-row">
               <div class="field-wrap">
-                <span class="field-icon">✉</span>
-                <input type="email" name="email" id="emailInput"
-                       placeholder="you@example.com" required autocomplete="email">
+                <span class="field-icon"><i class="ph-bold ph-envelope-simple"></i></span>
+                <input type="email" name="email" id="emailInput" placeholder="you@example.com" required autocomplete="email">
               </div>
               <button type="button" class="btn-send-otp" id="btnSendOtp" onclick="sendOtp()">Send OTP</button>
             </div>
@@ -340,16 +256,15 @@
           <div class="field">
             <label>Phone Number</label>
             <div class="field-wrap">
-              <span class="field-icon">📱</span>
-              <input type="tel" name="phone" maxlength="10"
-                     pattern="[6-9][0-9]{9}" placeholder="10-digit number">
+              <span class="field-icon"><i class="ph-bold ph-device-mobile"></i></span>
+              <input type="tel" name="phone" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit number">
             </div>
           </div>
 
           <div class="field">
             <label>Date of Birth</label>
             <div class="field-wrap">
-              <span class="field-icon">🎂</span>
+              <span class="field-icon"><i class="ph-bold ph-cake"></i></span>
               <input type="date" name="dob">
             </div>
           </div>
@@ -357,7 +272,7 @@
           <div class="field">
             <label>Gender</label>
             <div class="field-wrap">
-              <span class="field-icon">⚧</span>
+              <span class="field-icon"><i class="ph-bold ph-user-circle"></i></span>
               <select name="gender">
                 <option value="">Select gender</option>
                 <option value="MALE">Male</option>
@@ -370,22 +285,19 @@
           <div class="field full">
             <label>Address</label>
             <div class="field-wrap">
-              <span class="field-icon" style="top:18px;transform:none">📍</span>
+              <span class="field-icon" style="top:18px;transform:none"><i class="ph-bold ph-map-pin"></i></span>
               <textarea name="address" placeholder="Your full residential address"></textarea>
             </div>
           </div>
 
-          <!-- Security -->
           <div class="section-sep"><span>Security</span></div>
 
           <div class="field full">
             <label>Password <span style="color:var(--danger)">*</span></label>
             <div class="field-wrap">
-              <span class="field-icon">🔒</span>
-              <input type="password" name="password" id="pwInput"
-                     placeholder="Min 8 characters" required
-                     autocomplete="new-password" minlength="8">
-              <button type="button" class="toggle-pw" onclick="togglePw()" tabindex="-1">👁</button>
+              <span class="field-icon"><i class="ph-bold ph-lock-simple"></i></span>
+              <input type="password" name="password" id="pwInput" placeholder="Min 8 characters" required autocomplete="new-password" minlength="8">
+              <button type="button" class="toggle-pw" onclick="togglePw()" tabindex="-1"><i class="ph-bold ph-eye"></i></button>
             </div>
             <div class="strength-bar">
               <div class="strength-seg" id="s1"></div>
@@ -399,7 +311,7 @@
 
         <%-- Submit intercepted by JS — opens OTP modal --%>
         <button type="button" class="btn-submit" id="btnCreateAccount" onclick="handleCreateAccount()">
-          <span>Create My Account</span><span>→</span>
+          <span>Create my account</span><span>→</span>
         </button>
       </form>
     </div><!-- /reg-card -->
@@ -432,14 +344,12 @@
     });
   });
 
-  /* Stagger-animate fields on load */
   document.querySelectorAll('.field').forEach(function(f, i) {
     f.style.opacity = '0'; f.style.transform = 'translateY(12px)';
     f.style.transition = 'all 0.4s ease ' + (0.15 + i * 0.05) + 's';
     setTimeout(function(){ f.style.opacity = '1'; f.style.transform = 'translateY(0)'; }, 50);
   });
 
-  /* ── OTP STATE (unchanged) ────────────────────────────────── */
   var otpVerified   = false;
   var otpEmail      = null;
   var resendInterval = null;
@@ -537,7 +447,7 @@
     document.getElementById('otpHidden').value = otp;
     closeOtpModal();
     document.getElementById('btnCreateAccount').disabled = true;
-    document.getElementById('btnCreateAccount').innerHTML = '<span>⏳ Creating account...</span>';
+    document.getElementById('btnCreateAccount').innerHTML = '<span>Creating account...</span>';
     document.getElementById('regForm').submit();
   }
 

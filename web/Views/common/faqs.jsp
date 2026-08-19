@@ -6,16 +6,16 @@
 <title>FAQs – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
 .page-hero{background:var(--grad-brand);padding:56px 32px;text-align:center;color:#fff}
-.page-hero h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
+.page-hero h1{font-family:'Fraunces',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
 .page-hero p{opacity:.85;font-size:1rem;max-width:500px;margin:0 auto}
 .faq-wrap{max-width:820px;margin:0 auto;padding:56px 32px}
 .faq-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
-.faq-tab{padding:8px 18px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:.85rem;font-weight:600;cursor:pointer;background:var(--surface-0);color:var(--text-muted);transition:all .2s;font-family:'DM Sans',sans-serif}
+.faq-tab{padding:8px 18px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:.85rem;font-weight:600;cursor:pointer;background:var(--surface-0);color:var(--text-muted);transition:all .2s;font-family:'Inter',sans-serif}
 .faq-tab.active,.faq-tab:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-glow)}
 .faq-group{display:none}.faq-group.active{display:block}
 .faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:border-color .2s}
@@ -28,7 +28,7 @@
 .faq-item.open .faq-a{max-height:400px}
 .faq-a-inner{padding:0 20px 18px;color:var(--text-muted);line-height:1.75;font-size:.88rem}
 .still-need{background:var(--surface-0);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px;text-align:center;margin-top:48px}
-.still-need h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:8px}
+.still-need h3{font-family:'Fraunces',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:8px}
 .still-need p{color:var(--text-muted);margin-bottom:20px;font-size:.9rem}
 @media(max-width:600px){.faq-wrap{padding:32px 16px}.page-hero{padding:40px 16px}}
 </style>
@@ -96,8 +96,8 @@
     <h3>Didn't find your answer?</h3>
     <p>Our support team is happy to help. Send us a message and we'll get back to you within 24–48 hours.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="${pageContext.request.contextPath}/contact" class="btn btn-primary">📧 Contact Us</a>
-      <a href="${pageContext.request.contextPath}/help" class="btn btn-ghost">📖 Help Center</a>
+      <a href="${pageContext.request.contextPath}/contact" class="btn btn-primary"><i class="ph-bold ph-envelope-simple"></i> Contact Us</a>
+      <a href="${pageContext.request.contextPath}/help" class="btn btn-ghost"><i class="ph-bold ph-book-open"></i> Help Center</a>
     </div>
   </div>
 </div>

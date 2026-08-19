@@ -6,16 +6,16 @@
 <title>Cookie Policy – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
 .page-hero{background:var(--grad-brand);padding:56px 32px;text-align:center;color:#fff}
-.page-hero h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
+.page-hero h1{font-family:'Fraunces',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
 .page-hero p{opacity:.85;font-size:1rem}.page-hero .meta{margin-top:16px;font-size:.82rem;opacity:.7}
 .legal-wrap{max-width:820px;margin:0 auto;padding:56px 32px}
 .legal-section{margin-bottom:36px}
-.legal-section h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+.legal-section h2{font-family:'Fraunces',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border)}
 .legal-section p{color:var(--text-muted);line-height:1.8;font-size:.9rem;margin-bottom:10px}
 .cookie-table{width:100%;border-collapse:collapse;font-size:.87rem;margin:16px 0}
 .cookie-table th{background:var(--surface-2);padding:10px 14px;text-align:left;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);border-bottom:2px solid var(--border)}
@@ -23,15 +23,15 @@
 .cookie-table tr:last-child td{border:none}
 .cookie-table tr:hover td{background:var(--surface-2)}
 .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700}
-.tag.essential{background:rgba(16,185,129,.12);color:#059669}
-.tag.preference{background:rgba(14,165,233,.12);color:#0284C7}
+.tag.essential{background:var(--success-bg);color:var(--secondary-dark)}
+.tag.preference{background:var(--info-bg);color:var(--info-dark)}
 @media(max-width:600px){.legal-wrap{padding:32px 16px}.cookie-table{font-size:.78rem}}
 </style>
 </head>
 <body>
 <%@ include file="/Views/common/navbar.jsp" %>
 <div class="page-hero fade-up">
-  <h1>🍪 Cookie Policy</h1>
+  <h1><i class="ph-bold ph-cookie"></i> Cookie Policy</h1>
   <p>We keep cookies to a minimum. Here's exactly what we use and why.</p>
   <div class="meta">Last updated: January 1, 2026</div>
 </div>
@@ -72,11 +72,11 @@
     <h2>Cookies We Do NOT Use</h2>
     <p>To be clear about what AeroSphere does <strong>not</strong> do:</p>
     <ul style="padding-left:20px;color:var(--text-muted);font-size:.9rem;line-height:2;display:flex;flex-direction:column;gap:4px">
-      <li>❌ No Google Analytics or similar tracking</li>
-      <li>❌ No Facebook Pixel or social media tracking</li>
-      <li>❌ No advertising or retargeting cookies</li>
-      <li>❌ No cross-site tracking</li>
-      <li>❌ No fingerprinting or device tracking</li>
+      <li><i class="ph-bold ph-x-circle"></i> No Google Analytics or similar tracking</li>
+      <li><i class="ph-bold ph-x-circle"></i> No Facebook Pixel or social media tracking</li>
+      <li><i class="ph-bold ph-x-circle"></i> No advertising or retargeting cookies</li>
+      <li><i class="ph-bold ph-x-circle"></i> No cross-site tracking</li>
+      <li><i class="ph-bold ph-x-circle"></i> No fingerprinting or device tracking</li>
     </ul>
   </div>
 

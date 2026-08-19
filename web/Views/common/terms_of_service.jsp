@@ -6,31 +6,31 @@
 <title>Terms of Service – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
 .page-hero{background:var(--grad-brand);padding:56px 32px;text-align:center;color:#fff}
-.page-hero h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
+.page-hero h1{font-family:'Fraunces',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:10px}
 .page-hero p{opacity:.85;font-size:1rem}.page-hero .meta{margin-top:16px;font-size:.82rem;opacity:.7}
 .legal-wrap{max-width:820px;margin:0 auto;padding:56px 32px}
 .legal-toc{background:var(--surface-0);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:40px}
-.legal-toc h3{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
+.legal-toc h3{font-family:'Fraunces',sans-serif;font-weight:800;font-size:.9rem;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
 .legal-toc ol{padding-left:18px;display:flex;flex-direction:column;gap:6px}
 .legal-toc li a{color:var(--primary);font-size:.87rem;text-decoration:none;font-weight:500}
 .legal-toc li a:hover{text-decoration:underline}
 .legal-section{margin-bottom:36px}
-.legal-section h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border);scroll-margin-top:90px}
+.legal-section h2{font-family:'Fraunces',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border);scroll-margin-top:90px}
 .legal-section p{color:var(--text-muted);line-height:1.8;font-size:.9rem;margin-bottom:10px}
 .legal-section ul{padding-left:20px;color:var(--text-muted);font-size:.9rem;line-height:1.8;display:flex;flex-direction:column;gap:5px}
-.highlight-box{background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.2);border-radius:var(--radius);padding:16px 20px;color:var(--text);font-size:.88rem;line-height:1.7;margin-bottom:20px}
+.highlight-box{background:rgba(46,74,61,.06);border:1px solid rgba(46,74,61,.2);border-radius:var(--radius);padding:16px 20px;color:var(--text);font-size:.88rem;line-height:1.7;margin-bottom:20px}
 @media(max-width:600px){.legal-wrap{padding:32px 16px}}
 </style>
 </head>
 <body>
 <%@ include file="/Views/common/navbar.jsp" %>
 <div class="page-hero fade-up">
-  <h1>📄 Terms of Service</h1>
+  <h1><i class="ph-bold ph-file-text"></i> Terms of Service</h1>
   <p>Please read these terms carefully before using AeroSphere.</p>
   <div class="meta">Last updated: January 1, 2026 &nbsp;|&nbsp; Effective: January 1, 2026</div>
 </div>
