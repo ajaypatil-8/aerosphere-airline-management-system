@@ -7,8 +7,12 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserDAO {
+
+    private static final Logger LOG = Logger.getLogger(UserDAO.class.getName());
 
     /** Authenticate: returns User if credentials match, null otherwise */
     public User authenticate(String email, String plainPassword) {
@@ -53,9 +57,15 @@ public class UserDAO {
                 if (keys.next()) return keys.getInt(1);
             }
         } catch (SQLIntegrityConstraintViolationException e) {
+            LOG.log(Level.WARNING, "Register failed — duplicate email: " + user.getEmail(), e);
             return -2; // email already exists
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Log the FULL detail (SQLState + vendor error code) so the real
+            // cause shows up in the server/Render logs instead of vanishing.
+            LOG.log(Level.SEVERE, "Register failed for " + user.getEmail()
+                    + " — SQLState=" + e.getSQLState()
+                    + " ErrorCode=" + e.getErrorCode()
+                    + " Message=" + e.getMessage(), e);
         }
         return -1;
     }

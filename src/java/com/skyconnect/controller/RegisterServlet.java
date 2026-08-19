@@ -159,8 +159,13 @@ public class RegisterServlet extends HttpServlet {
             LOG.info("New user registered: " + email + " (id=" + newId + ")");
             EmailService.sendWelcome(user.getEmail(), user.getName());
             resp.sendRedirect(req.getContextPath() + "/login?registered=1");
+        } else if (newId == -2) {
+            // Duplicate email caught at the DB level (race with emailExists check,
+            // or a leftover row from an earlier attempt).
+            forward(req, resp, "An account with this email already exists.");
         } else {
-            forward(req, resp, "Registration failed. Please try again.");
+            // Genuine DB/SQL failure — details are in the server logs (UserDAO.register).
+            forward(req, resp, "Registration failed due to a server error. Please try again shortly, or contact support if it persists.");
         }
     }
 
