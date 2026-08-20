@@ -26,7 +26,9 @@
 <title>Dashboard – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
@@ -70,7 +72,7 @@
   color: var(--text-faint); margin-bottom: 8px;
 }
 .greeting-name {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', serif;
   font-size: 1.8rem; font-weight: 800;
   letter-spacing: -.04em; margin-bottom: 6px;
 }
@@ -94,7 +96,7 @@
   background: var(--grad-brand);
 }
 .search-hero-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', serif;
   font-size: .95rem; font-weight: 700;
   margin-bottom: 18px;
   display: flex; align-items: center; gap: 8px;
@@ -114,7 +116,7 @@
   width: 100%; padding: 10px 13px;
   background: var(--bg); border: 1.5px solid var(--border-2);
   border-radius: var(--radius-sm); color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: .875rem;
+  font-family: 'Inter', sans-serif; font-size: .875rem;
   outline: none;
   transition: border-color var(--trans-fast), box-shadow var(--trans-fast);
 }
@@ -129,7 +131,7 @@ input[type="date"] { color-scheme: light; }
 .btn-search {
   padding: 10px 22px; background: var(--grad-brand);
   color: #fff; border: none; border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700; font-size: .875rem; cursor: pointer;
   box-shadow: 0 4px 14px var(--primary-glow-lg); white-space: nowrap;
   transition: transform var(--trans-fast), box-shadow var(--trans-fast);
@@ -163,10 +165,10 @@ input[type="date"] { color-scheme: light; }
 .dash-stat.c-green::after  { background: var(--secondary); }
 .dash-stat.c-red::after    { background: var(--danger); }
 .dash-stat.c-amber::after  { background: var(--accent); }
-.dash-stat:hover.c-blue    { border-color: rgba(14,165,233,.3); }
-.dash-stat:hover.c-green   { border-color: rgba(16,185,129,.3); }
-.dash-stat:hover.c-red     { border-color: rgba(239,68,68,.3); }
-.dash-stat:hover.c-amber   { border-color: rgba(245,158,11,.3); }
+.dash-stat:hover.c-blue    { border-color: rgba(46,74,61,.3); }
+.dash-stat:hover.c-green   { border-color: rgba(91,138,110,.3); }
+.dash-stat:hover.c-red     { border-color: rgba(179,85,74,.3); }
+.dash-stat:hover.c-amber   { border-color: rgba(184,134,63,.3); }
 
 .ds-icon {
   width: 44px; height: 44px; border-radius: var(--radius-sm);
@@ -181,7 +183,7 @@ input[type="date"] { color-scheme: light; }
 .ds-icon.amber  { background: var(--warning-bg); }
 
 .ds-num {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', serif;
   font-size: 1.9rem; font-weight: 800;
   letter-spacing: -.04em; line-height: 1;
   margin-bottom: 4px;
@@ -204,7 +206,7 @@ input[type="date"] { color-scheme: light; }
   margin-bottom: 16px; gap: 12px;
 }
 .section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', serif;
   font-size: 1.05rem; font-weight: 700;
   letter-spacing: -.02em;
 }
@@ -249,45 +251,45 @@ input[type="date"] { color-scheme: light; }
 
   <%-- Alerts --%>
   <% if (error != null) { %>
-    <div class="alert alert-error"><span>⚠</span><span><%= error %></span></div>
+    <div class="alert alert-error"><span><i class="ph-bold ph-warning"></i></span><span><%= error %></span></div>
   <% } %>
   <% if (bookingError != null) { %>
-    <div class="alert alert-error"><span>⚠</span><span><%= bookingError %></span></div>
+    <div class="alert alert-error"><span><i class="ph-bold ph-warning"></i></span><span><%= bookingError %></span></div>
   <% } %>
 
   <%-- ── GREETING BANNER ─────────────────────────────────────── --%>
   <div class="greeting-banner fade-up">
-    <div class="greeting-bg-plane">✈</div>
+    <div class="greeting-bg-plane"><i class="ph-bold ph-airplane-tilt"></i></div>
     <div class="greeting-content">
       <div class="greeting-label" id="timeLabel">Good morning</div>
-      <div class="greeting-name">Welcome back, <span><%= firstName %></span> 👋</div>
+      <div class="greeting-name">Welcome back, <span><%= firstName %></span> </div>
       <div class="greeting-sub">Where do you want to fly today?</div>
     </div>
     <div class="greeting-actions">
-      <a href="${pageContext.request.contextPath}/searchFlights" class="btn btn-primary">🔍 Search Flights</a>
-      <a href="${pageContext.request.contextPath}/userBookings"  class="btn btn-ghost">🎫 My Bookings</a>
+      <a href="${pageContext.request.contextPath}/searchFlights" class="btn btn-primary"><i class="ph-bold ph-magnifying-glass"></i> Search Flights</a>
+      <a href="${pageContext.request.contextPath}/userBookings"  class="btn btn-ghost"><i class="ph-bold ph-ticket"></i> My Bookings</a>
     </div>
   </div>
 
   <%-- ── STATS ─────────────────────────────────────────────────── --%>
   <div class="stats-grid-4">
     <div class="dash-stat c-blue fade-up d1">
-      <div class="ds-icon blue">🎫</div>
+      <div class="ds-icon blue"><i class="ph-bold ph-ticket"></i></div>
       <div class="ds-num blue count-up" data-target="<%= totalB %>"><%= totalB %></div>
       <div class="ds-label">Total Bookings</div>
     </div>
     <div class="dash-stat c-green fade-up d2">
-      <div class="ds-icon green">✅</div>
+      <div class="ds-icon green"><i class="ph-bold ph-check-circle"></i></div>
       <div class="ds-num green count-up" data-target="<%= paidB %>"><%= paidB %></div>
       <div class="ds-label">Paid</div>
     </div>
     <div class="dash-stat c-red fade-up d3">
-      <div class="ds-icon red">❌</div>
+      <div class="ds-icon red"><i class="ph-bold ph-x-circle"></i></div>
       <div class="ds-num red count-up" data-target="<%= cancelledB %>"><%= cancelledB %></div>
       <div class="ds-label">Cancelled</div>
     </div>
     <div class="dash-stat c-amber fade-up d4">
-      <div class="ds-icon amber">💰</div>
+      <div class="ds-icon amber"><i class="ph-bold ph-coins"></i></div>
       <div class="ds-num amber count-up" data-target="<%= (long)amtSpent %>" data-prefix="₹">₹<%= String.format("%,.0f", amtSpent) %></div>
       <div class="ds-label">Amount Spent</div>
     </div>
@@ -295,7 +297,7 @@ input[type="date"] { color-scheme: light; }
 
   <%-- ── SEARCH HERO ─────────────────────────────────────────────── --%>
   <div class="search-hero fade-up d2">
-    <div class="search-hero-title">✈ Search & Book a Flight</div>
+    <div class="search-hero-title"><i class="ph-bold ph-airplane-tilt"></i> Search & Book a Flight</div>
     <%-- FORM: action, method, all name attrs UNCHANGED --%>
     <form action="${pageContext.request.contextPath}/searchFlights" method="get" class="search-grid">
       <div class="search-field">
@@ -319,7 +321,7 @@ input[type="date"] { color-scheme: light; }
         </select>
       </div>
       <div class="sb">
-        <button type="submit" class="btn-search">🔍 Search</button>
+        <button type="submit" class="btn-search"><i class="ph-bold ph-magnifying-glass"></i> Search</button>
       </div>
     </form>
   </div>
@@ -334,10 +336,10 @@ input[type="date"] { color-scheme: light; }
     <div class="table-wrap">
       <% if (recentBookings == null || recentBookings.isEmpty()) { %>
         <div class="empty-state">
-          <div class="empty-icon">✈</div>
+          <div class="empty-icon"><i class="ph-bold ph-airplane-tilt"></i></div>
           <h3>No bookings yet</h3>
           <p>Search for a flight above to get started on your journey!</p>
-          <a href="${pageContext.request.contextPath}/searchFlights" class="btn btn-primary" style="margin-top:16px">🔍 Search Flights</a>
+          <a href="${pageContext.request.contextPath}/searchFlights" class="btn btn-primary" style="margin-top:16px"><i class="ph-bold ph-magnifying-glass"></i> Search Flights</a>
         </div>
       <% } else { %>
         <table class="sc-table zebra">
@@ -360,7 +362,7 @@ input[type="date"] { color-scheme: light; }
           %>
             <tr>
               <td style="color:var(--text-faint);font-size:.78rem"><%= sno++ %></td>
-              <td><strong style="font-family:'Syne',sans-serif"><%= b.flightNo %></strong></td>
+              <td><strong style="font-family:'Fraunces',serif"><%= b.flightNo %></strong></td>
               <td>
                 <div class="route-display">
                   <span class="route-city"><%= b.source %></span>
@@ -374,7 +376,7 @@ input[type="date"] { color-scheme: light; }
               <td><span class="badge <%= bc %>"><%= st.substring(0,1).toUpperCase()+st.substring(1) %></span></td>
               <td>
                 <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= b.bookingId %>" class="tbl-action">
-                  🎫 Invoice
+                  <i class="ph-bold ph-ticket"></i> Invoice
                 </a>
               </td>
             </tr>
@@ -397,10 +399,10 @@ input[type="date"] { color-scheme: light; }
     var h = new Date().getHours();
     var label = document.getElementById('timeLabel');
     if (label) {
-      if (h < 12)      label.textContent = '🌅 Good morning';
-      else if (h < 17) label.textContent = '☀️ Good afternoon';
-      else if (h < 21) label.textContent = '🌆 Good evening';
-      else             label.textContent = '🌙 Good night';
+      if (h < 12)      label.textContent = '<i class="ph-bold ph-sun-horizon"></i>  Good morning';
+      else if (h < 17) label.textContent = '<i class="ph-bold ph-sun"></i>  Good afternoon';
+      else if (h < 21) label.textContent = '<i class="ph-bold ph-sun-horizon"></i>  Good evening';
+      else             label.textContent = '<i class="ph-bold ph-moon"></i>  Good night';
     }
   })();
 </script>

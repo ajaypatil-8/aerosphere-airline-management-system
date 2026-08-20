@@ -4,7 +4,7 @@
 <%!
   private String _ps(boolean a){
     String b="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;border:1.5px solid;transition:all .15s;";
-    return a ? b+"background:linear-gradient(135deg,#0EA5E9,#10B981);color:#fff;border-color:transparent;"
+    return a ? b+"background:#2E4A3D;color:#fff;border-color:transparent;"
              : b+"background:transparent;color:var(--text-muted,#64748B);border-color:var(--border,#E2E8F0);";
   }
   private String _ps(){ return _ps(false); }
@@ -35,7 +35,8 @@
 <title>Search Flights – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
@@ -61,7 +62,7 @@
   margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
 }
 .search-hero-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 1.05rem; font-weight: 700;
   display: flex; align-items: center; gap: 8px;
 }
@@ -79,7 +80,7 @@
   width: 100%; padding: 10px 13px;
   background: var(--bg); border: 1.5px solid var(--border-2);
   border-radius: var(--radius-sm); color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: .875rem;
+  font-family: 'Inter', sans-serif; font-size: .875rem;
   outline: none;
   transition: border-color var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast);
 }
@@ -95,7 +96,7 @@ input[type="date"] { color-scheme: light; }
   padding: 11px 24px;
   background: var(--grad-brand); color: #fff; border: none;
   border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700; font-size: .9rem; cursor: pointer;
   box-shadow: 0 4px 14px var(--primary-glow-lg);
   white-space: nowrap;
@@ -113,14 +114,14 @@ input[type="date"] { color-scheme: light; }
 .swap-btn {
   width: 32px; height: 32px;
   background: var(--primary-glow);
-  border: 1px solid rgba(14,165,233,.3);
+  border: 1px solid rgba(46,74,61,.3);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 14px;
   transition: transform var(--trans-fast), background var(--trans-fast);
   color: var(--primary); align-self: flex-end; margin-bottom: 0;
 }
-.swap-btn:hover { background: rgba(14,165,233,.25); transform: rotate(180deg); }
+.swap-btn:hover { background: rgba(46,74,61,.25); transform: rotate(180deg); }
 
 /* Results header bar */
 .results-meta {
@@ -134,7 +135,7 @@ input[type="date"] { color-scheme: light; }
 .results-count-chip {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--primary-glow);
-  border: 1px solid rgba(14,165,233,.3);
+  border: 1px solid rgba(46,74,61,.3);
   border-radius: var(--radius-full);
   padding: 5px 14px;
   font-size: .8rem; font-weight: 700; color: var(--primary);
@@ -176,7 +177,7 @@ input[type="date"] { color-scheme: light; }
 
 /* City block */
 .fc-city-code {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 1.7rem; font-weight: 800;
   letter-spacing: -.04em; color: var(--text);
   line-height: 1;
@@ -208,7 +209,7 @@ input[type="date"] { color-scheme: light; }
   text-align: center;
 }
 .seats-num {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 1.3rem; font-weight: 800;
   color: var(--text); line-height: 1;
 }
@@ -218,7 +219,7 @@ input[type="date"] { color-scheme: light; }
 /* Price block */
 .fc-price { text-align: right; }
 .fc-price-big {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 1.55rem; font-weight: 800;
   color: var(--primary); letter-spacing: -.03em; line-height: 1;
 }
@@ -235,7 +236,7 @@ input[type="date"] { color-scheme: light; }
   padding: 8px 18px;
   background: var(--grad-brand); color: #fff; border: none;
   border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: .84rem; font-weight: 700; cursor: pointer;
   box-shadow: 0 3px 12px var(--primary-glow-lg);
   transition: transform var(--trans-fast), box-shadow var(--trans-fast);
@@ -278,7 +279,7 @@ input[type="date"] { color-scheme: light; }
   animation: fadeUp .4s var(--ease) both;
 }
 .no-results-icon { font-size: 3.5rem; opacity: .35; margin-bottom: 16px; animation: floatAnim 3s ease-in-out infinite; }
-.no-results h3 { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; margin-bottom:10px; }
+.no-results h3 { font-family:'Fraunces',sans-serif; font-size:1.2rem; font-weight:800; margin-bottom:10px; }
 .no-results p  { color: var(--text-muted); font-size:.9rem; margin-bottom: 20px; }
 
 /* Page header strip */
@@ -288,7 +289,7 @@ input[type="date"] { color-scheme: light; }
   gap: 12px; margin-bottom: 24px;
 }
 .page-topbar-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 1.6rem; font-weight: 800;
   letter-spacing: -.04em; margin-bottom: 4px;
 }
@@ -312,15 +313,6 @@ input[type="date"] { color-scheme: light; }
 
 <!-- NAVBAR -->
 <%@ include file="/Views/common/navbar.jsp" %>
-<div class="mobile-nav" id="as-mobile-nav">
-  <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
-  <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link active">🔍 Search Flights</a>
-  <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
-  <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refund History</a>
-  <a href="${pageContext.request.contextPath}/profile"           class="nav-link">👤 Profile</a>
-  <hr style="border:none;border-top:1px solid var(--border);margin:6px 0">
-  <a href="${pageContext.request.contextPath}/logout" class="nav-link btn-danger">↩ Logout</a>
-</div>
 
 <!-- PAGE -->
 <div class="page-wrapper">
@@ -328,7 +320,7 @@ input[type="date"] { color-scheme: light; }
   <!-- Page heading -->
   <div class="page-topbar fade-up">
     <div>
-      <div class="page-topbar-title">🔍 Search <span style="color:var(--primary)">Flights</span></div>
+      <div class="page-topbar-title"><i class="ph-bold ph-magnifying-glass"></i> Search <span style="color:var(--primary)">Flights</span></div>
       <div class="page-topbar-sub">Find and book the best flights for your journey</div>
     </div>
   </div>
@@ -336,10 +328,10 @@ input[type="date"] { color-scheme: light; }
   <!-- SEARCH FORM (all name/action attrs preserved exactly) -->
   <div class="search-hero fade-up d1">
     <div class="search-hero-head">
-      <div class="search-hero-title">✈ Enter your travel details</div>
+      <div class="search-hero-title"><i class="ph-bold ph-airplane-tilt"></i> Enter your travel details</div>
       <% if (Boolean.TRUE.equals(searched) && flights != null) { %>
         <div class="results-count-chip">
-          ✈ <%= flights.size() %> flight<%= flights.size() != 1 ? "s" : "" %> found
+          <i class="ph-bold ph-airplane-tilt"></i> <%= flights.size() %> flight<%= flights.size() != 1 ? "s" : "" %> found
         </div>
       <% } %>
     </div>
@@ -352,7 +344,7 @@ input[type="date"] { color-scheme: light; }
 
       <%-- Swap button sits between From and To (cosmetic only, handled by JS) --%>
       <div style="display:flex;align-items:flex-end;padding-bottom:1px">
-        <button type="button" class="swap-btn" onclick="swapCities()" title="Swap cities">⇄</button>
+        <button type="button" class="swap-btn" onclick="swapCities()" title="Swap cities"><i class="ph-bold ph-arrows-left-right"></i></button>
       </div>
 
       <div class="sf-field">
@@ -376,7 +368,7 @@ input[type="date"] { color-scheme: light; }
       </div>
       <div class="btn-col">
         <button type="submit" class="btn-search-main">
-          <span>🔍</span><span>Search</span>
+          <span><i class="ph-bold ph-magnifying-glass"></i></span><span>Search</span>
         </button>
       </div>
     </form>
@@ -384,7 +376,7 @@ input[type="date"] { color-scheme: light; }
 
   <%-- Alerts --%>
   <% if (error != null) { %>
-    <div class="alert alert-error"><span>⚠</span><span><%= HtmlUtils.e(error) %></span></div>
+    <div class="alert alert-error"><span><i class="ph-bold ph-warning"></i></span><span><%= HtmlUtils.e(error) %></span></div>
   <% } %>
 
   <%-- RESULTS --%>
@@ -393,7 +385,7 @@ input[type="date"] { color-scheme: light; }
 
       <!-- No results -->
       <div class="no-results">
-        <div class="no-results-icon">🛫</div>
+        <div class="no-results-icon"><i class="ph-bold ph-airplane-tilt"></i></div>
         <h3>No flights found</h3>
         <p>We couldn't find flights for <strong><%= srcParamE %> → <%= dstParamE %></strong> on <strong><%= datParamE %></strong>.<br>Try a different date, route, or fewer passengers.</p>
         <button onclick="document.getElementById('srcInput').focus()" class="btn btn-primary">Modify Search</button>
@@ -425,7 +417,7 @@ input[type="date"] { color-scheme: light; }
           <div>
             <div class="fc-city-code"><%= srcCode %></div>
             <div class="fc-city-name"><%= f.get("source") %></div>
-            <div class="fc-city-time">🛫 <%= f.get("depart_time") %></div>
+            <div class="fc-city-time"><i class="ph-bold ph-airplane-takeoff"></i> <%= f.get("depart_time") %></div>
           </div>
 
           <!-- Route line -->
@@ -433,7 +425,7 @@ input[type="date"] { color-scheme: light; }
             <div class="fc-fno"><%= f.get("flight_no") %></div>
             <div class="fc-line">
               <div class="fc-line-bar"></div>
-              <div class="fc-plane">✈</div>
+              <div class="fc-plane"><i class="ph-bold ph-airplane-tilt"></i></div>
               <div class="fc-line-bar"></div>
             </div>
           </div>
@@ -442,13 +434,13 @@ input[type="date"] { color-scheme: light; }
           <div>
             <div class="fc-city-code"><%= dstCode %></div>
             <div class="fc-city-name"><%= f.get("destination") %></div>
-            <div class="fc-city-time">🛬 <%= f.get("arrival_time") != null ? f.get("arrival_time") : "—" %></div>
+            <div class="fc-city-time"><i class="ph-bold ph-airplane-landing"></i> <%= f.get("arrival_time") != null ? f.get("arrival_time") : "—" %></div>
           </div>
 
           <!-- Seats -->
           <div class="fc-seats">
             <div class="seats-num <%= avail <= 5 ? "seats-low" : "" %>"><%= avail %></div>
-            <div class="seats-label">seats left<%= avail <= 5 ? " ⚠" : "" %></div>
+            <div class="seats-label">seats left<%= avail <= 5 ? " <i class=\"ph-bold ph-warning\"></i>" : "" %></div>
           </div>
 
           <!-- Price + CTA -->
@@ -463,16 +455,16 @@ input[type="date"] { color-scheme: light; }
                 <button type="submit" class="btn-book">Book Now →</button>
               </form>
             <% } else { %>
-              <span class="badge-full">✗ Full</span>
+              <span class="badge-full"><i class="ph-bold ph-x-circle"></i> Full</span>
             <% } %>
           </div>
         </div>
 
         <!-- Footer meta -->
         <div class="fc-footer">
-          <span class="fc-meta">📅 <%= f.get("depart_date") %></span>
-          <span class="fc-meta">💺 <%= avail %> seat<%= avail != 1 ? "s" : "" %> available</span>
-          <span class="fc-meta">👥 <%= numSeatsInt %> passenger<%= numSeatsInt > 1 ? "s" : "" %></span>
+          <span class="fc-meta"><i class="ph-bold ph-calendar-blank"></i> <%= f.get("depart_date") %></span>
+          <span class="fc-meta"><i class="ph-bold ph-armchair"></i> <%= avail %> seat<%= avail != 1 ? "s" : "" %> available</span>
+          <span class="fc-meta"><i class="ph-bold ph-users"></i> <%= numSeatsInt %> passenger<%= numSeatsInt > 1 ? "s" : "" %></span>
           <span class="fc-meta-total">Total for <%= numSeatsInt %> seat<%= numSeatsInt > 1 ? "s" : "" %>: ₹<%= String.format("%,.0f", total) %></span>
         </div>
       </div>

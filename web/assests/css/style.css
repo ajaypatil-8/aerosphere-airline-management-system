@@ -82,6 +82,15 @@
   --glass-bg:     rgba(255,255,255,.72);
   --glass-border: rgba(32,42,54,.08);
   --glass-blur:   blur(20px) saturate(140%);
+
+  /* Compatibility aliases — some older pages (seat_map, invoice) use this
+     alternate naming convention instead of the tokens above. Keeping both
+     resolves to one visual system without rewriting those pages' CSS wholesale. */
+  --bg-0:          var(--bg);
+  --text-primary:  var(--text);
+  --text-secondary:var(--text-2);
+  --accent-blue:   var(--primary);
+  --accent-green:  var(--secondary);
 }
 
 [data-theme="dark"] {
@@ -128,6 +137,12 @@
 
   --glass-bg:     rgba(11,15,22,.78);
   --glass-border: rgba(168,173,180,.10);
+
+  --bg-0:          var(--bg);
+  --text-primary:  var(--text);
+  --text-secondary:var(--text-2);
+  --accent-blue:   var(--primary);
+  --accent-green:  var(--secondary);
 }
 
 /* ─────────────────────────────────────────────────────────────────

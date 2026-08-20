@@ -3,7 +3,7 @@
 <%!
   private String _ps(boolean a){
     String b="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;border:1.5px solid;transition:all .15s;";
-    return a ? b+"background:linear-gradient(135deg,#0EA5E9,#10B981);color:#fff;border-color:transparent;"
+    return a ? b+"background:linear-gradient(135deg,#2E4A3D,#5B8A6E);color:#fff;border-color:transparent;"
              : b+"background:transparent;color:var(--text-muted,#64748B);border-color:var(--border,#E2E8F0);";
   }
   private String _ps(){ return _ps(false); }
@@ -25,22 +25,24 @@
 <title>Refund History – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <style>
-:root{--sky:#0EA5E9;--sky-dark:#0284C7;--sky-glow:rgba(14,165,233,.18);--em:#10B981;--em-dark:#059669;--em-glow:rgba(16,185,129,.18);--grad:linear-gradient(135deg,var(--sky),var(--em));--bg:#F0F9FF;--s0:#FFFFFF;--s1:#F8FAFC;--s2:#F0F9FF;--text:#0F172A;--muted:#64748B;--border:#E2E8F0;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);--sh-lg:0 8px 32px rgba(0,0,0,.08);--r:14px}
+:root{--sky:#2E4A3D;--sky-dark:#253D33;--sky-glow:rgba(46,74,61,.18);--em:#5B8A6E;--em-dark:#3E6350;--em-glow:rgba(91,138,110,.18);--grad:linear-gradient(135deg,var(--sky),var(--em));--bg:#F0F9FF;--s0:#FFFFFF;--s1:#F8FAFC;--s2:#F0F9FF;--text:#0F172A;--muted:#64748B;--border:#E2E8F0;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);--sh-lg:0 8px 32px rgba(0,0,0,.08);--r:14px}
 [data-theme="dark"]{--bg:#060A12;--s0:#0D1117;--s1:#111827;--s2:#1A2232;--text:#F1F5F9;--muted:#94A3B8;--border:#1E293B;--sh:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);--sh-lg:0 8px 32px rgba(0,0,0,.5)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 [data-theme="dark"] .brand-name span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .theme-toggle:hover{border-color:var(--sky)}
-.btn-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:#EF4444;background:rgba(239,68,68,.08);padding:6px 12px;border-radius:8px}
+.btn-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:#B3554A;background:rgba(179,85,74,.08);padding:6px 12px;border-radius:8px}
 /* ── Page ── */
 .page-wrap{max-width:1100px;margin:0 auto;padding:32px 28px}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.page-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.page-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
 .page-subtitle{color:var(--muted);font-size:.9rem}
-.alert{padding:13px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626}
-[data-theme="dark"] .alert{color:#FCA5A5}
+.alert{padding:13px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(179,85,74,.08);border:1px solid rgba(179,85,74,.2);color:#96453B}
+[data-theme="dark"] .alert{color:#D99089}
 /* ── Info banner ── */
 .info-banner{background:var(--sky-glow);border:1px solid var(--sky);border-radius:11px;padding:13px 16px;margin-bottom:20px;font-size:.84rem;color:var(--sky-dark);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
 [data-theme="dark"] .info-banner{color:var(--sky)}
@@ -53,19 +55,19 @@ tbody td{padding:12px 14px;font-size:.86rem;border-bottom:1px solid var(--border
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--sky-glow)}
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:.72rem;font-weight:700}
-.badge-approved{background:rgba(16,185,129,.12);color:var(--em-dark);border:1px solid rgba(16,185,129,.3)}
+.badge-approved{background:rgba(91,138,110,.12);color:var(--em-dark);border:1px solid rgba(91,138,110,.3)}
 [data-theme="dark"] .badge-approved{color:#34D399}
-.badge-pending{background:rgba(245,158,11,.1);color:#D97706;border:1px solid rgba(245,158,11,.3)}
-[data-theme="dark"] .badge-pending{color:#FCD34D}
-.badge-rejected{background:rgba(239,68,68,.08);color:#DC2626;border:1px solid rgba(239,68,68,.2)}
-[data-theme="dark"] .badge-rejected{color:#FCA5A5}
+.badge-pending{background:rgba(184,134,63,.1);color:#8A6530;border:1px solid rgba(184,134,63,.3)}
+[data-theme="dark"] .badge-pending{color:#E0BC7E}
+.badge-rejected{background:rgba(179,85,74,.08);color:#96453B;border:1px solid rgba(179,85,74,.2)}
+[data-theme="dark"] .badge-rejected{color:#D99089}
 .route-cell{display:flex;align-items:center;gap:5px;font-size:.84rem}
 .route-arrow{color:var(--sky)}
 .amount{font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .dim{color:var(--muted)}
 .empty-state{padding:60px 20px;text-align:center;color:var(--muted)}
 .empty-icon{font-size:3rem;margin-bottom:14px;opacity:.4}
-.empty-state h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.empty-state h3{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px}
 .empty-state a{color:var(--sky);font-weight:600;text-decoration:none}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fadeUp .45s ease both}.fu-1{animation-delay:.05s}.fu-2{animation-delay:.1s}
@@ -77,13 +79,13 @@ tbody tr:hover{background:var(--sky-glow)}
 <div class="page-wrap">
   <div class="page-header fu">
     <div>
-      <h1 class="page-title">💸 Refund History</h1>
+      <h1 class="page-title"><i class="ph-bold ph-hand-coins"></i> Refund History</h1>
       <p class="page-subtitle"><%= refunds != null ? refunds.size() : 0 %> refund request(s)</p>
     </div>
     <a href="${pageContext.request.contextPath}/userBookings" style="text-decoration:none;font-size:.84rem;font-weight:600;color:var(--muted);padding:8px 14px;border:1.5px solid var(--border);border-radius:9px;transition:all .2s">← My Bookings</a>
   </div>
 
-  <% if (error != null) { %><div class="alert fu">⚠ <%= error %></div><% } %>
+  <% if (error != null) { %><div class="alert fu"><i class="ph-bold ph-warning"></i> <%= error %></div><% } %>
 
   <div class="info-banner fu-1">
     ℹ️ <div>Refunds are processed within <strong>3–5 business days</strong> after admin approval. The amount is credited back to your original payment method. Cancellation more than 24h before departure = 100% refund; 2–24h before = 50% refund.</div>
@@ -92,7 +94,7 @@ tbody tr:hover{background:var(--sky-glow)}
   <div class="table-card fu-2">
     <% if (refunds == null || refunds.isEmpty()) { %>
       <div class="empty-state">
-        <div class="empty-icon">💸</div>
+        <div class="empty-icon"><i class="ph-bold ph-hand-coins"></i></div>
         <h3>No refund requests</h3>
         <p>Refunds appear here when you cancel a paid booking.</p>
         <br><a href="${pageContext.request.contextPath}/userBookings">View My Bookings →</a>
@@ -154,8 +156,8 @@ tbody tr:hover{background:var(--sky-glow)}
 </div>
 
 <script>
-(function(){const s=localStorage.getItem('asTheme')||'light';document.documentElement.setAttribute('data-theme',s);document.getElementById('themeToggle').textContent=s==='dark'?'☀️':'🌙';})();
-document.getElementById('themeToggle').addEventListener('click',function(){const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('asTheme',n);this.textContent=n==='dark'?'☀️':'🌙';});
+(function(){const s=localStorage.getItem('asTheme')||'light';document.documentElement.setAttribute('data-theme',s);document.getElementById('themeToggle').textContent=s==='dark'?'<i class="ph-bold ph-sun"></i>':'<i class="ph-bold ph-moon"></i>';})();
+document.getElementById('themeToggle').addEventListener('click',function(){const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('asTheme',n);this.textContent=n==='dark'?'<i class="ph-bold ph-sun"></i>':'<i class="ph-bold ph-moon"></i>';});
 </script>
 <%@ include file="/Views/common/Footer.jsp" %>
 </body>

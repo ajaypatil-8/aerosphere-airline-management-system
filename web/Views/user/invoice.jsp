@@ -45,8 +45,8 @@
     <title>E-Ticket — Booking #<%= bookingId %> – AeroSphere</title>
     <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css"/>
 
@@ -55,8 +55,8 @@
             min-height: 100vh;
             background: var(--bg-0);
             background-image:
-                radial-gradient(ellipse 60% 40% at 30% 5%, rgba(14,165,233,.1) 0%, transparent 65%),
-                radial-gradient(ellipse 40% 30% at 80% 90%, rgba(16,185,129,.08) 0%, transparent 60%);
+                radial-gradient(ellipse 60% 40% at 30% 5%, rgba(46,74,61,.1) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 30% at 80% 90%, rgba(91,138,110,.08) 0%, transparent 60%);
         }
 
         .inv-wrapper {
@@ -74,7 +74,7 @@
             animation: fadeDown .5s ease both;
         }
         .inv-page-title {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: 1.5rem;
             font-weight: 800;
             color: var(--text-primary);
@@ -92,7 +92,7 @@
             gap: .45rem;
             padding: .6rem 1.2rem;
             border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .85rem;
             font-weight: 500;
             cursor: pointer;
@@ -108,7 +108,7 @@
             border-color: transparent;
             color: #fff;
         }
-        .btn-inv.primary:hover { box-shadow: 0 6px 20px rgba(14,165,233,.35); }
+        .btn-inv.primary:hover { box-shadow: 0 6px 20px rgba(46,74,61,.35); }
 
         /* ── BOARDING PASS CARD ── */
         .boarding-pass {
@@ -123,7 +123,7 @@
 
         /* Top gradient band */
         .bp-header {
-            background: linear-gradient(135deg, #0a1628 0%, #0c1f3a 50%, #0d2040 100%);
+            background: linear-gradient(135deg, #12201A 0%, #17281F 50%, #0E1712 100%);
             padding: 2rem 2.5rem;
             position: relative;
             overflow: hidden;
@@ -133,8 +133,8 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse 60% 80% at 80% 50%, rgba(14,165,233,.15) 0%, transparent 70%),
-                radial-gradient(ellipse 40% 60% at 20% 50%, rgba(16,185,129,.08) 0%, transparent 60%);
+                radial-gradient(ellipse 60% 80% at 80% 50%, rgba(46,74,61,.15) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 20% 50%, rgba(91,138,110,.08) 0%, transparent 60%);
         }
         .bp-watermark {
             position: absolute;
@@ -156,7 +156,7 @@
             margin-bottom: 2rem;
         }
         .bp-airline-name {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: 1.1rem;
             font-weight: 800;
             color: #fff;
@@ -172,18 +172,18 @@
             align-items: center;
             gap: .4rem;
             padding: .35rem .9rem;
-            background: rgba(16,185,129,.15);
-            border: 1px solid rgba(16,185,129,.3);
+            background: rgba(91,138,110,.15);
+            border: 1px solid rgba(91,138,110,.3);
             border-radius: 20px;
-            color: #10B981;
+            color: #5B8A6E;
             font-size: .8rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
         }
         .bp-status-dot {
             width: 6px; height: 6px;
             border-radius: 50%;
-            background: #10B981;
+            background: #5B8A6E;
             animation: pulse 1.5s ease infinite;
         }
 
@@ -200,7 +200,7 @@
         }
         .bp-city.right { text-align: right; }
         .bp-city-code {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: 3.5rem;
             font-weight: 800;
             color: #fff;
@@ -209,13 +209,13 @@
         .bp-city-name {
             font-size: .85rem;
             color: rgba(255,255,255,.5);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin-top: .3rem;
         }
         .bp-city-time {
             font-size: 1.1rem;
             color: rgba(255,255,255,.85);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             margin-top: .5rem;
         }
@@ -230,7 +230,7 @@
         .bp-duration {
             font-size: .75rem;
             color: rgba(255,255,255,.4);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         .bp-route-line {
             display: flex;
@@ -245,7 +245,7 @@
         .bp-line {
             width: 80px;
             height: 1px;
-            background: linear-gradient(90deg, rgba(255,255,255,.2), rgba(14,165,233,.6), rgba(255,255,255,.2));
+            background: linear-gradient(90deg, rgba(255,255,255,.2), rgba(46,74,61,.6), rgba(255,255,255,.2));
         }
         .bp-plane-icon { color: var(--accent-blue); font-size: 1.2rem; }
 
@@ -276,7 +276,7 @@
             padding: .2rem .8rem;
             font-size: .7rem;
             color: var(--text-muted);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             letter-spacing: .08em;
             text-transform: uppercase;
             border-radius: 10px;
@@ -297,14 +297,14 @@
         .bp-info-cell:not(:first-child) { padding-left: 1rem; }
         .bp-info-label {
             font-size: .7rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: .08em;
             margin-bottom: .3rem;
         }
         .bp-info-val {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: .95rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -365,7 +365,7 @@
         .inv-detail-header {
             padding: 1.2rem 2rem;
             border-bottom: 1px solid var(--border);
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: .9rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -387,7 +387,7 @@
         .inv-table tr:hover { background: var(--surface-2); }
         .inv-table td {
             padding: .9rem 2rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .875rem;
         }
         .inv-table td:first-child { color: var(--text-muted); }
@@ -406,7 +406,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: 1.15rem;
         }
 
@@ -416,19 +416,19 @@
             align-items: center;
             gap: 1rem;
             padding: 1rem 2rem;
-            background: rgba(16,185,129,.07);
-            border-top: 1px solid rgba(16,185,129,.15);
+            background: rgba(91,138,110,.07);
+            border-top: 1px solid rgba(91,138,110,.15);
         }
         .ivb-icon {
             width: 40px; height: 40px;
             border-radius: 50%;
-            background: rgba(16,185,129,.15);
+            background: rgba(91,138,110,.15);
             display: flex; align-items: center; justify-content: center;
             color: var(--accent-green);
             font-size: 1.1rem;
             flex-shrink: 0;
         }
-        .ivb-text { font-family: 'DM Sans', sans-serif; }
+        .ivb-text { font-family: 'Inter', sans-serif; }
         .ivb-title { font-size: .9rem; font-weight: 600; color: var(--accent-green); }
         .ivb-sub { font-size: .78rem; color: var(--text-muted); margin-top: .1rem; }
         .ivb-pid {
@@ -493,16 +493,16 @@
         <div class="inv-page-header">
             <div>
                 <div class="inv-page-title">E-Ticket &amp; <span>Invoice</span></div>
-                <div style="font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text-muted); margin-top:.3rem;">
+                <div style="font-family:'Inter',sans-serif; font-size:.85rem; color:var(--text-muted); margin-top:.3rem;">
                     Booking #<%= bookingId %> &nbsp;·&nbsp; <%= departDate != null ? departDate : "—" %>
                 </div>
             </div>
             <div class="inv-actions">
                 <button class="btn-inv" onclick="window.print()">
-                    <i class="fa fa-print"></i> Print
+                    <i class="ph-bold ph-printer"></i> Print
                 </button>
                 <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= bookingId %>&download=true" class="btn-inv primary">
-                    <i class="fa fa-download"></i> Download PDF
+                    <i class="ph-bold ph-download-simple"></i> Download PDF
                 </a>
             </div>
         </div>
@@ -511,10 +511,10 @@
         <div class="boarding-pass">
             <!-- Header: airline + status -->
             <div class="bp-header">
-                <div class="bp-watermark">✈</div>
+                <div class="bp-watermark"><i class="ph-bold ph-airplane-tilt"></i></div>
                 <div class="bp-airline-row">
                     <div>
-                        <div class="bp-airline-name">✈ AeroSphere Airlines</div>
+                        <div class="bp-airline-name"><i class="ph-bold ph-airplane-tilt"></i> AeroSphere Airlines</div>
                         <div class="bp-flight-no">Flight <%= flightNo != null ? flightNo : "—" %></div>
                     </div>
                     <div class="bp-status">
@@ -534,7 +534,7 @@
                         <div class="bp-route-line">
                             <div class="bp-dot"></div>
                             <div class="bp-line"></div>
-                            <i class="fa fa-plane bp-plane-icon"></i>
+                            <i class="ph-bold ph-airplane-tilt bp-plane-icon"></i>
                             <div class="bp-line"></div>
                             <div class="bp-dot"></div>
                         </div>
@@ -552,7 +552,7 @@
             <div class="bp-perforation">
                 <div class="bp-perf-circle" style="margin-left:-14px;"></div>
                 <div class="bp-perf-line"></div>
-                <div class="bp-perf-label">✂ TEAR HERE</div>
+                <div class="bp-perf-label"><i class="ph-bold ph-scissors"></i> TEAR HERE</div>
                 <div class="bp-perf-line"></div>
                 <div class="bp-perf-circle" style="margin-right:-14px;"></div>
             </div>
@@ -590,7 +590,7 @@
             <!-- Barcode row -->
             <div class="bp-barcode-row">
                 <div>
-                    <div style="font-size:.7rem; color:var(--text-muted); font-family:'DM Sans',sans-serif; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem;">Booking Reference</div>
+                    <div style="font-size:.7rem; color:var(--text-muted); font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem;">Booking Reference</div>
                     <div class="bp-booking-id">
                         <span>#<%= bookingId != null ? bookingId : "——" %></span>
                     </div>
@@ -603,7 +603,7 @@
         <!-- ══ PAYMENT DETAILS ══ -->
         <div class="inv-detail-card">
             <div class="inv-detail-header">
-                <i class="fa fa-receipt"></i> Fare Breakdown &amp; Payment
+                <i class="ph-bold ph-receipt"></i> Fare Breakdown &amp; Payment
             </div>
             <table class="inv-table">
                 <tr>
@@ -624,7 +624,7 @@
                 </tr>
             </table>
             <div class="inv-verified-banner">
-                <div class="ivb-icon"><i class="fa fa-circle-check"></i></div>
+                <div class="ivb-icon"><i class="ph-bold ph-check-circle"></i></div>
                 <div class="ivb-text">
                     <div class="ivb-title"><%= isPaid ? "Payment Verified" : "Booking Confirmed" %></div>
                     <div class="ivb-sub">Processed securely via Razorpay</div>
@@ -635,13 +635,13 @@
         <!-- CTA strip -->
         <div class="inv-cta-strip">
             <a href="${pageContext.request.contextPath}/userDashboard" class="btn-inv">
-                <i class="fa fa-arrow-left"></i> Back to Dashboard
+                <i class="ph-bold ph-arrow-left"></i> Back to Dashboard
             </a>
             <a href="${pageContext.request.contextPath}/userBookings" class="btn-inv">
-                <i class="fa fa-list"></i> My Bookings
+                <i class="ph-bold ph-list-bullets"></i> My Bookings
             </a>
             <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= bookingId %>&download=true" class="btn-inv primary">
-                <i class="fa fa-download"></i> Download E-Ticket PDF
+                <i class="ph-bold ph-download-simple"></i> Download E-Ticket PDF
             </a>
         </div>
 

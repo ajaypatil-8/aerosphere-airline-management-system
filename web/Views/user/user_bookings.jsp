@@ -5,7 +5,7 @@
 <%!
   private String _ps(boolean a){
     String b="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600;border:1.5px solid;transition:all .15s;";
-    return a ? b+"background:linear-gradient(135deg,#0EA5E9,#10B981);color:#fff;border-color:transparent;"
+    return a ? b+"background:linear-gradient(135deg,#2E4A3D,#5B8A6E);color:#fff;border-color:transparent;"
              : b+"background:transparent;color:var(--text-muted,#64748B);border-color:var(--border,#E2E8F0);";
   }
   private String _ps(){ return _ps(false); }
@@ -29,13 +29,15 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Bookings – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <style>
 
 :root{
-  --sky:#0EA5E9;--emerald:#10B981;--emerald-dark:#059669;
+  --sky:#2E4A3D;--emerald:#5B8A6E;--emerald-dark:#3E6350;
   --grad:linear-gradient(135deg,var(--sky),var(--emerald));
-  --sky-glow:rgba(14,165,233,.18);--em-glow:rgba(16,185,129,.18);
+  --sky-glow:rgba(46,74,61,.18);--em-glow:rgba(91,138,110,.18);
   --bg:#F8FAFC;--card-bg:#FFFFFF;--text:#0F172A;--text-muted:#64748B;
   --border:#E2E8F0;--shadow:0 2px 12px rgba(0,0,0,.06);
   --shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px;
@@ -48,8 +50,8 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
+h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Fraunces',serif}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fadeUp .45s ease forwards}
@@ -60,13 +62,13 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 .page-subtitle{color:var(--text-muted);font-size:.88rem}
 .alert{padding:12px 16px;border-radius:11px;margin-bottom:16px;font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:8px}
 .alert-success{background:var(--em-glow);border:1px solid var(--emerald);color:var(--emerald)}
-.alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626}
+.alert-error{background:rgba(179,85,74,.08);border:1px solid rgba(179,85,74,.2);color:#96453B}
 .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .search-wrap{flex:2;min-width:180px;position:relative}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none}
-.filter-input{width:100%;padding:10px 12px 10px 36px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s}
+.filter-input{width:100%;padding:10px 12px 10px 36px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s}
 .filter-input:focus{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow)}
-.filter-select{padding:10px 14px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;appearance:none;cursor:pointer;min-width:140px}
+.filter-select{padding:10px 14px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.87rem;outline:none;appearance:none;cursor:pointer;min-width:140px}
 .table-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
@@ -76,20 +78,20 @@ tr:last-child td{border-bottom:none}
 tbody tr{transition:background .15s}
 tbody tr:hover{background:var(--sky-glow)}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:uppercase}
-.b-paid{background:rgba(16,185,129,.12);color:#059669}[data-theme="dark"] .b-paid{color:#34D399}
-.b-cancelled{background:rgba(239,68,68,.1);color:#DC2626}[data-theme="dark"] .b-cancelled{color:#FCA5A5}
-.b-booked{background:rgba(14,165,233,.1);color:#0284C7}[data-theme="dark"] .b-booked{color:#7DD3FC}
-.btn-cancel{padding:5px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626;border-radius:8px;font-size:.77rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.btn-cancel:hover{background:rgba(239,68,68,.15)}
+.b-paid{background:rgba(91,138,110,.12);color:#3E6350}[data-theme="dark"] .b-paid{color:#34D399}
+.b-cancelled{background:rgba(179,85,74,.1);color:#96453B}[data-theme="dark"] .b-cancelled{color:#D99089}
+.b-booked{background:rgba(46,74,61,.1);color:#253D33}[data-theme="dark"] .b-booked{color:#A9C0D2}
+.btn-cancel{padding:5px 12px;background:rgba(179,85,74,.08);border:1px solid rgba(179,85,74,.2);color:#96453B;border-radius:8px;font-size:.77rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-cancel:hover{background:rgba(179,85,74,.15)}
 .btn-receipt{padding:5px 12px;border:1px solid var(--border);border-radius:8px;font-size:.77rem;font-weight:600;color:var(--sky);text-decoration:none;transition:all .2s}
 .btn-receipt:hover{border-color:var(--sky);background:var(--sky-glow)}
 .btn-invoice{padding:5px 12px;border:1px solid var(--emerald);border-radius:8px;font-size:.77rem;font-weight:600;color:var(--emerald);text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
-.btn-invoice:hover{background:rgba(16,185,129,.1)}
+.btn-invoice:hover{background:rgba(91,138,110,.1)}
 .btn-pdf{padding:5px 12px;background:linear-gradient(135deg,var(--sky),var(--emerald));border:none;border-radius:8px;font-size:.77rem;font-weight:700;color:#fff;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
 .btn-pdf:hover{opacity:.88;transform:translateY(-1px)}
 .empty-state{text-align:center;padding:56px 24px;color:var(--text-muted)}
 .empty-icon{font-size:2.5rem;margin-bottom:12px}
-.empty-state h3{font-family:'Syne',sans-serif;color:var(--text)}
+.empty-state h3{font-family:'Fraunces',serif;color:var(--text)}
 .no-results{display:none;text-align:center;padding:40px;color:var(--text-muted)}
 </style>
 </head>
@@ -98,17 +100,17 @@ tbody tr:hover{background:var(--sky-glow)}
 <div class="page-wrap">
   <div class="page-header fu">
     <div>
-      <h1 class="page-title">🎫 My Bookings</h1>
+      <h1 class="page-title"><i class="ph-bold ph-ticket"></i> My Bookings</h1>
       <p class="page-subtitle">View, track and manage your flight reservations</p>
     </div>
   </div>
-  <% if(cancelSuccess!=null){%><div class="alert alert-success fu">✅ <%=cancelSuccess%></div><%}%>
-  <% if(cancelError!=null){  %><div class="alert alert-error  fu">⚠️ <%=cancelError%></div><%}%>
+  <% if(cancelSuccess!=null){%><div class="alert alert-success fu"><i class="ph-bold ph-check-circle"></i> <%=cancelSuccess%></div><%}%>
+  <% if(cancelError!=null){  %><div class="alert alert-error  fu"><i class="ph-bold ph-warning"></i> <%=cancelError%></div><%}%>
   <% if(bookings==null||bookings.isEmpty()){%>
-    <div class="empty-state fu"><div class="empty-icon">🎫</div><h3>No bookings yet</h3><p style="margin-top:8px;font-size:.87rem">Book your first flight to get started.</p><a href="${pageContext.request.contextPath}/searchFlights" style="display:inline-block;margin-top:16px;padding:10px 22px;background:var(--grad);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-family:'Syne',sans-serif">Search Flights</a></div>
+    <div class="empty-state fu"><div class="empty-icon"><i class="ph-bold ph-ticket"></i></div><h3>No bookings yet</h3><p style="margin-top:8px;font-size:.87rem">Book your first flight to get started.</p><a href="${pageContext.request.contextPath}/searchFlights" style="display:inline-block;margin-top:16px;padding:10px 22px;background:var(--grad);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-family:'Fraunces',serif">Search Flights</a></div>
   <%}else{%>
   <div class="filter-bar fu">
-    <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" class="filter-input" id="bSearch" placeholder="Search passenger, flight, route…"></div>
+    <div class="search-wrap"><span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span><input type="text" class="filter-input" id="bSearch" placeholder="Search passenger, flight, route…"></div>
     <select class="filter-select" id="bStatus" onchange="filterBookings()">
       <option value="">All Statuses</option>
       <option value="PAID">Paid</option>
@@ -140,9 +142,9 @@ tbody tr:hover{background:var(--sky-glow)}
                   <input type="hidden" name="bookingId" value="<%=b.id%>">
                   <button type="submit" class="btn-cancel">Cancel</button>
                 </form>
-                <a href="${pageContext.request.contextPath}/invoice?bookingId=<%=b.id%>" class="btn-invoice">📄 Invoice</a>
+                <a href="${pageContext.request.contextPath}/invoice?bookingId=<%=b.id%>" class="btn-invoice"><i class="ph-bold ph-file-text"></i> Invoice</a>
                 <% if("PAID".equals(b.paymentStatus)){%>
-                  <a href="${pageContext.request.contextPath}/invoice?bookingId=<%=b.id%>&download=true" class="btn-pdf">⬇ PDF</a>
+                  <a href="${pageContext.request.contextPath}/invoice?bookingId=<%=b.id%>&download=true" class="btn-pdf"><i class="ph-bold ph-download-simple"></i> PDF</a>
                 <%}%>
               <%}%>
               <% if("CANCELLED".equals(st)){%>
@@ -163,7 +165,7 @@ tbody tr:hover{background:var(--sky-glow)}
 (function(){
   var btn=document.getElementById('asThemeToggle');
   if(!btn)return;
-  function apply(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('asTheme',t);btn.textContent=t==='dark'?'☀️':'🌙';}
+  function apply(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('asTheme',t);btn.textContent=t==='dark'?'<i class="ph-bold ph-sun"></i>':'<i class="ph-bold ph-moon"></i>';}
   apply(document.documentElement.getAttribute('data-theme')||'light');
   btn.addEventListener('click',function(){apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
 })();

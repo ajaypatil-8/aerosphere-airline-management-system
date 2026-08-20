@@ -28,25 +28,26 @@
     if (selectedSeatsStr == null) selectedSeatsStr = "";
 %>
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
     <title>Seat Selection — <%= flightNo != null ? flightNo : "Flight" %></title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-    <link rel="stylesheet" href="assests/css/style.css"/>
-    <link rel="stylesheet" href="assests/css/animations.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css"/>
 
     <style>
         .sm-page {
             min-height: 100vh;
             background: var(--bg-0);
             background-image:
-                radial-gradient(ellipse 50% 40% at 80% 10%, rgba(14,165,233,.1) 0%, transparent 65%),
-                radial-gradient(ellipse 40% 30% at 20% 80%, rgba(16,185,129,.07) 0%, transparent 60%);
+                radial-gradient(ellipse 50% 40% at 80% 10%, var(--primary-glow) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 30% at 20% 80%, var(--secondary-glow) 0%, transparent 60%);
         }
         .sm-wrapper {
             max-width: 1050px;
@@ -77,7 +78,7 @@
         .sm-back-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
         .sm-title-block { flex: 1; }
         .sm-title {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: 1.4rem;
             font-weight: 800;
             color: var(--text-primary);
@@ -85,7 +86,7 @@
         .sm-subtitle {
             font-size: .85rem;
             color: var(--text-muted);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin-top: .2rem;
         }
         .sm-pass-pill {
@@ -94,10 +95,10 @@
             gap: .4rem;
             padding: .5rem 1rem;
             border-radius: 20px;
-            background: rgba(14,165,233,.1);
-            border: 1px solid rgba(14,165,233,.2);
+            background: var(--primary-glow);
+            border: 1px solid var(--primary-glow-lg);
             color: var(--accent-blue);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .85rem;
             font-weight: 600;
         }
@@ -126,7 +127,7 @@
             justify-content: space-between;
         }
         .cabin-card-header .cht {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: .95rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -142,7 +143,7 @@
             display: flex;
             align-items: center;
             gap: .4rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .75rem;
             color: var(--text-muted);
         }
@@ -152,9 +153,9 @@
             flex-shrink: 0;
         }
         .leg-box.available { background: var(--surface-2); border: 1.5px solid var(--border); }
-        .leg-box.occupied  { background: rgba(239,68,68,.25); border: 1.5px solid rgba(239,68,68,.4); }
+        .leg-box.occupied  { background: var(--danger-border); border: 1.5px solid var(--danger-border); }
         .leg-box.selected  { background: var(--grad-brand); }
-        .leg-box.business  { background: rgba(14,165,233,.2); border: 1.5px solid rgba(14,165,233,.35); }
+        .leg-box.business  { background: var(--primary-glow-lg); border: 1.5px solid var(--primary-glow-lg); }
 
         /* ── Airplane body ── */
         .airplane-body {
@@ -183,7 +184,7 @@
         /* Class label */
         .class-label {
             text-align: center;
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: .7rem;
             font-weight: 700;
             letter-spacing: .12em;
@@ -252,16 +253,16 @@
         }
         .seat:hover:not(.occupied):not(.selected) {
             border-color: var(--accent-blue);
-            background: rgba(14,165,233,.12);
+            background: var(--primary-glow);
             color: var(--accent-blue);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(14,165,233,.2);
+            box-shadow: 0 4px 12px var(--primary-glow-lg);
         }
         .seat.occupied {
-            background: rgba(239,68,68,.1);
-            border-color: rgba(239,68,68,.3);
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
             cursor: not-allowed;
-            color: rgba(239,68,68,.5);
+            color: var(--danger);
         }
         .seat.occupied::after {
             content: '✕';
@@ -273,18 +274,18 @@
             border-color: transparent;
             color: #fff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(14,165,233,.35);
+            box-shadow: 0 4px 16px var(--primary-glow-lg);
             animation: seatPop .25s ease;
         }
         .seat.business-class {
-            background: rgba(14,165,233,.08);
-            border-color: rgba(14,165,233,.2);
+            background: var(--primary-glow);
+            border-color: var(--primary-glow-lg);
             width: 42px; height: 42px;
             border-radius: 10px 10px 6px 6px;
         }
         .seat.business-class:hover:not(.occupied):not(.selected) {
             border-color: var(--accent-blue);
-            background: rgba(14,165,233,.2);
+            background: var(--primary-glow-lg);
         }
 
         @keyframes seatPop {
@@ -312,7 +313,7 @@
         .sm-sc-header {
             padding: 1rem 1.4rem;
             border-bottom: 1px solid var(--border);
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: .85rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -329,7 +330,7 @@
         }
         .sm-route-city { text-align: center; }
         .sm-route-code {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: 1.2rem;
             font-weight: 800;
             color: var(--text-primary);
@@ -337,7 +338,7 @@
         .sm-route-name {
             font-size: .7rem;
             color: var(--text-muted);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         .sm-route-arrow { color: var(--accent-blue); font-size: 1rem; }
 
@@ -349,7 +350,7 @@
         .ssl-empty {
             text-align: center;
             color: var(--text-muted);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .85rem;
             padding: 1rem 0;
         }
@@ -364,8 +365,8 @@
             gap: .35rem;
             padding: .35rem .75rem;
             border-radius: 20px;
-            background: rgba(14,165,233,.12);
-            border: 1px solid rgba(14,165,233,.25);
+            background: var(--primary-glow);
+            border: 1px solid var(--primary-glow-lg);
             font-family: 'DM Mono', monospace;
             font-size: .8rem;
             color: var(--accent-blue);
@@ -397,7 +398,7 @@
         .sm-progress-label {
             display: flex;
             justify-content: space-between;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .75rem;
             color: var(--text-muted);
             margin-bottom: .4rem;
@@ -427,7 +428,7 @@
             border: none;
             border-radius: 12px;
             color: #fff;
-            font-family: 'Syne', sans-serif;
+            font-family: 'Fraunces', sans-serif;
             font-size: .95rem;
             font-weight: 700;
             cursor: pointer;
@@ -437,7 +438,7 @@
         }
         .btn-confirm-seats:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(14,165,233,.35);
+            box-shadow: 0 8px 24px var(--primary-glow-lg);
         }
         .btn-confirm-seats:disabled {
             opacity: .45;
@@ -450,7 +451,7 @@
             display: flex;
             align-items: center;
             gap: .5rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: .78rem;
             color: var(--text-muted);
             border-top: 1px solid var(--border);
@@ -482,13 +483,13 @@
 </head>
 <body>
 <div class="sm-page">
-    <%@ include file="common/navbar.jsp" %>
+    <%@ include file="/Views/common/navbar.jsp" %>
 
     <div class="sm-wrapper">
 
         <!-- Header -->
         <div class="sm-header">
-            <a href="javascript:history.back()" class="sm-back-btn"><i class="fa fa-arrow-left"></i></a>
+            <a href="javascript:history.back()" class="sm-back-btn"><i class="ph-bold ph-arrow-left"></i></a>
             <div class="sm-title-block">
                 <div class="sm-title">Select Your Seat<%= passCount > 1 ? "s" : "" %></div>
                 <div class="sm-subtitle">
@@ -499,7 +500,7 @@
                 </div>
             </div>
             <div class="sm-pass-pill">
-                <i class="fa fa-user-group"></i>
+                <i class="ph-bold ph-users"></i>
                 <%= passCount %> passenger<%= passCount > 1 ? "s" : "" %>
             </div>
         </div>
@@ -508,7 +509,7 @@
             <!-- ═══ CABIN ═══ -->
             <div class="cabin-card">
                 <div class="cabin-card-header">
-                    <span class="cht">✈ Cabin View</span>
+                    <span class="cht"><i class="ph-bold ph-airplane-tilt"></i> Cabin View</span>
                     <div class="seat-legend">
                         <div class="leg-item"><div class="leg-box available"></div> Available</div>
                         <div class="leg-item"><div class="leg-box occupied"></div> Taken</div>
@@ -519,11 +520,11 @@
 
                 <div class="airplane-body">
                     <div class="plane-nose">
-                        <div class="plane-nose-inner">✈</div>
+                        <div class="plane-nose-inner"><i class="ph-bold ph-airplane-tilt"></i></div>
                     </div>
 
                     <!-- Business class: rows 1–4, seats A–D (4-wide) -->
-                    <div class="class-label business">✦ Business Class ✦</div>
+                    <div class="class-label business">Business Class</div>
                     <div class="seat-rows" id="businessRows"></div>
 
                     <!-- Economy class: rows 5–30, seats A–F (6-wide) -->
@@ -535,13 +536,13 @@
             <!-- ═══ SIDEBAR ═══ -->
             <div class="sm-sidebar">
                 <div class="sm-sidebar-card">
-                    <div class="sm-sc-header"><i class="fa fa-plane" style="color:var(--accent-blue);margin-right:.4rem;"></i> Flight Details</div>
+                    <div class="sm-sc-header"><i class="ph-bold ph-airplane-tilt" style="color:var(--accent-blue);margin-right:.4rem;"></i> Flight Details</div>
                     <div class="sm-route">
                         <div class="sm-route-city">
                             <div class="sm-route-code"><%= from != null ? from.substring(0, Math.min(3, from.length())).toUpperCase() : "DEP" %></div>
                             <div class="sm-route-name"><%= from != null ? from : "—" %></div>
                         </div>
-                        <i class="fa fa-arrow-right sm-route-arrow"></i>
+                        <i class="ph-bold ph-arrow-right sm-route-arrow"></i>
                         <div class="sm-route-city">
                             <div class="sm-route-code"><%= to != null ? to.substring(0, Math.min(3, to.length())).toUpperCase() : "ARR" %></div>
                             <div class="sm-route-name"><%= to != null ? to : "—" %></div>
@@ -551,7 +552,7 @@
                     <div class="sm-sc-header" style="border-top:1px solid var(--border);">Selected Seats</div>
                     <div class="selected-seats-list" id="selectedSeatsList">
                         <div class="ssl-empty" id="sslEmpty">
-                            <i class="fa fa-chair" style="display:block;font-size:1.5rem;margin-bottom:.5rem;opacity:.3;"></i>
+                            <i class="ph-bold ph-armchair" style="display:block;font-size:1.5rem;margin-bottom:.5rem;opacity:.3;"></i>
                             Tap a seat to select
                         </div>
                         <div class="ssl-seat-chips" id="sslChips"></div>
@@ -568,7 +569,7 @@
                     </div>
 
                     <div class="seat-tip">
-                        <i class="fa fa-circle-info"></i>
+                        <i class="ph-bold ph-info"></i>
                         Select exactly <%= passCount %> seat<%= passCount > 1 ? "s" : "" %> to continue
                     </div>
 
@@ -577,7 +578,7 @@
                         <input type="hidden" name="bookingId" value="<%= bookingId %>"/>
                         <input type="hidden" name="selectedSeats" id="selectedSeatsInput"/>
                         <button type="submit" class="btn-confirm-seats" id="confirmBtn" disabled>
-                            <i class="fa fa-check-circle"></i> Confirm Seats
+                            <i class="ph-bold ph-check-circle"></i> Confirm Seats
                         </button>
                     </form>
                 </div>
@@ -585,10 +586,10 @@
         </div>
 
     </div>
-    <%@ include file="common/footer.jsp" %>
+    <%@ include file="/Views/common/Footer.jsp" %>
 </div>
 
-<script src="assests/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/assests/js/main.js"></script>
 <script>
     /* ── Config from JSP ── */
     const MAX_SEATS      = <%= passCount %>;
@@ -704,7 +705,7 @@
             selectedSeats.forEach(sId => {
                 const chip = document.createElement('div');
                 chip.className = 'ssl-chip';
-                chip.innerHTML = `<i class="fa fa-chair"></i> ${sId}
+                chip.innerHTML = `<i class="ph-bold ph-armchair"></i> ${sId}
                     <button onclick="deselect('${sId}')" title="Remove">✕</button>`;
                 chips.appendChild(chip);
             });

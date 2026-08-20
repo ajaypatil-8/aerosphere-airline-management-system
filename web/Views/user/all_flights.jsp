@@ -35,37 +35,39 @@
 <title>All Flights – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <style>
-:root{--sky:#0EA5E9;--sky-dark:#0284C7;--sky-glow:rgba(14,165,233,.18);--em:#10B981;--em-dark:#059669;--em-glow:rgba(16,185,129,.18);--grad:linear-gradient(135deg,var(--sky),var(--em));--bg:#F0F9FF;--s0:#FFFFFF;--s1:#F8FAFC;--s2:#F0F9FF;--text:#0F172A;--muted:#64748B;--border:#E2E8F0;--warn:#F59E0B;--danger:#EF4444;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);--sh-lg:0 8px 32px rgba(0,0,0,.08);--r:14px}
+:root{--sky:#2E4A3D;--sky-dark:#253D33;--sky-glow:rgba(46,74,61,.18);--em:#5B8A6E;--em-dark:#3E6350;--em-glow:rgba(91,138,110,.18);--grad:linear-gradient(135deg,var(--sky),var(--em));--bg:#F0F9FF;--s0:#FFFFFF;--s1:#F8FAFC;--s2:#F0F9FF;--text:#0F172A;--muted:#64748B;--border:#E2E8F0;--warn:#B8863F;--danger:#B3554A;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);--sh-lg:0 8px 32px rgba(0,0,0,.08);--r:14px}
 [data-theme="dark"]{--bg:#060A12;--s0:#0D1117;--s1:#111827;--s2:#1A2232;--text:#F1F5F9;--muted:#94A3B8;--border:#1E293B;--sh:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);--sh-lg:0 8px 32px rgba(0,0,0,.5)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 /* ── Navbar ── */
 [data-theme="dark"] .brand-name span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .nav-link.theme-toggle:hover{border-color:var(--sky)}
-.btn-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:var(--danger);background:rgba(239,68,68,.08);padding:6px 12px;border-radius:8px}
+.btn-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:var(--danger);background:rgba(179,85,74,.08);padding:6px 12px;border-radius:8px}
 /* ── Page ── */
 .page-wrap{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.page-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.page-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
 .page-subtitle{color:var(--muted);font-size:.9rem}
 /* ── Stats ── */
 .stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
 .stat-card{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;flex:1;min-width:130px;box-shadow:var(--sh)}
-.stat-num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.5px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-num{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:800;letter-spacing:-.5px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .stat-lbl{font-size:.74rem;color:var(--muted);font-weight:500;margin-top:2px}
 /* ── Filter bar ── */
 .filter-bar{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:var(--sh);position:relative;overflow:hidden}
 .filter-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
 .filter-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);white-space:nowrap;margin-right:4px}
-.filter-btn{background:var(--s1);border:1.5px solid var(--border);color:var(--muted);padding:5px 13px;border-radius:99px;font-size:.79rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.filter-btn{background:var(--s1);border:1.5px solid var(--border);color:var(--muted);padding:5px 13px;border-radius:99px;font-size:.79rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap}
 .filter-btn:hover{border-color:var(--sky);color:var(--sky)}
 .filter-btn.active{background:var(--grad);border-color:transparent;color:#fff}
 .filter-sep{width:1px;height:22px;background:var(--border);margin:0 4px;flex-shrink:0}
 .search-wrap{margin-left:auto;position:relative}
-.search-wrap input{background:var(--s1);border:1.5px solid var(--border);color:var(--text);padding:7px 12px 7px 34px;border-radius:99px;font-size:.82rem;font-family:'DM Sans',sans-serif;width:200px;outline:none;transition:all .2s}
+.search-wrap input{background:var(--s1);border:1.5px solid var(--border);color:var(--text);padding:7px 12px 7px 34px;border-radius:99px;font-size:.82rem;font-family:'Inter',sans-serif;width:200px;outline:none;transition:all .2s}
 .search-wrap input:focus{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow);width:240px}
 .search-wrap input::placeholder{color:var(--muted);opacity:.7}
 .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);width:14px;height:14px;pointer-events:none}
@@ -81,7 +83,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .flight-card:hover{border-color:var(--sky);box-shadow:var(--sh-lg);transform:translateY(-2px)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .fc-body{padding:18px 22px;display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:center;gap:14px}
-.city-code{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px}
+.city-code{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px}
 .city-name{font-size:.73rem;color:var(--muted);margin-top:2px}
 .city-time{font-size:.8rem;font-weight:600;margin-top:4px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .flight-center{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 6px}
@@ -91,24 +93,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .fl-icon{color:var(--sky);font-size:.9rem}
 .flight-dur{font-size:.67rem;color:var(--muted)}
 .price-block{text-align:right}
-.price-big{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.5px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.price-big{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:800;letter-spacing:-.5px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .price-sub{font-size:.71rem;color:var(--muted);margin-bottom:10px;margin-top:1px}
-.btn-book{display:inline-flex;align-items:center;gap:5px;padding:8px 18px;background:var(--grad);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 3px 10px var(--sky-glow);transition:all .2s}
+.btn-book{display:inline-flex;align-items:center;gap:5px;padding:8px 18px;background:var(--grad);color:#fff;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 3px 10px var(--sky-glow);transition:all .2s}
 .btn-book:hover{opacity:.9;transform:translateY(-1px)}
 .btn-book.sold{background:var(--s1);color:var(--muted);cursor:not-allowed;pointer-events:none;box-shadow:none}
 .fc-footer{padding:9px 22px;background:var(--s1);border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .fmeta{font-size:.74rem;color:var(--muted)}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:.7rem;font-weight:700;white-space:nowrap}
-.badge-ok{background:rgba(16,185,129,.1);color:var(--em);border:1px solid rgba(16,185,129,.2)}
-.badge-warn{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
-.badge-full{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2)}
+.badge-ok{background:rgba(91,138,110,.1);color:var(--em);border:1px solid rgba(91,138,110,.2)}
+.badge-warn{background:rgba(184,134,63,.1);color:var(--warn);border:1px solid rgba(184,134,63,.2)}
+.badge-full{background:rgba(179,85,74,.08);color:var(--danger);border:1px solid rgba(179,85,74,.2)}
 /* ── Jump bar ── */
 .jump-bar{display:flex;gap:6px;overflow-x:auto;padding:2px 0 14px;scrollbar-width:none;margin-bottom:6px}
 .jump-bar::-webkit-scrollbar{display:none}
-.jump-btn{background:var(--s0);border:1.5px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:99px;font-size:.74rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif}
+.jump-btn{background:var(--s0);border:1.5px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:99px;font-size:.74rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'Inter',sans-serif}
 .jump-btn:hover{border-color:var(--sky);color:var(--sky)}
 /* ── Alert + Empty ── */
-.alert{padding:12px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--danger)}
+.alert{padding:12px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px;background:rgba(179,85,74,.08);border:1px solid rgba(179,85,74,.2);color:var(--danger)}
 .empty-card{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);padding:60px 24px;text-align:center;box-shadow:var(--sh)}
 .empty-icon{font-size:3rem;margin-bottom:14px;opacity:.4}
 /* ── Back to top ── */
@@ -133,24 +135,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <%@ include file="/Views/common/navbar.jsp" %>
 <div class="mobile-nav" id="mobileNav">
-  <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link">🏠 Dashboard</a>
-  <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link">🔍 Search</a>
-  <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link active">✈ All Flights</a>
-  <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link">🎫 My Bookings</a>
-  <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link">💸 Refunds</a>
+  <a href="${pageContext.request.contextPath}/userDashboard"     class="nav-link"><i class="ph-bold ph-house"></i> Dashboard</a>
+  <a href="${pageContext.request.contextPath}/searchFlights"     class="nav-link"><i class="ph-bold ph-magnifying-glass"></i> Search</a>
+  <a href="${pageContext.request.contextPath}/allFlights"        class="nav-link active"><i class="ph-bold ph-airplane-tilt"></i> All Flights</a>
+  <a href="${pageContext.request.contextPath}/userBookings"      class="nav-link"><i class="ph-bold ph-ticket"></i> My Bookings</a>
+  <a href="${pageContext.request.contextPath}/userRefundHistory" class="nav-link"><i class="ph-bold ph-hand-coins"></i> Refunds</a>
   <a href="${pageContext.request.contextPath}/logout"            class="nav-link btn-danger" style="color:var(--danger)">↩ Logout</a>
 </div>
 
 <div class="page-wrap">
   <div class="page-header">
     <div>
-      <h1 class="page-title">✈ All Flights</h1>
+      <h1 class="page-title"><i class="ph-bold ph-airplane-tilt"></i> All Flights</h1>
       <p class="page-subtitle">Showing <%= showingFrom %>–<%= showingTo %> of <%= totalFlights %> upcoming flights</p>
     </div>
-    <a href="${pageContext.request.contextPath}/searchFlights" class="btn-book" style="padding:9px 18px;font-size:.84rem">🔍 Advanced Search</a>
+    <a href="${pageContext.request.contextPath}/searchFlights" class="btn-book" style="padding:9px 18px;font-size:.84rem"><i class="ph-bold ph-magnifying-glass"></i> Advanced Search</a>
   </div>
 
-  <% if (error != null) { %><div class="alert">⚠ <%= error %></div><% } %>
+  <% if (error != null) { %><div class="alert"><i class="ph-bold ph-warning"></i> <%= error %></div><% } %>
 
   <%
     int totalDays    = grouped.size();
@@ -201,7 +203,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
   <% if (totalFlights == 0) { %>
     <div class="empty-card">
-      <div class="empty-icon">🛫</div>
+      <div class="empty-icon"><i class="ph-bold ph-airplane-takeoff"></i></div>
       <p style="color:var(--muted);font-size:1rem;margin-bottom:20px">No flights scheduled right now.</p>
       <a href="${pageContext.request.contextPath}/userDashboard" class="btn-book">Go to Dashboard</a>
     </div>
@@ -252,8 +254,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           double pct = (double) seatsAvail / seatsTotal;
           String badgeCls, badgeTxt;
           if      (seatsAvail == 0) { badgeCls="badge-full"; badgeTxt="⛔ Sold Out"; }
-          else if (pct < 0.15)      { badgeCls="badge-warn"; badgeTxt="🔥 "+seatsAvail+" left"; }
-          else                      { badgeCls="badge-ok";   badgeTxt="✅ "+seatsAvail+" seats"; }
+          else if (pct < 0.15)      { badgeCls="badge-warn"; badgeTxt="<i class="ph-bold ph-fire"></i> "+seatsAvail+" left"; }
+          else                      { badgeCls="badge-ok";   badgeTxt="<i class="ph-bold ph-check-circle"></i> "+seatsAvail+" seats"; }
       %>
       <div class="flight-card"
            style="animation:fadeUp .4s ease both <%= globalIdx * 0.04 %>s"
@@ -269,7 +271,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
           <div class="flight-center">
             <div class="flight-no-lbl"><%= flightNo %></div>
-            <div class="flight-line"><div class="fl-bar"></div><span class="fl-icon">✈</span><div class="fl-bar"></div></div>
+            <div class="flight-line"><div class="fl-bar"></div><span class="fl-icon"><i class="ph-bold ph-airplane-tilt"></i></span><div class="fl-bar"></div></div>
             <div class="flight-dur"><%= dur %> · Non-stop</div>
           </div>
           <div>
@@ -290,7 +292,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
 
         <div class="fc-footer">
-          <span class="fmeta">✈ <%= flightNo %></span>
+          <span class="fmeta"><i class="ph-bold ph-airplane-tilt"></i> <%= flightNo %></span>
           <span class="fmeta"><%= src %> → <%= dst %></span>
           <span class="fmeta">⏱ <%= dur %></span>
           <span class="badge <%= badgeCls %>"><%= badgeTxt %></span>
@@ -345,8 +347,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <script>
 // Theme
-(function(){const s=localStorage.getItem('asTheme')||'light';document.documentElement.setAttribute('data-theme',s);document.getElementById('themeToggle').textContent=s==='dark'?'☀️':'🌙';})();
-document.getElementById('themeToggle').addEventListener('click',function(){const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('asTheme',n);this.textContent=n==='dark'?'☀️':'🌙';});
+(function(){const s=localStorage.getItem('asTheme')||'light';document.documentElement.setAttribute('data-theme',s);document.getElementById('themeToggle').textContent=s==='dark'?'<i class="ph-bold ph-sun"></i>':'<i class="ph-bold ph-moon"></i>';})();
+document.getElementById('themeToggle').addEventListener('click',function(){const c=document.documentElement.getAttribute('data-theme');const n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('asTheme',n);this.textContent=n==='dark'?'<i class="ph-bold ph-sun"></i>':'<i class="ph-bold ph-moon"></i>';});
 // Hamburger
 const ham=document.getElementById('hamburger'),mn=document.getElementById('mobileNav');
 ham.addEventListener('click',()=>mn.classList.toggle('open'));

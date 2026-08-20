@@ -49,7 +49,9 @@
 <title>Confirm Booking – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
@@ -81,7 +83,7 @@
   animation: floatAnim 5s ease-in-out infinite;
 }
 .rs-city {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces',serif;
   font-size: 1.75rem; font-weight: 800;
   letter-spacing: -.04em; color: var(--text); line-height: 1;
 }
@@ -114,11 +116,11 @@
 /* Warning */
 .alert-warn {
   background: var(--warning-bg); border: 1px solid var(--warning-border);
-  color: #92400E; border-radius: var(--radius); padding: 12px 16px;
+  color: #8A6530; border-radius: var(--radius); padding: 12px 16px;
   font-size: .875rem; font-weight: 500;
   display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
 }
-[data-theme="dark"] .alert-warn { color: #FCD34D; }
+[data-theme="dark"] .alert-warn { color: #E0BC7E; }
 
 /* Fare summary */
 .fare-card {
@@ -132,7 +134,7 @@
 .fare-head {
   padding: 14px 20px;
   background: var(--surface-1); border-bottom: 1px solid var(--border);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces',serif;
   font-size: .85rem; font-weight: 700; letter-spacing: -.01em;
   display: flex; align-items: center; gap: 8px;
 }
@@ -152,11 +154,11 @@
   background: var(--primary-glow);
 }
 .fare-total-label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces',serif;
   font-size: 1rem; font-weight: 800; color: var(--text);
 }
 .fare-total-val {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces',serif;
   font-size: 1.4rem; font-weight: 800;
   color: var(--primary); letter-spacing: -.03em;
 }
@@ -172,7 +174,7 @@
 .form-section-head {
   padding: 14px 20px; background: var(--surface-1);
   border-bottom: 1px solid var(--border);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces',serif;
   font-size: .85rem; font-weight: 700;
 }
 .form-section-body { padding: 20px; }
@@ -193,7 +195,7 @@
   width: 100%; padding: 12px 14px 12px 40px;
   background: var(--surface-1); border: 1.5px solid var(--border-2);
   border-radius: var(--radius); color: var(--text);
-  font-family: 'DM Sans', sans-serif; font-size: .95rem;
+  font-family: 'Inter',sans-serif; font-size: .95rem;
   outline: none;
   transition: border-color var(--trans-fast), box-shadow var(--trans-fast), background var(--trans-fast);
 }
@@ -208,7 +210,7 @@
   width: 100%; padding: 15px; margin-top: 16px;
   background: var(--grad-brand); border: none;
   border-radius: var(--radius); color: #fff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter',sans-serif;
   font-size: 1rem; font-weight: 700; cursor: pointer;
   box-shadow: 0 6px 20px var(--primary-glow-lg);
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -269,17 +271,17 @@
 
   <!-- ROUTE CARD -->
   <div class="route-strip">
-    <div class="route-strip-bg">✈</div>
+    <div class="route-strip-bg"><i class="ph-bold ph-airplane-tilt"></i></div>
     <div>
       <div class="rs-city"><%= source %></div>
       <div class="rs-label">Origin</div>
-      <div class="rs-time">🛫 <%= departTime %></div>
+      <div class="rs-time"><i class="ph-bold ph-airplane-takeoff"></i> <%= departTime %></div>
     </div>
-    <div class="rs-icon">✈</div>
+    <div class="rs-icon"><i class="ph-bold ph-airplane-tilt"></i></div>
     <div style="text-align:right">
       <div class="rs-city"><%= destination %></div>
       <div class="rs-label">Destination</div>
-      <div class="rs-time">🛬 <%= (arrivalTime != null && !arrivalTime.isEmpty()) ? arrivalTime : "—" %></div>
+      <div class="rs-time"><i class="ph-bold ph-airplane-landing"></i> <%= (arrivalTime != null && !arrivalTime.isEmpty()) ? arrivalTime : "—" %></div>
     </div>
   </div>
 
@@ -303,7 +305,7 @@
     </div>
     <div class="info-tile">
       <div class="info-tile-label">Available Seats</div>
-      <div class="info-tile-val <%= seatsAvailable <= 5 ? "highlight" : "" %>"><%= seatsAvailable %><%= seatsAvailable <= 5 ? " ⚠" : "" %></div>
+      <div class="info-tile-val <%= seatsAvailable <= 5 ? "highlight" : "" %>"><%= seatsAvailable %><%= seatsAvailable <= 5 ? " <i class="ph-bold ph-warning"></i>" : "" %></div>
     </div>
     <div class="info-tile">
       <div class="info-tile-label">Price per Seat</div>
@@ -313,14 +315,14 @@
 
   <% if (seatsAvailable < numSeats) { %>
     <div class="alert-warn">
-      <span>⚠</span>
+      <span><i class="ph-bold ph-warning"></i></span>
       <span>Only <strong><%= seatsAvailable %></strong> seat(s) available. Please reduce your seat count below.</span>
     </div>
   <% } %>
 
   <!-- FARE SUMMARY -->
   <div class="fare-card">
-    <div class="fare-head">💰 Fare Summary</div>
+    <div class="fare-head"><i class="ph-bold ph-coins"></i> Fare Summary</div>
     <div class="fare-body">
       <div class="fare-row">
         <span class="fare-row-label">Price per Seat</span>
@@ -339,7 +341,7 @@
 
   <!-- BOOKING FORM (action, method, all name attrs preserved exactly) -->
   <div class="form-section">
-    <div class="form-section-head">✈ Confirm Your Booking</div>
+    <div class="form-section-head"><i class="ph-bold ph-airplane-tilt"></i> Confirm Your Booking</div>
     <div class="form-section-body">
       <form action="${pageContext.request.contextPath}/bookFlight" method="post" id="bookForm">
         <input type="hidden" name="_csrf"     value="<%= HtmlUtils.e(csrfToken) %>">
@@ -348,7 +350,7 @@
         <div class="seat-field">
           <label>Number of Seats</label>
           <div class="seat-input-wrap">
-            <span class="seat-input-icon">💺</span>
+            <span class="seat-input-icon"><i class="ph-bold ph-armchair"></i></span>
             <input type="number" name="numSeats"
                    min="1" max="<%= seatsAvailable %>"
                    value="<%= numSeats %>" required
@@ -358,7 +360,7 @@
 
         <button type="submit" class="btn-confirm" id="btnConfirm"
                 <%= seatsAvailable == 0 ? "disabled" : "" %>>
-          <span>✅ Confirm Booking</span><span>→</span>
+          <span><i class="ph-bold ph-check-circle"></i> Confirm Booking</span><span>→</span>
         </button>
       </form>
     </div>

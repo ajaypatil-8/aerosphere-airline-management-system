@@ -14,13 +14,15 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Passenger Details – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <style>
 
 :root{
-  --sky:#0EA5E9;--emerald:#10B981;--emerald-dark:#059669;
+  --sky:#2E4A3D;--emerald:#5B8A6E;--emerald-dark:#3E6350;
   --grad:linear-gradient(135deg,var(--sky),var(--emerald));
-  --sky-glow:rgba(14,165,233,.18);--em-glow:rgba(16,185,129,.18);
+  --sky-glow:rgba(46,74,61,.18);--em-glow:rgba(91,138,110,.18);
   --bg:#F8FAFC;--card-bg:#FFFFFF;--text:#0F172A;--text-muted:#64748B;
   --border:#E2E8F0;--shadow:0 2px 12px rgba(0,0,0,.06);
   --shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:14px;
@@ -33,8 +35,8 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
+h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Fraunces',serif}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fadeUp .45s ease forwards}
@@ -63,9 +65,9 @@ h1,h2,h3,.brand-name,.page-title,.card-title{font-family:'Syne',sans-serif}
 .form-group label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted)}
 .field-wrap{position:relative}
 .fi{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
-.field-wrap input,.field-wrap select{width:100%;background:var(--input-bg);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px 10px 36px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:all .2s;appearance:none}
+.field-wrap input,.field-wrap select{width:100%;background:var(--input-bg);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px 10px 36px;color:var(--text);font-family:'Inter',sans-serif;font-size:.88rem;outline:none;transition:all .2s;appearance:none}
 .field-wrap input:focus,.field-wrap select:focus{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow);background:var(--card-bg)}
-.btn-submit{padding:12px 32px;background:var(--grad);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-submit{padding:12px 32px;background:var(--grad);color:#fff;border:none;border-radius:10px;font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 5px 16px var(--sky-glow)}
 input[type="date"]{color-scheme:light}
 [data-theme="dark"] input[type="date"]{color-scheme:dark}
@@ -84,7 +86,7 @@ input[type="date"]{color-scheme:light}
     <div class="step-line"></div>
     <div class="step"><div class="step-circle">4</div><div class="step-label">Payment</div></div>
   </div>
-  <h1 class="page-title fu">🧳 Passenger Details</h1>
+  <h1 class="page-title fu"><i class="ph-bold ph-suitcase"></i> Passenger Details</h1>
   <p class="page-subtitle fu">Enter details for all <%=seats%> passenger<%=seats>1?"s":""%></p>
   <form method="post" action="${pageContext.request.contextPath}/savePassengers">
     <input type="hidden" name="_csrf"      value="<%=csrfToken%>">
@@ -94,11 +96,11 @@ input[type="date"]{color-scheme:light}
     <div class="pax-card fu" style="animation-delay:<%=(p-1)*0.07%>s">
       <div class="pax-badge">Passenger <%=p%></div>
       <div class="pax-grid">
-        <div class="form-group"><label>Full Name</label><div class="field-wrap"><span class="fi">👤</span><input type="text" name="full_name[]" required placeholder="Full name"></div></div>
-        <div class="form-group"><label>Date of Birth</label><div class="field-wrap"><span class="fi">📅</span><input type="date" name="dob[]" class="dob-input" required max="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>"></div></div>
-        <div class="form-group"><label>Gender</label><div class="field-wrap"><span class="fi">⚧</span><select name="gender[]" required><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div></div>
-        <div class="form-group"><label>Phone</label><div class="field-wrap"><span class="fi">📞</span><input type="tel" name="phone[]" required placeholder="Phone number"></div></div>
-        <div class="form-group"><label>Email</label><div class="field-wrap"><span class="fi">✉️</span><input type="email" name="email[]" required placeholder="Email address"></div></div>
+        <div class="form-group"><label>Full Name</label><div class="field-wrap"><span class="fi"><i class="ph-bold ph-user"></i></span><input type="text" name="full_name[]" required placeholder="Full name"></div></div>
+        <div class="form-group"><label>Date of Birth</label><div class="field-wrap"><span class="fi"><i class="ph-bold ph-calendar-blank"></i></span><input type="date" name="dob[]" class="dob-input" required max="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>"></div></div>
+        <div class="form-group"><label>Gender</label><div class="field-wrap"><span class="fi"><i class="ph-bold ph-user-circle"></i></span><select name="gender[]" required><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div></div>
+        <div class="form-group"><label>Phone</label><div class="field-wrap"><span class="fi"><i class="ph-bold ph-phone"></i></span><input type="tel" name="phone[]" required placeholder="Phone number"></div></div>
+        <div class="form-group"><label>Email</label><div class="field-wrap"><span class="fi"><i class="ph-bold ph-envelope-simple"></i></span><input type="email" name="email[]" required placeholder="Email address"></div></div>
       </div>
     </div>
     <%}%>
@@ -111,7 +113,7 @@ input[type="date"]{color-scheme:light}
 (function(){
   var btn=document.getElementById('asThemeToggle');
   if(!btn)return;
-  function apply(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('asTheme',t);btn.textContent=t==='dark'?'☀️':'🌙';}
+  function apply(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('asTheme',t);btn.textContent=t==='dark'?'<i class="ph-bold ph-sun"></i>':'<i class="ph-bold ph-moon"></i>';}
   apply(document.documentElement.getAttribute('data-theme')||'light');
   btn.addEventListener('click',function(){apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
 })();

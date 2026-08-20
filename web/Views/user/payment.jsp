@@ -29,7 +29,8 @@
 <title>Payment – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <!-- Razorpay SDK -->
@@ -42,35 +43,35 @@
 /* Steps */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:28px;flex-wrap:wrap;gap:4px}
 .step{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;color:var(--text-faint,#94A3B8)}
-.step.active{color:var(--primary,#0EA5E9);font-weight:700}
-.step.done{color:var(--success,#10B981)}
-.step-circle{width:24px;height:24px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:800;flex-shrink:0}
+.step.active{color:var(--primary,#2E4A3D);font-weight:700}
+.step.done{color:var(--success,#5B8A6E)}
+.step-circle{width:24px;height:24px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',sans-serif;font-size:.7rem;font-weight:800;flex-shrink:0}
 .step.active .step-circle,.step.done .step-circle{background:currentColor;color:#fff;border-color:transparent}
 .step-line{flex:1;height:1px;background:var(--border,#E2E8F0);margin:0 6px;min-width:16px}
-.step-line.done{background:var(--success,#10B981)}
+.step-line.done{background:var(--success,#5B8A6E)}
 
 /* Cards */
 .pay-card{background:var(--surface-0,#fff);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow,0 2px 12px rgba(0,0,0,.06));margin-bottom:16px;animation:fadeUp .5s var(--ease,.4s cubic-bezier(.16,1,.3,1)) both}
-.pay-card-head{padding:14px 20px;background:var(--surface-1,#F8FAFC);border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:.86rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.pay-card-head{padding:14px 20px;background:var(--surface-1,#F8FAFC);border-bottom:1px solid var(--border);font-family:'Fraunces',sans-serif;font-size:.86rem;font-weight:700;display:flex;align-items:center;gap:8px}
 .pay-card-body{padding:22px}
 
 /* Test mode banner */
-.test-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:11px 15px;font-size:.8rem;color:#D97706;font-weight:600;display:flex;align-items:flex-start;gap:8px;margin-bottom:16px;line-height:1.5}
-[data-theme="dark"] .test-banner{background:rgba(245,158,11,.07);color:#FCD34D;border-color:rgba(245,158,11,.2)}
+.test-banner{background:rgba(184,134,63,.1);border:1px solid rgba(184,134,63,.3);border-radius:10px;padding:11px 15px;font-size:.8rem;color:#8A6530;font-weight:600;display:flex;align-items:flex-start;gap:8px;margin-bottom:16px;line-height:1.5}
+[data-theme="dark"] .test-banner{background:rgba(184,134,63,.07);color:#E0BC7E;border-color:rgba(184,134,63,.2)}
 
 /* Razorpay box */
 .rzp-box{border:2px dashed var(--border);border-radius:14px;padding:26px 20px;text-align:center;background:var(--surface-1,#F8FAFC);transition:border-color .2s}
-.rzp-box:hover{border-color:var(--primary,#0EA5E9)}
+.rzp-box:hover{border-color:var(--primary,#2E4A3D)}
 .rzp-icon{font-size:2.5rem;margin-bottom:10px}
-.rzp-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:6px}
+.rzp-title{font-family:'Fraunces',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:6px}
 .rzp-desc{font-size:.83rem;color:var(--text-muted);line-height:1.6;margin-bottom:16px;max-width:360px;margin-left:auto;margin-right:auto}
 .rzp-badges{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:18px}
-.rzp-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;background:rgba(16,185,129,.1);color:#059669;font-size:.73rem;font-weight:600}
-[data-theme="dark"] .rzp-badge{background:rgba(16,185,129,.15);color:#34D399}
+.rzp-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;background:rgba(91,138,110,.1);color:#3E6350;font-size:.73rem;font-weight:600}
+[data-theme="dark"] .rzp-badge{background:rgba(91,138,110,.15);color:#34D399}
 
 /* Pay button */
-.btn-pay{width:100%;padding:14px;background:var(--grad-brand,linear-gradient(135deg,#0EA5E9,#10B981));border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
-.btn-pay:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(14,165,233,.35)}
+.btn-pay{width:100%;padding:14px;background:var(--grad-brand,linear-gradient(135deg,#2E4A3D,#5B8A6E));border:none;border-radius:12px;color:#fff;font-family:'Fraunces',sans-serif;font-size:.97rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.btn-pay:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,74,61,.35)}
 .btn-pay:active{transform:translateY(0)}
 .btn-pay:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-pay .spinner{display:none;width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
@@ -79,27 +80,27 @@
 
 /* Summary card */
 .summary-card{background:var(--surface-0,#fff);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s var(--ease,.4s cubic-bezier(.16,1,.3,1)) .1s both}
-.summary-head{padding:14px 20px;background:var(--surface-1);border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:.86rem;font-weight:700;position:relative}
-.summary-head::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-brand,linear-gradient(135deg,#0EA5E9,#10B981))}
+.summary-head{padding:14px 20px;background:var(--surface-1);border-bottom:1px solid var(--border);font-family:'Fraunces',sans-serif;font-size:.86rem;font-weight:700;position:relative}
+.summary-head::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-brand,linear-gradient(135deg,#2E4A3D,#5B8A6E))}
 .route-block{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.route-city .code{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;color:var(--text);line-height:1}
+.route-city .code{font-family:'Fraunces',sans-serif;font-size:1.45rem;font-weight:800;color:var(--text);line-height:1}
 .route-city .name{font-size:.7rem;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
-.route-city .time{font-size:.78rem;color:var(--primary,#0EA5E9);font-weight:600;margin-top:4px}
-.route-arrow{font-size:1.25rem;color:var(--primary,#0EA5E9);animation:floatAnim 3s ease-in-out infinite}
+.route-city .time{font-size:.78rem;color:var(--primary,#2E4A3D);font-weight:600;margin-top:4px}
+.route-arrow{font-size:1.25rem;color:var(--primary,#2E4A3D);animation:floatAnim 3s ease-in-out infinite}
 .fare-row{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;font-size:.865rem;border-top:1px solid var(--border)}
 .fare-row-lbl{color:var(--text-muted)}
 .fare-row-val{font-weight:600;color:var(--text)}
-.fare-total{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;background:var(--primary-glow,rgba(14,165,233,.07));border-top:2px solid var(--primary,#0EA5E9)}
-.fare-total-lbl{font-family:'Syne',sans-serif;font-weight:800;color:var(--text)}
-.fare-total-val{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:var(--primary,#0EA5E9)}
+.fare-total{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;background:var(--primary-glow,rgba(46,74,61,.07));border-top:2px solid var(--primary,#2E4A3D)}
+.fare-total-lbl{font-family:'Fraunces',sans-serif;font-weight:800;color:var(--text)}
+.fare-total-val{font-family:'Fraunces',sans-serif;font-size:1.25rem;font-weight:800;color:var(--primary,#2E4A3D)}
 
 /* Timer */
-.timer-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:10px;font-size:.81rem;color:#D97706;font-weight:600;margin-bottom:14px}
-#countdown{font-family:'Syne',sans-serif;font-weight:800}
+.timer-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(184,134,63,.08);border:1px solid rgba(184,134,63,.22);border-radius:10px;font-size:.81rem;color:#8A6530;font-weight:600;margin-bottom:14px}
+#countdown{font-family:'Fraunces',sans-serif;font-weight:800}
 
 /* Error toast */
-.err-toast{background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;border-radius:10px;padding:11px 15px;font-size:.84rem;margin-bottom:14px;display:none;line-height:1.5}
-[data-theme="dark"] .err-toast{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.25);color:#FCA5A5}
+.err-toast{background:#FEF2F2;border:1px solid #FECACA;color:#96453B;border-radius:10px;padding:11px 15px;font-size:.84rem;margin-bottom:14px;display:none;line-height:1.5}
+[data-theme="dark"] .err-toast{background:rgba(150,69,59,.1);border-color:rgba(150,69,59,.25);color:#D99089}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -130,7 +131,7 @@
 
     <!-- TEST MODE notice -->
     <div class="test-banner">
-      🧪 <div>
+      <i class="ph-bold ph-flask"></i> <div>
         <strong>TEST MODE</strong> — Razorpay is in test mode.<br>
         Use card <code>4111 1111 1111 1111</code> &nbsp;|&nbsp; Expiry: any future date &nbsp;|&nbsp; CVV: any 3 digits
       </div>
@@ -138,23 +139,23 @@
 
     <!-- Pay card -->
     <div class="pay-card">
-      <div class="pay-card-head">⚡ Pay Securely with Razorpay</div>
+      <div class="pay-card-head"><i class="ph-bold ph-lightning"></i> Pay Securely with Razorpay</div>
       <div class="pay-card-body">
         <div class="rzp-box">
-          <div class="rzp-icon">⚡</div>
+          <div class="rzp-icon"><i class="ph-bold ph-lightning"></i></div>
           <div class="rzp-title">Razorpay Secure Checkout</div>
           <div class="rzp-desc">
             Complete your booking with UPI, Cards, Net Banking or Wallets.<br>
             All payments are 256-bit SSL encrypted.
           </div>
           <div class="rzp-badges">
-            <span class="rzp-badge">🔒 SSL</span>
-            <span class="rzp-badge">🛡 PCI DSS</span>
-            <span class="rzp-badge">⚡ Instant Confirm</span>
-            <span class="rzp-badge">🔄 Easy Refunds</span>
+            <span class="rzp-badge"><i class="ph-bold ph-lock-simple"></i> SSL</span>
+            <span class="rzp-badge"><i class="ph-bold ph-shield-check"></i> PCI DSS</span>
+            <span class="rzp-badge"><i class="ph-bold ph-lightning"></i> Instant Confirm</span>
+            <span class="rzp-badge"><i class="ph-bold ph-arrow-clockwise"></i> Easy Refunds</span>
           </div>
           <button class="btn-pay" id="payBtn" onclick="startPayment()">
-            <span class="btn-label">🔒&nbsp; Pay ₹<%= String.format("%.2f", finalAmount) %> Now</span>
+            <span class="btn-label"><i class="ph-bold ph-lock-simple"></i>&nbsp; Pay ₹<%= String.format("%.2f", finalAmount) %> Now</span>
             <span class="spinner"></span>
           </button>
         </div>
@@ -162,29 +163,29 @@
     </div>
 
     <div style="text-align:center;font-size:.78rem;color:var(--text-faint,#94A3B8);margin-top:6px">
-      Booking #<%= bookingId %> &nbsp;·&nbsp; Powered by Razorpay &nbsp;·&nbsp; 🔐 Secure &amp; Encrypted
+      Booking #<%= bookingId %> &nbsp;·&nbsp; Powered by Razorpay &nbsp;·&nbsp; <i class="ph-bold ph-lock-key"></i> Secure &amp; Encrypted
     </div>
   </div>
 
   <!-- ═══ RIGHT COL ═══ -->
   <div>
     <div class="timer-bar">
-      ⏱ Expires in <span id="countdown">09:59</span>
+      <i class="ph-bold ph-clock"></i> Expires in <span id="countdown">09:59</span>
     </div>
 
     <div class="summary-card">
-      <div class="summary-head">✈ Booking Summary</div>
+      <div class="summary-head"><i class="ph-bold ph-airplane-tilt"></i> Booking Summary</div>
       <div class="route-block">
         <div class="route-city">
           <div class="code"><%= source != null && source.length()>=3 ? source.substring(0,3).toUpperCase() : (source!=null?source.toUpperCase():"DEP") %></div>
           <div class="name"><%= source != null ? source : "—" %></div>
-          <div class="time">🛫 <%= departTime != null ? departTime : "—" %></div>
+          <div class="time"><i class="ph-bold ph-airplane-takeoff"></i> <%= departTime != null ? departTime : "—" %></div>
         </div>
-        <div class="route-arrow">✈</div>
+        <div class="route-arrow"><i class="ph-bold ph-airplane-tilt"></i></div>
         <div class="route-city" style="text-align:right">
           <div class="code"><%= destination != null && destination.length()>=3 ? destination.substring(0,3).toUpperCase() : (destination!=null?destination.toUpperCase():"ARR") %></div>
           <div class="name"><%= destination != null ? destination : "—" %></div>
-          <div class="time">🛬 <%= arrivalTime != null ? arrivalTime : "—" %></div>
+          <div class="time"><i class="ph-bold ph-airplane-landing"></i> <%= arrivalTime != null ? arrivalTime : "—" %></div>
         </div>
       </div>
       <div class="fare-row"><span class="fare-row-lbl">Flight</span><span class="fare-row-val" style="color:var(--primary)"><%= flightNo != null ? flightNo : "—" %></span></div>
@@ -225,7 +226,7 @@
 
 function showErr(msg){
   var t = document.getElementById('errToast');
-  t.textContent = '⚠ ' + msg;
+  t.innerHTML = '<i class="ph-bold ph-warning"></i> ' + msg;
   t.style.display = 'block';
   t.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -272,7 +273,7 @@ async function startPayment() {
         contact: ''
       },
       notes: { booking_id: '<%= bookingId %>' },
-      theme: { color: '#0EA5E9' },
+      theme: { color: '#2E4A3D' },
       handler: async function(response) {
         // 3. Verify payment signature on server via fetch (servlet returns JSON)
         try {
