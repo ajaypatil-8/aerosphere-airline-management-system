@@ -237,9 +237,9 @@ public class UserDAO {
         u.setDob(rs.getDate("dob"));
         u.setGender(rs.getString("gender"));
         u.setAddress(rs.getString("address"));
-        u.setRole(rs.getString("role"));
+        String roleVal = rs.getString("role");
+        u.setRole(roleVal != null ? roleVal.trim().toUpperCase() : "USER");
         u.setCreatedAt(rs.getTimestamp("created_at"));
-        // is_active column: default true if column doesn't exist yet (safe fallback)
         try {
             u.setActive(rs.getBoolean("is_active"));
         } catch (SQLException ignored) {

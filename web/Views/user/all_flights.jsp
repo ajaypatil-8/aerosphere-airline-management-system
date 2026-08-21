@@ -254,8 +254,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           double pct = (double) seatsAvail / seatsTotal;
           String badgeCls, badgeTxt;
           if      (seatsAvail == 0) { badgeCls="badge-full"; badgeTxt="⛔ Sold Out"; }
-          else if (pct < 0.15)      { badgeCls="badge-warn"; badgeTxt="<i class="ph-bold ph-fire"></i> "+seatsAvail+" left"; }
-          else                      { badgeCls="badge-ok";   badgeTxt="<i class="ph-bold ph-check-circle"></i> "+seatsAvail+" seats"; }
+          else if (pct < 0.15)      { badgeCls="badge-warn"; badgeTxt="<i class=\"ph-bold ph-fire\"></i> "+seatsAvail+" left"; }
+          else                      { badgeCls="badge-ok";   badgeTxt="<i class=\"ph-bold ph-check-circle\"></i> "+seatsAvail+" seats"; }
       %>
       <div class="flight-card"
            style="animation:fadeUp .4s ease both <%= globalIdx * 0.04 %>s"
