@@ -85,7 +85,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 .btn-hero-ghost:hover{background:rgba(255,255,255,.2)}
 
 /* ── Quick search (own section, just below hero) ── */
-.search-section{padding:0 24px;margin-top:-46px;position:relative;z-index:5;display:flex;justify-content:center}
+.search-section{padding:0 24px; margin-top:80px;position:relative;z-index:5;display:flex;justify-content:center}
 .hero-search{background:var(--s0);border:1px solid var(--border);border-radius:22px;padding:26px 30px;box-shadow:var(--sh-xl);max-width:1100px;width:100%}
 .search-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;text-align:left;display:flex;align-items:center;gap:8px}
 .search-grid{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) minmax(100px,1fr) minmax(110px,1fr) auto;gap:8px;align-items:end}
