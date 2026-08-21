@@ -16,12 +16,13 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Add Flight – AeroSphere Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <style>
 /* ── Design Tokens ─────────────────────────────────────── */
 :root{
-  --sky:#0EA5E9;--sky-dark:#0284C7;--sky-glow:rgba(14,165,233,.18);
-  --em:#10B981;--em-dark:#059669;--em-glow:rgba(16,185,129,.18);
+  --sky:#2E4A3D;--sky-dark:#253D33;--sky-glow:rgba(46,74,61,.18);
+  --em:#5B8A6E;--em-dark:#3E6350;--em-glow:rgba(91,138,110,.18);
   --grad:linear-gradient(135deg,var(--sky),var(--em));
   --bg:#F0F9FF;--s0:#FFFFFF;--s1:#F8FAFC;--s2:#F0F9FF;
   --text:#0F172A;--muted:#64748B;--border:#E2E8F0;
@@ -36,7 +37,7 @@
   --sh-lg:0 8px 32px rgba(0,0,0,.5);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 
 /* ── Admin Layout ──────────────────────────────────────── */
 .as-layout{display:flex;min-height:100vh}
@@ -45,9 +46,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .as-sidebar.collapsed{transform:translateX(-100%)}
 .sb-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 18px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text)}
 .sb-brand-icon{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 3px 10px var(--sky-glow)}
-.sb-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:-.4px;line-height:1.1}
+.sb-brand-name{font-family:'Fraunces',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:-.4px;line-height:1.1}
 .sb-brand-name span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.sb-admin-tag{font-size:.6rem;background:rgba(245,158,11,.15);color:#D97706;border:1px solid rgba(245,158,11,.3);padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.05em;display:block;margin-top:2px}
+.sb-admin-tag{font-size:.6rem;background:rgba(184,134,63,.15);color:#8A6530;border:1px solid var(--warning-border);padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.05em;display:block;margin-top:2px}
 .sb-section-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:16px 20px 6px}
 .sb-nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
 .sb-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;text-decoration:none;color:var(--muted);font-size:.86rem;font-weight:500;transition:all .18s;position:relative}
@@ -55,7 +56,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sb-link:hover{color:var(--text);background:var(--s2)}
 .sb-link.active{color:var(--sky);background:var(--sky-glow);font-weight:600}
 .sb-link.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--sky);border-radius:0 2px 2px 0}
-.sb-link .badge-pill{margin-left:auto;background:rgba(239,68,68,.15);color:#EF4444;font-size:.64rem;font-weight:700;padding:2px 6px;border-radius:99px}
+.sb-link .badge-pill{margin-left:auto;background:var(--danger-bg);color:#B3554A;font-size:.64rem;font-weight:700;padding:2px 6px;border-radius:99px}
 .sb-divider{border:none;border-top:1px solid var(--border);margin:10px 12px}
 .sb-footer{padding:16px 20px;border-top:1px solid var(--border);margin-top:auto}
 .sb-user{display:flex;align-items:center;gap:10px}
@@ -74,26 +75,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;
   transition:all .2s;color:var(--muted);flex-shrink:0}
 .sb-toggle:hover{border-color:var(--sky);color:var(--sky)}
-.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
+.topbar-title{font-family:'Fraunces',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--s0);
   cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .2s;color:var(--muted)}
 .theme-toggle:hover{border-color:var(--sky);color:var(--sky)}
-.topbar-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:#EF4444;background:rgba(239,68,68,.08);
+.topbar-logout{text-decoration:none;font-size:.82rem;font-weight:600;color:#B3554A;background:rgba(179,85,74,.08);
   padding:6px 14px;border-radius:8px;transition:all .2s}
-.topbar-logout:hover{background:rgba(239,68,68,.15)}
+.topbar-logout:hover{background:var(--danger-bg)}
 
 /* ── Page content ──────────────────────────────────────── */
 .page-content{max-width:760px;margin:0 auto;padding:32px 28px;width:100%}
 
 /* ── Page header ───────────────────────────────────────── */
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:12px;flex-wrap:wrap}
-.page-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.page-title{font-family:'Fraunces',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
 .page-subtitle{color:var(--muted);font-size:.9rem}
 
 /* ── Alerts ────────────────────────────────────────────── */
 .alert{padding:12px 16px;border-radius:11px;margin-bottom:20px;font-size:.86rem;font-weight:500;display:flex;align-items:center;gap:8px}
-.alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#DC2626}
+.alert-error{background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger-dark)}
 [data-theme="dark"] .alert-error{color:#FCA5A5}
 .alert-success{background:var(--em-glow);border:1px solid var(--em);color:var(--em-dark)}
 [data-theme="dark"] .alert-success{color:#34D399}
@@ -104,7 +105,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   display:flex;align-items:center;gap:12px}
 .card-header-icon{width:38px;height:38px;border-radius:10px;background:var(--grad);display:flex;
   align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px var(--sky-glow)}
-.card-header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem}
+.card-header-title{font-family:'Fraunces',sans-serif;font-weight:700;font-size:1rem}
 .card-header-sub{font-size:.8rem;color:var(--muted);margin-top:2px}
 .card-body{padding:28px}
 
@@ -117,7 +118,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .field-wrap:focus-within{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow)}
 .field-wrap .fi{font-size:.95rem;flex-shrink:0;opacity:.7}
 .field-wrap input,.field-wrap select{flex:1;border:none;background:transparent;color:var(--text);
-  font-family:'DM Sans',sans-serif;font-size:.88rem;padding:11px 0;outline:none}
+  font-family:'Inter',sans-serif;font-size:.88rem;padding:11px 0;outline:none}
 .field-wrap input::placeholder{color:var(--muted);opacity:.65}
 .form-hint{font-size:.74rem;color:var(--muted)}
 
@@ -129,7 +130,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ── Buttons ───────────────────────────────────────────── */
 .form-actions{display:flex;gap:10px;justify-content:flex-end;padding-top:4px}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:9px;font-weight:600;
-  font-size:.85rem;text-decoration:none;cursor:pointer;transition:all .2s;border:none;font-family:'DM Sans',sans-serif}
+  font-size:.85rem;text-decoration:none;cursor:pointer;transition:all .2s;border:none;font-family:'Inter',sans-serif}
 .btn-grad{background:var(--grad);color:#fff;box-shadow:0 4px 14px var(--sky-glow)}
 .btn-grad:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 6px 20px var(--sky-glow)}
 .btn-outline{background:var(--s0);border:1.5px solid var(--border);color:var(--muted)}
@@ -162,10 +163,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <main class="as-main">
     <!-- Topbar -->
     <header class="as-topbar">
-      <button class="sb-toggle" id="sbToggle" title="Toggle sidebar">☰</button>
-      <span class="topbar-title">✈ Schedule Flight</span>
+      <button class="sb-toggle" id="sbToggle" title="Toggle sidebar"><i class="ph-bold ph-list"></i></button>
+      <span class="topbar-title"><i class="ph-bold ph-airplane-tilt"></i> Schedule Flight</span>
       <div class="topbar-right">
-        <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme"><i class="ph-bold ph-moon"></i></button>
         <a href="${pageContext.request.contextPath}/logout" class="topbar-logout">Logout</a>
       </div>
     </header>
@@ -180,12 +181,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <a href="${pageContext.request.contextPath}/adminFlights" class="btn btn-outline">← All Flights</a>
       </div>
 
-      <% if (flightError   != null) { %><div class="alert alert-error fu">⚠ <%= flightError %></div><% } %>
-      <% if (flightSuccess != null) { %><div class="alert alert-success fu">✅ <%= flightSuccess %></div><% } %>
+      <% if (flightError   != null) { %><div class="alert alert-error fu"><i class="ph-bold ph-warning"></i> <%= flightError %></div><% } %>
+      <% if (flightSuccess != null) { %><div class="alert alert-success fu"><i class="ph-bold ph-check-circle"></i> <%= flightSuccess %></div><% } %>
 
       <div class="card fu-1">
         <div class="card-header">
-          <div class="card-header-icon">✈</div>
+          <div class="card-header-icon"><i class="ph-bold ph-airplane-tilt"></i></div>
           <div>
             <div class="card-header-title">Flight Details</div>
             <div class="card-header-sub">Fill in all required fields to schedule a new flight</div>
@@ -200,7 +201,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <div class="form-group">
                 <label class="form-label">Airline / Operator *</label>
                 <div class="field-wrap">
-                  <span class="fi">🏢</span>
+                  <span class="fi"><i class="ph-bold ph-buildings"></i></span>
                   <input type="text" name="airline" placeholder="e.g. AeroSphere Airlines" required maxlength="100" autocomplete="off">
                 </div>
                 <span class="form-hint">Name of the operating airline</span>
@@ -208,7 +209,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <div class="form-group">
                 <label class="form-label">Flight Number *</label>
                 <div class="field-wrap">
-                  <span class="fi">🛩</span>
+                  <span class="fi"><i class="ph-bold ph-airplane-tilt"></i></span>
                   <input type="text" name="flight_no" placeholder="e.g. SK101" required maxlength="20" autocomplete="off">
                 </div>
                 <span class="form-hint">Unique identifier for this flight</span>
@@ -216,14 +217,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <div class="form-group">
                 <label class="form-label">Departure Date *</label>
                 <div class="field-wrap">
-                  <span class="fi">📅</span>
+                  <span class="fi"><i class="ph-bold ph-calendar-blank"></i></span>
                   <input type="date" name="depart_date" required>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Flight Class</label>
                 <div class="field-wrap">
-                  <span class="fi">🎫</span>
+                  <span class="fi"><i class="ph-bold ph-ticket"></i></span>
                   <select name="flight_class">
                     <option value="Economy">Economy</option>
                     <option value="Business">Business</option>
@@ -234,28 +235,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <div class="form-group">
                 <label class="form-label">From (Source) *</label>
                 <div class="field-wrap">
-                  <span class="fi">🛫</span>
+                  <span class="fi"><i class="ph-bold ph-airplane-takeoff"></i></span>
                   <input type="text" name="source" placeholder="e.g. Mumbai" required maxlength="100">
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">To (Destination) *</label>
                 <div class="field-wrap">
-                  <span class="fi">🛬</span>
+                  <span class="fi"><i class="ph-bold ph-airplane-landing"></i></span>
                   <input type="text" name="destination" placeholder="e.g. Delhi" required maxlength="100">
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Departure Time *</label>
                 <div class="field-wrap">
-                  <span class="fi">🕐</span>
+                  <span class="fi"><i class="ph-bold ph-clock"></i></span>
                   <input type="time" name="depart_time" id="departTime" required>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Arrival Time</label>
                 <div class="field-wrap">
-                  <span class="fi">🕑</span>
+                  <span class="fi"><i class="ph-bold ph-clock"></i></span>
                   <input type="time" name="arrival_time" id="arrivalTime">
                 </div>
                 <span class="form-hint" id="arrivalHint"> </span>
@@ -272,14 +273,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <div class="form-group">
                 <label class="form-label">Price per Seat (₹) *</label>
                 <div class="field-wrap">
-                  <span class="fi">💰</span>
+                  <span class="fi"><i class="ph-bold ph-coins"></i></span>
                   <input type="number" name="price" placeholder="e.g. 4500" min="1" step="0.01" required>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Total Seats *</label>
                 <div class="field-wrap">
-                  <span class="fi">💺</span>
+                  <span class="fi"><i class="ph-bold ph-armchair"></i></span>
                   <input type="number" name="seats_total" placeholder="e.g. 180" min="1" max="999" required>
                 </div>
                 <span class="form-hint">Available seats = total seats on creation</span>
@@ -290,7 +291,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <div class="form-actions">
               <a href="${pageContext.request.contextPath}/adminFlights" class="btn btn-outline">Cancel</a>
               <button type="reset" class="btn btn-outline">Reset</button>
-              <button type="submit" class="btn btn-grad btn-lg">✈ Schedule Flight</button>
+              <button type="submit" class="btn btn-grad btn-lg"><i class="ph-bold ph-airplane-tilt"></i> Schedule Flight</button>
             </div>
           </form>
         </div>
@@ -306,14 +307,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   const root = document.documentElement;
   const saved = localStorage.getItem('asTheme') || 'light';
   root.setAttribute('data-theme', saved);
-  document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+  document.getElementById('themeToggle').textContent = saved === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
 })();
 document.getElementById('themeToggle').addEventListener('click', function(){
   const cur  = document.documentElement.getAttribute('data-theme');
   const next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('asTheme', next);
-  this.textContent = next === 'dark' ? '☀️' : '🌙';
+  this.textContent = next === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
 });
 
 // Sidebar toggle
@@ -346,14 +347,14 @@ var arrivalHint = document.getElementById('arrivalHint');
 function validateArrival(){
   if(departTime.value && arrivalTime.value){
     if(arrivalTime.value <= departTime.value){
-      arrivalHint.textContent = '⚠ Arrival time should be after departure (next day flights are fine)';
-      arrivalHint.style.color = '#EF4444';
+      arrivalHint.textContent = '<i class="ph-bold ph-warning"></i> Arrival time should be after departure (next day flights are fine)';
+      arrivalHint.style.color = '#B3554A';
     } else {
       var dep=departTime.value.split(':'), arr=arrivalTime.value.split(':');
       var mins=(parseInt(arr[0])-parseInt(dep[0]))*60+(parseInt(arr[1])-parseInt(dep[1]));
       var h=Math.floor(mins/60), m=mins%60;
       arrivalHint.textContent = '✓ Duration: '+h+'h '+(m>0?m+'m':'');
-      arrivalHint.style.color = '#10B981';
+      arrivalHint.style.color = '#5B8A6E';
     }
   } else { arrivalHint.textContent=' '; }
 }

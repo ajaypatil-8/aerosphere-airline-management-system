@@ -30,7 +30,8 @@
 <title>Admin Dashboard – AeroSphere</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
@@ -51,7 +52,7 @@
   display: flex; align-items: center; gap: 12px;
 }
 .topbar-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: .95rem; font-weight: 700; color: var(--text);
   letter-spacing: -.02em;
 }
@@ -90,16 +91,16 @@
 }
 .admin-stat.c-blue::after  { background: var(--primary); }
 .admin-stat.c-green::after { background: var(--secondary); }
-.admin-stat.c-purple::after{ background: #8B5CF6; }
+.admin-stat.c-purple::after{ background: #6B5B8A; }
 .admin-stat.c-amber::after { background: var(--accent); }
 .admin-stat.c-red::after   { background: var(--danger); }
 .admin-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 .admin-stat:hover::after { transform: scaleX(1); }
-.admin-stat:hover.c-blue   { border-color: rgba(14,165,233,.3); }
-.admin-stat:hover.c-green  { border-color: rgba(16,185,129,.3); }
-.admin-stat:hover.c-purple { border-color: rgba(139,92,246,.3); }
-.admin-stat:hover.c-amber  { border-color: rgba(245,158,11,.3); }
-.admin-stat:hover.c-red    { border-color: rgba(239,68,68,.3); }
+.admin-stat:hover.c-blue   { border-color: var(--primary-glow-lg); }
+.admin-stat:hover.c-green  { border-color: rgba(91,138,110,.3); }
+.admin-stat:hover.c-purple { border-color: rgba(107,91,138,.3); }
+.admin-stat:hover.c-amber  { border-color: var(--warning-border); }
+.admin-stat:hover.c-red    { border-color: var(--danger-border); }
 
 .as-icon {
   width: 48px; height: 48px; border-radius: var(--radius-sm);
@@ -110,19 +111,19 @@
 .admin-stat:hover .as-icon { transform: scale(1.1) rotate(-5deg); }
 .as-icon.blue   { background: var(--info-bg); }
 .as-icon.green  { background: var(--success-bg); }
-.as-icon.purple { background: rgba(139,92,246,.1); }
+.as-icon.purple { background: rgba(107,91,138,.12); }
 .as-icon.amber  { background: var(--warning-bg); }
 .as-icon.red    { background: var(--danger-bg); }
 
 .as-num {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 1.8rem; font-weight: 800;
   letter-spacing: -.04em; line-height: 1;
   margin-bottom: 5px;
 }
 .as-num.blue   { color: var(--primary); }
 .as-num.green  { color: var(--secondary); }
-.as-num.purple { color: #8B5CF6; }
+.as-num.purple { color: #6B5B8A; }
 .as-num.amber  { color: var(--accent); font-size: 1.4rem; }
 .as-num.red    { color: var(--danger); }
 .as-label {
@@ -151,7 +152,7 @@
 }
 .revenue-bar::after {
   content: '₹'; position: absolute; right: 20px; top: 50%;
-  transform: translateY(-50%); font-family: 'Syne', sans-serif;
+  transform: translateY(-50%); font-family: 'Fraunces', sans-serif;
   font-size: 6rem; opacity: .06; pointer-events: none;
   font-weight: 800; color: #fff;
 }
@@ -161,7 +162,7 @@
   margin-bottom: 6px;
 }
 .rb-amount {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Fraunces', sans-serif;
   font-size: 2rem; font-weight: 800;
   letter-spacing: -.04em; color: #fff;
 }
@@ -171,8 +172,8 @@
 /* Pending refunds badge on sidebar */
 .refund-pill {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3);
-  color: #FCA5A5; padding: 6px 12px; border-radius: var(--radius-full);
+  background: var(--danger-bg); border: 1px solid var(--danger-border);
+  color: var(--danger-dark); padding: 6px 12px; border-radius: var(--radius-full);
   font-size: .78rem; font-weight: 700;
 }
 
@@ -231,14 +232,14 @@
     <%-- Sticky top bar --%>
     <div class="admin-topbar">
       <div class="topbar-left">
-        <button class="sidebar-toggle-btn" id="as-sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <button class="sidebar-toggle-btn" id="as-sidebar-toggle" aria-label="Toggle sidebar"><i class="ph-bold ph-list"></i></button>
         <span class="topbar-title">Admin Dashboard</span>
         <% if (pendingRefunds > 0) { %>
-          <span class="refund-pill">🔔 <%= pendingRefunds %> pending refund<%= pendingRefunds > 1 ? "s" : "" %></span>
+          <span class="refund-pill"><i class="ph-bold ph-bell"></i> <%= pendingRefunds %> pending refund<%= pendingRefunds > 1 ? "s" : "" %></span>
         <% } %>
       </div>
       <div class="topbar-right">
-        <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()" aria-label="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="themeToggle" onclick="AS.toggleTheme()" aria-label="Toggle theme"><i class="ph-bold ph-moon"></i></button>
         <div class="user-pill">
           <div class="user-avatar"><%= adminFirst.charAt(0) %></div>
           <span><%= adminFirst %></span>
@@ -250,17 +251,17 @@
     <div class="page-wrapper">
 
       <% if (error != null) { %>
-        <div class="alert alert-error"><span>⚠</span><span><%= HtmlUtils.e(error) %></span></div>
+        <div class="alert alert-error"><span><i class="ph-bold ph-warning"></i></span><span><%= HtmlUtils.e(error) %></span></div>
       <% } %>
 
       <%-- ── PAGE HEADER ─────────────────────────────────────── --%>
       <div class="page-header fade-up">
         <div>
-          <div class="page-heading">🛡️ Admin <span>Dashboard</span></div>
+          <div class="page-heading"><i class="ph-bold ph-shield-check"></i> Admin <span>Dashboard</span></div>
           <div class="page-subheading">Welcome back, <strong><%= userName %></strong> — here's your system overview</div>
         </div>
         <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary">
-          ➕ Add New Flight
+          <i class="ph-bold ph-plus"></i> Add New Flight
         </a>
       </div>
 
@@ -272,35 +273,35 @@
           <div class="rb-meta">Across all confirmed bookings</div>
         </div>
         <div class="rb-right">
-          <a href="${pageContext.request.contextPath}/reportPayments" class="btn btn-ghost">💰 Revenue Report</a>
-          <a href="${pageContext.request.contextPath}/reports"        class="btn btn-ghost">📊 All Reports</a>
+          <a href="${pageContext.request.contextPath}/reportPayments" class="btn btn-ghost"><i class="ph-bold ph-coins"></i> Revenue Report</a>
+          <a href="${pageContext.request.contextPath}/reports"        class="btn btn-ghost"><i class="ph-bold ph-chart-bar"></i> All Reports</a>
         </div>
       </div>
 
       <%-- ── KPI STATS ──────────────────────────────────────── --%>
       <div class="stats-grid-5">
         <div class="admin-stat c-blue fade-up d1">
-          <div class="as-icon blue">✈️</div>
+          <div class="as-icon blue"><i class="ph-bold ph-airplane-tilt"></i></div>
           <div class="as-num blue count-up" data-target="<%= totalFlights %>"><%= totalFlights %></div>
           <div class="as-label">Total Flights</div>
         </div>
         <div class="admin-stat c-green fade-up d2">
-          <div class="as-icon green">🎫</div>
+          <div class="as-icon green"><i class="ph-bold ph-ticket"></i></div>
           <div class="as-num green count-up" data-target="<%= totalBookings %>"><%= totalBookings %></div>
           <div class="as-label">Total Bookings</div>
         </div>
         <div class="admin-stat c-purple fade-up d3">
-          <div class="as-icon purple">👥</div>
+          <div class="as-icon purple"><i class="ph-bold ph-users"></i></div>
           <div class="as-num purple count-up" data-target="<%= totalUsers %>"><%= totalUsers %></div>
           <div class="as-label">Registered Users</div>
         </div>
         <div class="admin-stat c-amber fade-up d4">
-          <div class="as-icon amber">💰</div>
+          <div class="as-icon amber"><i class="ph-bold ph-coins"></i></div>
           <div class="as-num amber" style="font-size:1.2rem">₹<%= String.format("%,.0f", totalRevenue) %></div>
           <div class="as-label">Revenue</div>
         </div>
         <div class="admin-stat c-red fade-up d5">
-          <div class="as-icon red">🔄</div>
+          <div class="as-icon red"><i class="ph-bold ph-arrow-clockwise"></i></div>
           <div class="as-num red count-up" data-target="<%= pendingRefunds %>"><%= pendingRefunds %></div>
           <div class="as-label">Pending Refunds</div>
         </div>
@@ -310,27 +311,27 @@
       <div class="section-label">Quick Actions</div>
       <div class="quick-grid-5 fade-up d2">
         <a href="${pageContext.request.contextPath}/addFlight"    class="quick-card">
-          <div class="qc-icon">➕</div>
+          <div class="qc-icon"><i class="ph-bold ph-plus"></i></div>
           <div class="qc-title">Add Flight</div>
           <div class="qc-sub">Schedule new route</div>
         </a>
         <a href="${pageContext.request.contextPath}/adminFlights" class="quick-card">
-          <div class="qc-icon">✈️</div>
+          <div class="qc-icon"><i class="ph-bold ph-airplane-tilt"></i></div>
           <div class="qc-title">Manage Flights</div>
           <div class="qc-sub">Edit or remove</div>
         </a>
         <a href="${pageContext.request.contextPath}/adminBookings" class="quick-card">
-          <div class="qc-icon">📋</div>
+          <div class="qc-icon"><i class="ph-bold ph-clipboard-text"></i></div>
           <div class="qc-title">All Bookings</div>
           <div class="qc-sub">View reservations</div>
         </a>
         <a href="${pageContext.request.contextPath}/adminRefunds"  class="quick-card">
-          <div class="qc-icon">💸</div>
+          <div class="qc-icon"><i class="ph-bold ph-hand-coins"></i></div>
           <div class="qc-title">Refund Requests</div>
           <div class="qc-sub"><%= pendingRefunds %> pending</div>
         </a>
         <a href="${pageContext.request.contextPath}/reports"       class="quick-card">
-          <div class="qc-icon">📊</div>
+          <div class="qc-icon"><i class="ph-bold ph-chart-bar"></i></div>
           <div class="qc-title">Reports</div>
           <div class="qc-sub">Analytics & exports</div>
         </a>
@@ -345,7 +346,7 @@
       <div class="table-wrap fade-up d3">
         <% if (recentBookings == null || recentBookings.isEmpty()) { %>
           <div class="empty-state">
-            <div class="empty-icon">📋</div>
+            <div class="empty-icon"><i class="ph-bold ph-clipboard-text"></i></div>
             <h3>No bookings yet</h3>
             <p>Bookings will appear here once passengers start booking flights.</p>
           </div>
@@ -370,7 +371,7 @@
             %>
               <tr>
                 <td style="color:var(--text-faint);font-size:.78rem"><%= si %></td>
-                <td style="color:var(--primary);font-weight:700;font-family:'Syne',sans-serif">#<%= b.bookingId %></td>
+                <td style="color:var(--primary);font-weight:700;font-family:'Fraunces',sans-serif">#<%= b.bookingId %></td>
                 <td style="font-weight:500"><%= b.userName %></td>
                 <td><strong><%= b.flightNo %></strong></td>
                 <td>

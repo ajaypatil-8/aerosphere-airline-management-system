@@ -24,23 +24,24 @@
 <title>Manage Flights – AeroSphere Admin</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
 .admin-topbar{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--glass-bg);border-bottom:1px solid var(--border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
 .topbar-left{display:flex;align-items:center;gap:12px}
-.topbar-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.topbar-title{font-family:'Fraunces',sans-serif;font-size:.95rem;font-weight:700;color:var(--text);letter-spacing:-.02em}
 .topbar-right{display:flex;align-items:center;gap:8px}
 .sidebar-toggle-btn{display:none;width:36px;height:36px;background:var(--surface-0);border:1px solid var(--border-2);border-radius:var(--radius-sm);align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:border-color .2s}
 .sidebar-toggle-btn:hover{border-color:var(--primary)}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.page-title{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.04em;color:var(--text)}
+.page-title{font-family:'Fraunces',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.04em;color:var(--text)}
 .page-subtitle{font-size:.88rem;color:var(--text-muted);margin-top:4px}
 .filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:18px}
 .filter-wrap{display:flex;align-items:center;gap:10px;background:var(--surface-0);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;flex:1;transition:border-color .2s}
 .filter-wrap:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-.filter-wrap input{border:none;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;width:100%}
+.filter-wrap input{border:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;outline:none;width:100%}
 .filter-wrap input::placeholder{color:var(--text-muted)}
 .route-cell{display:flex;align-items:center;gap:6px}
 .route-city{font-weight:600;font-size:.86rem}
@@ -71,11 +72,11 @@
   <main class="as-main">
     <div class="admin-topbar">
       <div class="topbar-left">
-        <button class="sidebar-toggle-btn" id="as-sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <button class="sidebar-toggle-btn" id="as-sidebar-toggle" aria-label="Toggle sidebar"><i class="ph-bold ph-list"></i></button>
         <span class="topbar-title">Flight Schedule</span>
       </div>
       <div class="topbar-right">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="ph-bold ph-moon"></i></button>
         <div class="user-pill">
           <div class="user-avatar"><%= adminFirst.charAt(0) %></div>
           <span><%= adminFirst %></span>
@@ -88,26 +89,26 @@
 
       <div class="page-header anim-fade-up">
         <div>
-          <h1 class="page-title">✈ Flight Schedule</h1>
+          <h1 class="page-title"><i class="ph-bold ph-airplane-tilt"></i> Flight Schedule</h1>
           <p class="page-subtitle"><%= totalFlights %> flights in the system — page <%= currentPage %> of <%= totalPages %></p>
         </div>
-        <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary">➕ Add Flight</a>
+        <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary"><i class="ph-bold ph-plus"></i> Add Flight</a>
       </div>
 
-      <% if (deleteError   != null) { %><div class="alert alert-danger anim-fade-up"><span>⚠</span><span><%= deleteError %></span></div><% } %>
-      <% if (deleteSuccess != null) { %><div class="alert alert-success anim-fade-up"><span>✅</span><span><%= deleteSuccess %></span></div><% } %>
+      <% if (deleteError   != null) { %><div class="alert alert-danger anim-fade-up"><span><i class="ph-bold ph-warning"></i></span><span><%= deleteError %></span></div><% } %>
+      <% if (deleteSuccess != null) { %><div class="alert alert-success anim-fade-up"><span><i class="ph-bold ph-check-circle"></i></span><span><%= deleteSuccess %></span></div><% } %>
 
       <div class="filter-bar anim-fade-up">
-        <div class="filter-wrap"><span>🔍</span><input id="searchBox" type="text" placeholder="Search flight number, city…"></div>
+        <div class="filter-wrap"><span><i class="ph-bold ph-magnifying-glass"></i></span><input id="searchBox" type="text" placeholder="Search flight number, city…"></div>
       </div>
 
       <div class="table-wrap anim-fade-up">
         <% if (flights == null || flights.isEmpty()) { %>
           <div class="empty-state">
-            <div style="font-size:2.5rem;margin-bottom:12px">✈</div>
-            <h3 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:6px">No flights scheduled</h3>
+            <div style="font-size:2.5rem;margin-bottom:12px"><i class="ph-bold ph-airplane-tilt"></i></div>
+            <h3 style="font-family:'Fraunces',sans-serif;font-weight:700;margin-bottom:6px">No flights scheduled</h3>
             <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:16px">Add your first flight to get started.</p>
-            <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary">➕ Add Flight</a>
+            <a href="${pageContext.request.contextPath}/addFlight" class="btn btn-primary"><i class="ph-bold ph-plus"></i> Add Flight</a>
           </div>
         <% } else { %>
         <table class="sc-table" id="flightTable">
@@ -124,7 +125,7 @@
           %>
           <tr>
             <td style="color:var(--text-muted)"><%= fi %></td>
-            <td><strong style="font-family:'Syne',sans-serif;color:var(--primary)"><%= f.flightNo %></strong></td>
+            <td><strong style="font-family:'Fraunces',sans-serif;color:var(--primary)"><%= f.flightNo %></strong></td>
             <td>
               <div class="route-cell">
                 <span class="route-city"><%= f.source %></span>
@@ -135,18 +136,18 @@
             <td style="font-size:.85rem"><%= f.date %></td>
             <td style="font-size:.85rem"><%= f.departTime  != null ? f.departTime.toString().substring(0,5)  : "—" %></td>
             <td style="font-size:.85rem"><%= f.arrivalTime != null ? f.arrivalTime.toString().substring(0,5) : "—" %></td>
-            <td style="color:var(--secondary);font-family:'Syne',sans-serif;font-weight:700">₹<%= String.format("%,.0f", f.price) %></td>
+            <td style="color:var(--secondary);font-family:'Fraunces',sans-serif;font-weight:700">₹<%= String.format("%,.0f", f.price) %></td>
             <td style="font-weight:600"><%= f.totalSeats %></td>
-            <td><span style="color:<%= seatColor %>;font-family:'Syne',sans-serif;font-weight:700"><%= f.availableSeats %></span></td>
+            <td><span style="color:<%= seatColor %>;font-family:'Fraunces',sans-serif;font-weight:700"><%= f.availableSeats %></span></td>
             <td>
               <div class="action-row">
                 <% if (f.availableSeats == f.totalSeats) { %>
-                <a href="${pageContext.request.contextPath}/editFlight?id=<%= f.id %>" class="btn btn-ghost btn-xs">✏️ Edit</a>
+                <a href="${pageContext.request.contextPath}/editFlight?id=<%= f.id %>" class="btn btn-ghost btn-xs"><i class="ph-bold ph-pencil-simple"></i> Edit</a>
                 <form action="${pageContext.request.contextPath}/deleteFlight" method="post" style="margin:0"
                       onsubmit="return confirm('Delete flight <%= f.flightNo %>?')">
                   <input type="hidden" name="_csrf" value="<%= HtmlUtils.e(csrfToken) %>">
                   <input type="hidden" name="id"   value="<%= f.id %>">
-                  <button type="submit" class="btn btn-danger btn-xs">🗑 Delete</button>
+                  <button type="submit" class="btn btn-danger btn-xs"><i class="ph-bold ph-trash"></i> Delete</button>
                 </form>
                 <% } else { %>
                 <span class="badge badge-warning">Has Bookings</span>
@@ -197,12 +198,12 @@
 (function(){
   var btn = document.getElementById('themeToggle');
   if (btn) {
-    btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
     btn.addEventListener('click', function() {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('asTheme', next);
-      btn.textContent = next === 'dark' ? '☀️' : '🌙';
+      btn.textContent = next === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
     });
   }
   // Search handled server-side via form submission

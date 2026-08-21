@@ -23,25 +23,26 @@
 <title>All Bookings – AeroSphere Admin</title>
 <script>(function(){var t=localStorage.getItem('asTheme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assests/css/animations.css">
 <style>
 .admin-topbar{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--glass-bg);border-bottom:1px solid var(--border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
 .topbar-left{display:flex;align-items:center;gap:12px}
-.topbar-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.topbar-title{font-family:'Fraunces',sans-serif;font-size:.95rem;font-weight:700;color:var(--text);letter-spacing:-.02em}
 .topbar-right{display:flex;align-items:center;gap:8px}
 .sidebar-toggle-btn{display:none;width:36px;height:36px;background:var(--surface-0);border:1px solid var(--border-2);border-radius:var(--radius-sm);align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:border-color .2s}
 .sidebar-toggle-btn:hover{border-color:var(--primary)}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.page-title{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.04em;color:var(--text)}
+.page-title{font-family:'Fraunces',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.04em;color:var(--text)}
 .page-subtitle{font-size:.88rem;color:var(--text-muted);margin-top:4px}
 .filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
 .filter-wrap{display:flex;align-items:center;gap:10px;background:var(--surface-0);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;flex:1;min-width:200px;transition:border-color .2s}
 .filter-wrap:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
-.filter-wrap input{border:none;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;width:100%}
+.filter-wrap input{border:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;outline:none;width:100%}
 .filter-wrap input::placeholder{color:var(--text-muted)}
-.filter-select{padding:9px 14px;background:var(--surface-0);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;cursor:pointer;transition:border-color .2s}
+.filter-select{padding:9px 14px;background:var(--surface-0);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;outline:none;cursor:pointer;transition:border-color .2s}
 .filter-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
 .empty-state{text-align:center;padding:60px 24px}
 @media(max-width:900px){
@@ -68,11 +69,11 @@
   <main class="as-main">
     <div class="admin-topbar">
       <div class="topbar-left">
-        <button class="sidebar-toggle-btn" id="as-sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <button class="sidebar-toggle-btn" id="as-sidebar-toggle" aria-label="Toggle sidebar"><i class="ph-bold ph-list"></i></button>
         <span class="topbar-title">All Bookings</span>
       </div>
       <div class="topbar-right">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="ph-bold ph-moon"></i></button>
         <div class="user-pill">
           <div class="user-avatar"><%= adminFirst.charAt(0) %></div>
           <span><%= adminFirst %></span>
@@ -85,16 +86,16 @@
 
       <div class="page-header anim-fade-up">
         <div>
-          <h1 class="page-title">🎫 All Bookings</h1>
+          <h1 class="page-title"><i class="ph-bold ph-ticket"></i> All Bookings</h1>
           <p class="page-subtitle"><%= totalBookings %> total reservations — page <%= currentPage %> of <%= totalPages %></p>
         </div>
       </div>
 
-      <% if (cancelError   != null) { %><div class="alert alert-danger anim-fade-up"><span>⚠</span><span><%= cancelError %></span></div><% } %>
-      <% if (cancelSuccess != null) { %><div class="alert alert-success anim-fade-up"><span>✅</span><span><%= cancelSuccess %></span></div><% } %>
+      <% if (cancelError   != null) { %><div class="alert alert-danger anim-fade-up"><span><i class="ph-bold ph-warning"></i></span><span><%= cancelError %></span></div><% } %>
+      <% if (cancelSuccess != null) { %><div class="alert alert-success anim-fade-up"><span><i class="ph-bold ph-check-circle"></i></span><span><%= cancelSuccess %></span></div><% } %>
 
       <div class="filter-bar anim-fade-up">
-        <div class="filter-wrap"><span>🔍</span><input id="searchBox" type="text" placeholder="Search passenger, flight, route…"></div>
+        <div class="filter-wrap"><span><i class="ph-bold ph-magnifying-glass"></i></span><input id="searchBox" type="text" placeholder="Search passenger, flight, route…"></div>
         <select class="filter-select" id="statusFilter">
           <option value="">All Statuses</option>
           <option value="booked">Booked</option>
@@ -106,8 +107,8 @@
       <div class="table-wrap anim-fade-up">
         <% if (bookings == null || bookings.isEmpty()) { %>
           <div class="empty-state">
-            <div style="font-size:2.5rem;margin-bottom:12px">🎫</div>
-            <h3 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:6px">No bookings yet</h3>
+            <div style="font-size:2.5rem;margin-bottom:12px"><i class="ph-bold ph-ticket"></i></div>
+            <h3 style="font-family:'Fraunces',sans-serif;font-weight:700;margin-bottom:6px">No bookings yet</h3>
             <p style="color:var(--text-muted);font-size:.88rem">Bookings will appear here once users start reserving flights.</p>
           </div>
         <% } else { %>
@@ -125,15 +126,15 @@
           %>
           <tr>
             <td style="color:var(--text-muted)"><%= bi %></td>
-            <td style="color:var(--primary);font-family:'Syne',sans-serif;font-weight:700">#<%= b.id %></td>
+            <td style="color:var(--primary);font-family:'Fraunces',sans-serif;font-weight:700">#<%= b.id %></td>
             <td style="font-weight:600"><%= b.userName %></td>
-            <td><strong style="font-family:'Syne',sans-serif;color:var(--primary)"><%= b.flightNo %></strong></td>
+            <td><strong style="font-family:'Fraunces',sans-serif;color:var(--primary)"><%= b.flightNo %></strong></td>
             <td style="text-align:center;font-weight:600"><%= b.seats %></td>
-            <td style="color:var(--secondary);font-family:'Syne',sans-serif;font-weight:700">₹<%= String.format("%,.0f", b.amount) %></td>
+            <td style="color:var(--secondary);font-family:'Fraunces',sans-serif;font-weight:700">₹<%= String.format("%,.0f", b.amount) %></td>
             <td><span class="badge <%= bc %>"><%= st.substring(0,1).toUpperCase()+st.substring(1) %></span></td>
             <td style="font-size:.82rem;color:var(--text-muted)"><%= b.bookedOn != null ? b.bookedOn.toString().substring(0,10) : "—" %></td>
             <td>
-              <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= b.id %>" class="btn btn-ghost btn-xs">🎫 Invoice</a>
+              <a href="${pageContext.request.contextPath}/invoice?bookingId=<%= b.id %>" class="btn btn-ghost btn-xs"><i class="ph-bold ph-ticket"></i> Invoice</a>
             </td>
           </tr>
           <% } %>
@@ -173,12 +174,12 @@
 (function(){
   var btn = document.getElementById('themeToggle');
   if (btn) {
-    btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
     btn.addEventListener('click', function() {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('asTheme', next);
-      btn.textContent = next === 'dark' ? '☀️' : '🌙';
+      btn.textContent = next === 'dark' ? '<i class="ph-bold ph-sun"></i>' : '<i class="ph-bold ph-moon"></i>';
     });
   }
   // Filter
