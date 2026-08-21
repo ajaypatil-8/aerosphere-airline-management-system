@@ -36,7 +36,12 @@ public class AllFlightsServlet extends HttpServlet {
         List<Map<String, Object>> flights = new ArrayList<>();
         int totalFlights = 0;
 
-        String baseSql = "FROM flights WHERE TIMESTAMP(depart_date, depart_time) >= NOW()";
+        // Index-friendly rewrite: the old version wrapped both columns in
+        // TIMESTAMP(depart_date, depart_time) >= NOW(), which can't use any
+        // index and forces a full table scan on every request. Splitting the
+        // condition lets the DB use an index on (depart_date, depart_time).
+        String baseSql = "FROM flights WHERE (depart_date > CURDATE() " +
+                          "OR (depart_date = CURDATE() AND depart_time >= CURTIME()))";
 
         try (Connection con = DBConnection.getConnection()) {
 
