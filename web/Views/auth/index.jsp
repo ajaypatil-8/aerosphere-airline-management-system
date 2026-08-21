@@ -94,7 +94,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 .sf-wrap{display:flex;align-items:center;gap:8px;background:var(--s1);border:1.5px solid var(--border);border-radius:12px;padding:0 12px;transition:border-color .2s,box-shadow .2s}
 .sf-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
 .sf-icon{font-size:.9rem;flex-shrink:0;color:var(--faint)}
-.sf-wrap input,.sf-wrap select{flex:1;border:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:.87rem;padding:10px 0;outline:none}
+.sf-wrap input,.sf-wrap select{flex:1;min-width:0;border:none;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:.87rem;padding:10px 0;outline:none}
 .sf-wrap input::placeholder{color:var(--faint)}
 .sf-wrap select{appearance:none;cursor:pointer}
 input[type="date"]{color-scheme:light}
@@ -102,13 +102,13 @@ input[type="date"]{color-scheme:light}
 .swap-btn{width:44px;height:42px;border:1.5px solid var(--border);border-radius:12px;background:var(--s1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--muted);transition:all .2s;align-self:flex-end;font-family:inherit}
 .swap-btn:hover{border-color:var(--accent);color:var(--accent);transform:rotate(180deg)}
 .btn-search{height:42px;padding:0 18px;font-size:.85rem;align-self:flex-end;white-space:nowrap;border-radius:12px;flex-shrink:0}
-.search-route-row{display:grid;grid-template-columns:1fr 46px 1fr;gap:10px;align-items:end}
-.search-bottom-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-top:10px}
+.search-route-row{display:grid;grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);gap:10px;align-items:end}
+.search-bottom-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end;margin-top:10px}
 .search-mobile-row{display:none}
 
 /* ── Stats ── */
 .stats{padding:96px 24px 80px;display:flex;justify-content:center}
-.stats-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:900px;width:100%}
+.stats-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;max-width:900px;width:100%}
 .stat-card{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center;box-shadow:var(--sh);transition:all .25s}
 .stat-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);border-color:var(--accent)}
 .stat-num{font-family:'Fraunces',serif;font-size:2.1rem;font-weight:500;letter-spacing:-.02em;color:var(--text)}
@@ -122,7 +122,7 @@ input[type="date"]{color-scheme:light}
 .section-sub{color:var(--muted);font-size:.95rem;line-height:1.6;max-width:520px;margin:0 auto 48px}
 
 /* ── Testimonials ── */
-.testimonial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:left}
+.testimonial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;text-align:left}
 .testimonial-card{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);padding:26px 24px;box-shadow:var(--sh)}
 .testimonial-quote{color:var(--text);font-size:.92rem;line-height:1.6;margin-bottom:18px}
 .testimonial-who{display:flex;align-items:center;gap:10px}
@@ -131,7 +131,7 @@ input[type="date"]{color-scheme:light}
 .testimonial-route{font-size:.76rem;color:var(--muted)}
 
 /* ── Popular routes ── */
-.routes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.routes-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .route-card{background:var(--s0);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:left;transition:all .25s}
 .route-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--sh-lg)}
 .route-cities{font-weight:600;font-size:.9rem;color:var(--text);display:flex;align-items:center;gap:6px}
@@ -139,7 +139,7 @@ input[type="date"]{color-scheme:light}
 .route-price b{color:var(--accent);font-weight:600}
 
 /* ── Features ── */
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:left}
+.features-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;text-align:left}
 .feature-card{background:var(--s0);border:1.5px solid var(--border);border-radius:var(--r);padding:26px 22px;box-shadow:var(--sh);transition:all .25s;position:relative;overflow:hidden}
 .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform .3s;transform-origin:left}
 .feature-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:var(--sh-lg)}
@@ -150,7 +150,7 @@ input[type="date"]{color-scheme:light}
 .feature-desc{color:var(--muted);font-size:.85rem;line-height:1.55}
 
 /* ── How it works ── */
-.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center;position:relative}
+.how-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;text-align:center;position:relative}
 .how-grid::before{content:'';position:absolute;top:28px;left:12%;right:12%;height:1px;background:var(--border)}
 .step-num{width:56px;height:56px;border-radius:50%;background:var(--text);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--s0);margin:0 auto 14px;position:relative}
 .step-title{font-family:'Fraunces',serif;font-weight:500;font-size:.98rem;margin-bottom:6px}
@@ -184,23 +184,24 @@ input[type="date"]{color-scheme:light}
 @media(max-width:900px){
   .navbar{padding:0 20px}
   .nav-links{display:none}
+  .nav-right > a.btn{display:none}
   .hamburger{display:flex}
-  .stats-inner{grid-template-columns:repeat(2,1fr)}
-  .features-grid,.testimonial-grid{grid-template-columns:1fr 1fr}
-  .how-grid{grid-template-columns:1fr 1fr}
+  .stats-inner{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .features-grid,.testimonial-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .how-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .how-grid::before{display:none}
-  .routes-grid{grid-template-columns:1fr 1fr}
+  .routes-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .search-grid{display:none}
   .search-route-row,.search-bottom-row{display:grid}
   .search-mobile-row{display:grid}
 }
 @media(max-width:760px){.hero-search{padding:20px 16px}}
 @media(max-width:580px){
-  .features-grid,.how-grid,.testimonial-grid,.routes-grid{grid-template-columns:1fr}
+  .features-grid,.how-grid,.testimonial-grid,.routes-grid{grid-template-columns:minmax(0,1fr)}
   .hero-search{padding:16px 14px}
   .search-section{margin-top:-30px}
-  .search-route-row{grid-template-columns:1fr 36px 1fr;gap:7px}
-  .search-bottom-row{grid-template-columns:1fr 1fr;gap:7px}
+  .search-route-row{grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:7px}
+  .search-bottom-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
   .btn-search-mobile{grid-column:1/-1;width:100%;justify-content:center}
   .cta-card{padding:40px 22px}
   .footer{padding:20px 20px;flex-direction:column;text-align:center}
@@ -461,7 +462,7 @@ input[type="date"]{color-scheme:light}
   <div class="footer-brand">AeroSphere</div>
   <p class="footer-text">&copy; <%= new java.util.Date().getYear() + 1900 %> AeroSphere. Built with ☕ and ✈</p>
   <div class="footer-links">
-    <a href="${pageContext.request.contextPath}/privacyPolicy">Privacy</a><a href="${pageContext.request.contextPath}/termsOfService">Terms</a><a href="${pageContext.request.contextPath}/helpCenter">Support</a>
+    <a href="${pageContext.request.contextPath}/privacyPolicy">Privacy</a><a href="${pageContext.request.contextPath}/termsOfService">Terms</a><a href="${pageContext.request.contextPath}/help">Support</a>
   </div>
 </footer>
 
